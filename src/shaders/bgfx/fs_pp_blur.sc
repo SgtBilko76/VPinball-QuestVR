@@ -1,4 +1,8 @@
+#ifdef STEREO
+$input v_texcoord0, v_eye
+#else
 $input v_texcoord0
+#endif
 
 #include "common.sh"
 
@@ -9,7 +13,7 @@ $input v_texcoord0
 // Use e.g. https://observablehq.com/@s4l4x/efficient-gaussian-blur-with-linear-sampling to compute centered coefficients/offsets
 // Use e.g. https://www.intel.com/content/www/us/en/developer/articles/technical/an-investigation-of-fast-real-time-gpu-based-image-blur-algorithms.html to compue not centered coefficients/offsets
 
-SAMPLER2D(tex_fb_filtered,  0);
+SAMPLER2DSTEREO(tex_fb_filtered,  0);
 
 // w_h_height.xy contains inverse size of source texture (1/w, 1/h), i.e. one texel shift to the upper (DX)/lower (OpenGL) left texel. Since OpenGL has upside down textures it leads to a different texel if not sampled on both sides
 // . for bloom, w_h_height.z keeps strength
@@ -95,13 +99,13 @@ void main()
 #ifdef NO_CENTER
    vec3 result = vec3(0.0, 0.0, 0.0);
    UNROLL for(int i = 0; i < ARRAY_SIZE; ++i)
-      result += (texture2DLod(tex_fb_filtered, v_texcoord0.xy + OFS, 0.0).rgb
-                +texture2DLod(tex_fb_filtered, v_texcoord0.xy - OFS, 0.0).rgb) * weight[i];
+      result += (texStereoNoLod(tex_fb_filtered, v_texcoord0.xy + OFS).rgb
+                +texStereoNoLod(tex_fb_filtered, v_texcoord0.xy - OFS).rgb) * weight[i];
 #else
-   vec3 result = texture2DLod(tex_fb_filtered, v_texcoord0.xy, 0.0).rgb * weight[0];
+   vec3 result = texStereoNoLod(tex_fb_filtered, v_texcoord0.xy      ).rgb  * weight[0];
    UNROLL for(int i = 1; i < ARRAY_SIZE; ++i)
-      result += (texture2DLod(tex_fb_filtered, v_texcoord0.xy + OFS, 0.0).rgb
-                +texture2DLod(tex_fb_filtered, v_texcoord0.xy - OFS, 0.0).rgb) * weight[i];
+      result += (texStereoNoLod(tex_fb_filtered, v_texcoord0.xy + OFS).rgb
+                +texStereoNoLod(tex_fb_filtered, v_texcoord0.xy - OFS).rgb) * weight[i];
 #endif
 
 	gl_FragColor = vec4(result, 1.0);
