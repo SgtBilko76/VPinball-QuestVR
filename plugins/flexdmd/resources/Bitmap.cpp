@@ -1,5 +1,5 @@
 #include "Bitmap.h"
-#include "SDL3_Image/SDL_image.h"
+#include <SDL3_image/SDL_image.h>
 
 Bitmap::Bitmap(void* pData, AssetType assetType)
 {

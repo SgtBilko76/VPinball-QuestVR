@@ -2,7 +2,7 @@
 
 #include "VPXPlugin.h"
 #include "AssetSrc.h"
-#include "SDL3/SDL_surface.h"
+#include <SDL3/SDL_surface.h>
 
 class Bitmap
 {

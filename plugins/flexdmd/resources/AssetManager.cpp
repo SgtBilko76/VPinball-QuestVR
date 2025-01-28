@@ -9,8 +9,8 @@
 #include "RegionFilter.h"
 #include "VPXFile.h"
 
-#include "SDL3_Image/SDL_image.h"
-#include "SDL3/SDL_platform.h"
+#include <SDL3_image/SDL_image.h>
+#include <SDL3/SDL_platform.h>
 
 #include <sstream>
 
@@ -109,14 +109,14 @@ AssetSrc* AssetManager::ResolveSrc(const string& src, AssetSrc* pBaseSrc)
       if (m_vpxFile == nullptr && std::filesystem::exists(m_szBasePath + m_szTableFile))
       {
          m_vpxFile = new VPXFile(m_szBasePath + m_szTableFile);
-         //log.Info("Path for resolving VPX embedded ressources defined to '{0}'", _vpxFile.ToString());
+         //log.Info("Path for resolving VPX embedded resources defined to '{0}'", _vpxFile.ToString());
       }
       if (m_vpxFile != nullptr)
       {
          const string& file = m_vpxFile->GetImportFile(pAssetSrc->GetPath());
          if (file.empty())
          {
-            //log.Error("Embedded VPX ressource was not found: '{0}'", def.Path);
+            //log.Error("Embedded VPX resource was not found: '{0}'", def.Path);
          }
          else
          {
@@ -262,7 +262,7 @@ void* AssetManager::Open(AssetSrc* pSrc)
                }
             }
          #endif
-         path = path + "assets" + PATH_SEPARATOR_CHAR + pSrc->GetPath();
+         path = path + "plugins/flexdmd/assets" + PATH_SEPARATOR_CHAR + pSrc->GetPath();
          if (pSrc->GetAssetType() == AssetType_BMFont)
             pAsset = BitmapFont::Create(path);
          else if (pSrc->GetAssetType() != AssetType_GIF)
@@ -276,7 +276,7 @@ void* AssetManager::Open(AssetSrc* pSrc)
          if (m_vpxFile == nullptr && std::filesystem::exists(m_szBasePath + m_szTableFile))
          {
             m_vpxFile = new VPXFile(m_szBasePath + m_szTableFile);
-            //log.Info("Path for resolving VPX embedded ressources defined to '{0}'", _vpxFile.ToString());
+            //log.Info("Path for resolving VPX embedded resources defined to '{0}'", _vpxFile.ToString());
          }
          if (m_vpxFile != nullptr)
          {

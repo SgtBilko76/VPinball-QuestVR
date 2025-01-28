@@ -2,7 +2,7 @@
 
 #include "Bitmap.h"
 #include "common.h"
-#include "SDL3/SDL_surface.h"
+#include <SDL3/SDL_surface.h>
 
 class BitmapFilter
 {

@@ -133,9 +133,10 @@ std::pair<unsigned int, uint8_t*> VPXFile::ReadImage(const string& path, bool na
    }
    if (!entry.name.empty())
       m_images[to_lower(entry.name)] = entry;
+   return { 0, nullptr };
 }
 
-const string& VPXFile::GetImportFile(const string& path)
+const string VPXFile::GetImportFile(const string& path)
 {
    auto it = m_images.find(path);
    if (it != m_images.end())
