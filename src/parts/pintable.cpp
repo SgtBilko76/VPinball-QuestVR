@@ -1463,10 +1463,11 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
    m_filename = filename;
 
    // Load user custom settings before actually loading the table for settings applying during load
-   if (const std::filesystem::path iniPath = GetSettingsFileName(); FileExists(iniPath))
+   if (const std::filesystem::path iniPath = GetSettingsFileName(); !iniPath.empty())
    {
       m_settings.SetIniPath(iniPath);
-      m_settings.Load(false);
+      if (FileExists(iniPath))
+         m_settings.Load(false);
    }
 
    HRESULT hr;
