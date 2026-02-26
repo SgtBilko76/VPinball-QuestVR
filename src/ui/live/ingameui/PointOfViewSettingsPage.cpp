@@ -117,7 +117,7 @@ void PointOfViewSettingsPage::UpdateDefaults()
       const bool isFitted = (m_player->m_ptable->GetViewSetup().mViewHOfs == 0.f) && (m_player->m_ptable->GetViewSetup().mSceneScaleY == m_player->m_ptable->GetViewSetup().mSceneScaleX);
       defViewSetup.SetWindowAutofit(m_player->m_ptable, m_playerPos, m_player->m_renderer->GetDisplayAspectRatio(), 
          m_player->GetCabinetAutoFitPos(), isFitted,
-         [this](string info) { m_glassNotifId = m_player->m_liveUI->PushNotification(info, 10000, m_glassNotifId); });
+         [this](const string& info) { m_glassNotifId = m_player->m_liveUI->PushNotification(info, 10000, m_glassNotifId); });
    }
    else if (const bool portrait = m_player->m_playfieldWnd->GetWidth() < m_player->m_playfieldWnd->GetHeight(); m_player->m_ptable->GetViewMode() == BG_DESKTOP && !portrait)
    { // Desktop

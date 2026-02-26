@@ -472,7 +472,7 @@ Player::Player(PinTable *const table, const PlayMode playMode)
                std::ifstream myFile(path);
                buffer << myFile.rdbuf();
                myFile.close();
-               const string xml = buffer.str();
+               const string& xml = buffer.str();
                if (xmlDoc.Parse(xml.c_str()) == tinyxml2::XML_SUCCESS)
                   preloadCache = xmlDoc.FirstChildElement("textures");
             }
@@ -807,7 +807,7 @@ Player::~Player()
             std::stringstream buffer;
             buffer << myFile.rdbuf();
             myFile.close();
-            const string xml = buffer.str();
+            const string& xml = buffer.str();
             if (xmlDoc.Parse(xml.c_str()) == tinyxml2::XML_SUCCESS)
             {
                vector<tinyxml2::XMLElement *> toRemove;

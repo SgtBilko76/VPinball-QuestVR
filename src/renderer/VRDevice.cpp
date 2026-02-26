@@ -313,7 +313,7 @@ public:
       m_graphicsBinding.device = m_device;
    }
 
-   ~XRD3D11Backend()
+   ~XRD3D11Backend() override
    {
       D3D11_SAFE_RELEASE(m_immediateContext);
       D3D11_SAFE_RELEASE(m_device);
@@ -565,8 +565,8 @@ public:
             start = i + 1;
          }
       }
-      const char* ext_VK_EXT_shader_viewport_index_layer = "VK_EXT_shader_viewport_index_layer";
-      const char* ext_VK_KHR_fragment_shading_rate = "VK_KHR_fragment_shading_rate";
+      static const char* const ext_VK_EXT_shader_viewport_index_layer = "VK_EXT_shader_viewport_index_layer";
+      static const char* const ext_VK_KHR_fragment_shading_rate = "VK_KHR_fragment_shading_rate";
       deviceExtensions.push_back(ext_VK_EXT_shader_viewport_index_layer);
       //deviceExtensions.push_back(ext_VK_KHR_fragment_shading_rate);
 
@@ -643,7 +643,7 @@ public:
       m_graphicsBinding.queueIndex = 0;
    }
 
-   ~XRVulkanBackend() final
+   ~XRVulkanBackend() override
    {
       if (m_device != VK_NULL_HANDLE)
       {

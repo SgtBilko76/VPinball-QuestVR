@@ -167,39 +167,39 @@ static const char* glErrorToString(const int error)
 #if defined(_DEBUG) && !defined(__OPENGLES__)
 void APIENTRY GLDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* msg, const void* data)
 {
-   char* _source;
+   const char* _source;
    switch (source)
    {
-   case GL_DEBUG_SOURCE_API: _source = (LPSTR) "API"; break;
-   case GL_DEBUG_SOURCE_WINDOW_SYSTEM: _source = (LPSTR) "WINDOW SYSTEM"; break;
-   case GL_DEBUG_SOURCE_SHADER_COMPILER: _source = (LPSTR) "SHADER COMPILER"; break;
-   case GL_DEBUG_SOURCE_THIRD_PARTY: _source = (LPSTR) "THIRD PARTY"; break;
-   case GL_DEBUG_SOURCE_APPLICATION: _source = (LPSTR) "APPLICATION"; break;
-   case GL_DEBUG_SOURCE_OTHER: _source = (LPSTR) "UNKNOWN"; break;
-   default: _source = (LPSTR) "UNHANDLED"; break;
+   case GL_DEBUG_SOURCE_API: _source = "API"; break;
+   case GL_DEBUG_SOURCE_WINDOW_SYSTEM: _source = "WINDOW SYSTEM"; break;
+   case GL_DEBUG_SOURCE_SHADER_COMPILER: _source = "SHADER COMPILER"; break;
+   case GL_DEBUG_SOURCE_THIRD_PARTY: _source = "THIRD PARTY"; break;
+   case GL_DEBUG_SOURCE_APPLICATION: _source = "APPLICATION"; break;
+   case GL_DEBUG_SOURCE_OTHER: _source = "UNKNOWN"; break;
+   default: _source = "UNHANDLED"; break;
    }
-   char* _type;
+   const char* _type;
    switch (type)
    {
-   case GL_DEBUG_TYPE_ERROR: _type = (LPSTR) "ERROR"; break;
-   case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: _type = (LPSTR) "DEPRECATED BEHAVIOR"; break;
-   case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: _type = (LPSTR) "UNDEFINED BEHAVIOR"; break;
-   case GL_DEBUG_TYPE_PORTABILITY: _type = (LPSTR) "PORTABILITY"; break;
-   case GL_DEBUG_TYPE_PERFORMANCE: _type = (LPSTR) "PERFORMANCE"; break;
-   case GL_DEBUG_TYPE_OTHER: _type = (LPSTR) "OTHER"; break;
-   case GL_DEBUG_TYPE_MARKER: _type = (LPSTR) "MARKER"; break;
-   case GL_DEBUG_TYPE_PUSH_GROUP: _type = (LPSTR) "GL_DEBUG_TYPE_PUSH_GROUP"; break;
-   case GL_DEBUG_TYPE_POP_GROUP: _type = (LPSTR) "GL_DEBUG_TYPE_POP_GROUP"; break;
-   default: _type = (LPSTR) "UNHANDLED"; break;
+   case GL_DEBUG_TYPE_ERROR: _type = "ERROR"; break;
+   case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: _type = "DEPRECATED BEHAVIOR"; break;
+   case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: _type = "UNDEFINED BEHAVIOR"; break;
+   case GL_DEBUG_TYPE_PORTABILITY: _type = "PORTABILITY"; break;
+   case GL_DEBUG_TYPE_PERFORMANCE: _type = "PERFORMANCE"; break;
+   case GL_DEBUG_TYPE_OTHER: _type = "OTHER"; break;
+   case GL_DEBUG_TYPE_MARKER: _type = "MARKER"; break;
+   case GL_DEBUG_TYPE_PUSH_GROUP: _type = "GL_DEBUG_TYPE_PUSH_GROUP"; break;
+   case GL_DEBUG_TYPE_POP_GROUP: _type = "GL_DEBUG_TYPE_POP_GROUP"; break;
+   default: _type = "UNHANDLED"; break;
    }
-   char* _severity;
+   const char* _severity;
    switch (severity)
    {
-   case GL_DEBUG_SEVERITY_HIGH: _severity = (LPSTR) "HIGH"; break;
-   case GL_DEBUG_SEVERITY_MEDIUM: _severity = (LPSTR) "MEDIUM"; break;
-   case GL_DEBUG_SEVERITY_LOW: _severity = (LPSTR) "LOW"; break;
-   case GL_DEBUG_SEVERITY_NOTIFICATION: _severity = (LPSTR) "NOTIFICATION"; break;
-   default: _severity = (LPSTR) "UNHANDLED"; break;
+   case GL_DEBUG_SEVERITY_HIGH: _severity = "HIGH"; break;
+   case GL_DEBUG_SEVERITY_MEDIUM: _severity = "MEDIUM"; break;
+   case GL_DEBUG_SEVERITY_LOW: _severity = "LOW"; break;
+   case GL_DEBUG_SEVERITY_NOTIFICATION: _severity = "NOTIFICATION"; break;
+   default: _severity = "UNHANDLED"; break;
    }
    //if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
    if (type != GL_DEBUG_TYPE_MARKER && type != GL_DEBUG_TYPE_PUSH_GROUP && type != GL_DEBUG_TYPE_POP_GROUP)
@@ -796,7 +796,7 @@ RenderDevice::RenderDevice(
    
    // Select backend
    static const string bgfxRendererNames[bgfx::RendererType::Count + 1] = { "Noop"s, "Agc"s, "Direct3D11"s, "Direct3D12"s, "Gnm"s, "Metal"s, "Nvn"s, "OpenGLES"s, "OpenGL"s, "Vulkan"s, "Default"s };
-   const string gfxBackend = g_pplayer->m_ptable->m_settings.GetPlayer_GfxBackend();
+   const string& gfxBackend = g_pplayer->m_ptable->m_settings.GetPlayer_GfxBackend();
    bgfx::RendererType::Enum supportedRenderers[bgfx::RendererType::Count];
    const int nRendererSupported = bgfx::getSupportedRenderers(bgfx::RendererType::Count, supportedRenderers);
    string supportedRendererLog;

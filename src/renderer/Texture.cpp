@@ -741,9 +741,9 @@ std::shared_ptr<BaseTexture> BaseTexture::ToBGRA() const
          const float b = src[o * 3 + 2];
          const float l = r * 0.176204f + g * 0.812985f + b * 0.0108109f;
          const float n = (l * (float)(255. * 0.25) + 255.0f) / (l + 1.0f); // simple tonemap and scale by 255, overflow is handled by clamp below
-         tmp[o * 4 + 0] = (int)clamp(b * n, 0.f, 255.f);
-         tmp[o * 4 + 1] = (int)clamp(g * n, 0.f, 255.f);
-         tmp[o * 4 + 2] = (int)clamp(r * n, 0.f, 255.f);
+         tmp[o * 4 + 0] = (uint8_t)clamp(b * n, 0.f, 255.f);
+         tmp[o * 4 + 1] = (uint8_t)clamp(g * n, 0.f, 255.f);
+         tmp[o * 4 + 2] = (uint8_t)clamp(r * n, 0.f, 255.f);
          tmp[o * 4 + 3] = 255;
       }
    }
@@ -758,9 +758,9 @@ std::shared_ptr<BaseTexture> BaseTexture::ToBGRA() const
          const float b = half2float(src[o * 3 + 2]);
          const float l = r * 0.176204f + g * 0.812985f + b * 0.0108109f;
          const float n = (l * (float)(255. * 0.25) + 255.0f) / (l + 1.0f); // simple tonemap and scale by 255, overflow is handled by clamp below
-         tmp[o * 4 + 0] = (int)clamp(b * n, 0.f, 255.f);
-         tmp[o * 4 + 1] = (int)clamp(g * n, 0.f, 255.f);
-         tmp[o * 4 + 2] = (int)clamp(r * n, 0.f, 255.f);
+         tmp[o * 4 + 0] = (uint8_t)clamp(b * n, 0.f, 255.f);
+         tmp[o * 4 + 1] = (uint8_t)clamp(g * n, 0.f, 255.f);
+         tmp[o * 4 + 2] = (uint8_t)clamp(r * n, 0.f, 255.f);
          tmp[o * 4 + 3] = 255;
       }
    }

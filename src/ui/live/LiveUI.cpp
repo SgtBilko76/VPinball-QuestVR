@@ -416,7 +416,7 @@ void LiveUI::RenderUI()
                tex->BackendUserData = new std::shared_ptr<BaseTexture>();
             auto texture = static_cast<std::shared_ptr<BaseTexture> *>(tex->BackendUserData);
             BaseTexture::Update(*texture, tex->Width, tex->Height, BaseTexture::RGBA, static_cast<const uint8_t *>(tex->GetPixels()));
-            tex->SetTexID(m_renderer->m_renderDevice->m_texMan.LoadTexture((*texture).get(), false));
+            tex->SetTexID(m_renderer->m_renderDevice->m_texMan.LoadTexture(texture->get(), false));
             tex->SetStatus(ImTextureStatus_OK);
          }
          else if (tex->Status == ImTextureStatus_WantDestroy && tex->UnusedFrames > 0)

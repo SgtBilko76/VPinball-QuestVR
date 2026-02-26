@@ -294,7 +294,7 @@ public:
     static int GetIntTextbox(const CEdit &textbox)
     {
         int value;
-        const string t = textbox.GetWindowText().GetString();
+        const string& t = textbox.GetWindowText().GetString();
         return (std::from_chars(t.c_str(), t.c_str() + t.length(), value).ec == std::errc{}) ? value : 0;
     }
 

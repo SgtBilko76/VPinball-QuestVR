@@ -13,9 +13,6 @@
 namespace VPX::InGameUI
 {
 
-static constexpr const char* SELECT_TABLE_OR_GLOBAL = "Save globally or for table ?";
-static constexpr const char* CONFIRM_GLOBAL_SAVE = "Save to global setting ?";
-
 InGameUIPage::InGameUIPage(const string& title, const string& info, SaveMode saveMode)
    : m_player(g_pplayer)
    , m_title(title)
@@ -482,7 +479,7 @@ void InGameUIPage::Render(float elapsedS)
       {
          m_items.push_back(std::make_unique<InGameUIItem>(InGameUIItem::Type::ResetToStoredValues));
          ImGui::BeginDisabled(false);
-         highlighted = m_player->m_liveUI->m_inGameUI.IsFlipperNav() && (m_selectedItem == m_items.size() - 1);
+         highlighted = m_player->m_liveUI->m_inGameUI.IsFlipperNav() && (m_selectedItem == (int)m_items.size() - 1);
       }
       else
       {
@@ -514,7 +511,7 @@ void InGameUIPage::Render(float elapsedS)
          {
             m_items.push_back(std::make_unique<InGameUIItem>(InGameUIItem::Type::SaveChanges));
             ImGui::BeginDisabled(false);
-            highlighted = m_player->m_liveUI->m_inGameUI.IsFlipperNav() && (m_selectedItem == m_items.size() - 1);
+            highlighted = m_player->m_liveUI->m_inGameUI.IsFlipperNav() && (m_selectedItem == (int)m_items.size() - 1);
          }
          else
          {

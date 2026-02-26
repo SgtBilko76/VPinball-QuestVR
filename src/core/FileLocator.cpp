@@ -47,7 +47,7 @@ void FileLocator::SetupPrefPath()
 #endif
 
    // Preference are stored per minor version (grouping all minor revision together, as minor revisions are not allowed to need user setup changes)
-   const string versionPath(STR(VP_VERSION_MAJOR) "." STR(VP_VERSION_MINOR));
+   static const string versionPath(STR(VP_VERSION_MAJOR) "." STR(VP_VERSION_MINOR));
    m_prefPath = basePrefPath / versionPath;
    if (DirExists(m_prefPath))
       return;

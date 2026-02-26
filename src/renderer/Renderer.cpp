@@ -1242,7 +1242,7 @@ void Renderer::SetupDisplayRenderer(const bool isBackdrop, Vertex3D_NoTex2* vert
       eye.Normalize();
       const float tN = tangent.Length();
       const float btN = bitangent.Length();
-      const float depth = CMTOVPU(0.5f); // depth between glass and display
+      constexpr float depth = CMTOVPU(0.5f); // depth between glass and display
       parallaxU = (depth / tN) * tangent.Dot(eye) / tN;
       parallaxV = (depth / btN) * bitangent.Dot(eye) / btN;
    }
@@ -1831,7 +1831,7 @@ void Renderer::RenderDynamics()
    else
    {
       const vec4 fillColor = m_shadeMode == ShadeMode::NoDepthWireframe ? vec4(0.f, 0.f, 0.f, (float)(32. / 255.)) : vec4((float)(32. / 255.), (float)(32. / 255.), (float)(32. / 255.), 1.f);
-      const vec4 edgeColor(0.f, 0.f, 0.f, 1.f);
+      constexpr vec4 edgeColor{0.f, 0.f, 0.f, 1.f};
       for (IEditable* renderable : g_pplayer->m_vhitables)
          DrawWireframe(renderable, fillColor, edgeColor, m_shadeMode != ShadeMode::NoDepthWireframe);
    }
@@ -3095,8 +3095,8 @@ RenderTarget* Renderer::SetupAncillaryRenderTarget(VPXWindowId window, VPX::Rend
    assert(VPXWindowId::VPXWINDOW_Backglass <= window && window <= VPXWindowId::VPXWINDOW_Topper);
    static std::array<string, 3> renderPassNames = { "Backglass Render"s, "ScoreView Render"s, "Topper Render"s };
    static std::array<string, 3> hdrRTNames = { "BackglassBackBuffer"s, "ScoreViewBackBuffer"s, "TopperBackBuffer"s };
-   const string renderPassName = renderPassNames[window - VPXWindowId::VPXWINDOW_Backglass];
-   const string hdrRTName = hdrRTNames[window - VPXWindowId::VPXWINDOW_Backglass];
+   const string& renderPassName = renderPassNames[window - VPXWindowId::VPXWINDOW_Backglass];
+   const string& hdrRTName = hdrRTNames[window - VPXWindowId::VPXWINDOW_Backglass];
 
    // TODO implement rendering for VR (on a flasher)
    if (g_pplayer->m_vrDevice != nullptr)
@@ -3283,7 +3283,7 @@ void Renderer::RenderAncillaryWindow(VPXWindowId window, VPX::RenderOutput& outp
          {
             assert(false); // This is disabled for the time being
             static std::array<string, 3> tonemapPassNames = { "Backglass Tonemap"s, "ScoreView Tonemap"s, "Topper Tonemap"s };
-            const string tonemapPassName = tonemapPassNames[window - VPXWindowId::VPXWINDOW_Backglass];
+            const string& tonemapPassName = tonemapPassNames[window - VPXWindowId::VPXWINDOW_Backglass];
             const float jitter = (float)((msec() & 2047) / 1000.0);
             rd->ResetRenderState();
             rd->SetRenderState(RenderState::ZENABLE, RenderState::RS_FALSE);

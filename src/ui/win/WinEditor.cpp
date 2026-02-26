@@ -894,7 +894,6 @@ void WinEditor::DoPlay(const int playMode)
    }
 
    PLOGI << "Starting Play mode [table: " << table->m_tableName << ", play mode: " << playMode << ']';
-   bool initError = false;
 
    // Create the player on a (shallow) copy of the table, that will be animated by the script, animations, ...
    PinTable *live_table = table->CopyForPlay();

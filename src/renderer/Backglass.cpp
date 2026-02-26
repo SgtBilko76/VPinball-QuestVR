@@ -107,7 +107,7 @@ BackGlass::BackGlass(RenderDevice* const pd3dDevice, Texture * backgroundFallbac
       std::ifstream myFile(b2sFileName);
       buffer << myFile.rdbuf();
       myFile.close();
-      const string xml = buffer.str();
+      const string& xml = buffer.str();
       if (b2sTree.Parse(xml.c_str(), xml.size()))
       {
          PLOGE << "Failed to parse B2S file";

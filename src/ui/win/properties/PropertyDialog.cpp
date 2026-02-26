@@ -720,7 +720,7 @@ BOOL PropertyDialog::IsSubDialogMessage(MSG &msg) const
                 return TRUE;                    //disable enter key for any input otherwise the app would crash!?
             if (msg.message == WM_KEYDOWN && msg.wParam == VK_DELETE)
             {
-                const string className = GetFocus().GetClassName().GetString();
+                const string& className = GetFocus().GetClassName().GetString();
                 if (className != "Edit")
                 {
                     g_pvp->ParseCommand(ID_DELETE, false);
@@ -729,7 +729,7 @@ BOOL PropertyDialog::IsSubDialogMessage(MSG &msg) const
             }
             if (msg.message == WM_KEYDOWN && msg.wParam == VK_ESCAPE)
             {
-               const string className = GetFocus().GetClassName().GetString();
+               const string& className = GetFocus().GetClassName().GetString();
                // filter ESC-key otherwise VPX will enter an endless event loop!?
                if (className == "Edit" || className == "msctls_trackbar32" || className=="Button")
                   return TRUE;

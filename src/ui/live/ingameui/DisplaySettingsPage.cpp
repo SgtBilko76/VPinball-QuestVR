@@ -145,7 +145,7 @@ void DisplaySettingsPage::BuildPage()
       AddItem(std::make_unique<InGameUIItem>(
          VPX::Properties::BoolPropertyDef(""s, ""s, "Enable"s, "Enable rendering this display"s, false, false), //
          [this]() { return GetOutput(m_wndId).GetMode() != VPX::RenderOutput::OM_DISABLED; }, // Live
-         [this](Settings& settings) { return settings.GetWindow_Mode(m_wndId) != VPX::RenderOutput::OM_DISABLED; }, // Stored
+         [this](const Settings& settings) { return settings.GetWindow_Mode(m_wndId) != VPX::RenderOutput::OM_DISABLED; }, // Stored
          [this](bool v)
          {
             GetOutput(m_wndId).SetMode(m_player->m_ptable->m_settings, v ? VPX::RenderOutput::OM_EMBEDDED : VPX::RenderOutput::OM_DISABLED);
@@ -207,7 +207,7 @@ void DisplaySettingsPage::BuildWindowPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::EnumPropertyDef(""s, ""s, "Display"s, "Select the display output"s, false, 0, 0, m_displayNames), //
       [wndDisplay]() { return wndDisplay; }, // Live
-      [this](Settings& settings)
+      [this](const Settings& settings)
       {
          const string name = settings.GetWindow_Display(m_wndId);
          auto it = std::ranges::find_if(m_displays, [&name](const Window::DisplayConfig& display) { return display.displayName == name; });

@@ -63,7 +63,7 @@ VRSettingsPage::VRSettingsPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::IntPropertyDef(""s, ""s, "Color Key Red"s, ""s, false, 0, 255, 128), "%3d / 255"s, //
       [this]() { return m_arColorKey.r; }, //
-      [this](Settings& settings) { return settings.GetPlayerVR_PassthroughColor() & 0xFF; }, //
+      [this](const Settings& settings) { return settings.GetPlayerVR_PassthroughColor() & 0xFF; }, //
       [this](int, int v)
       {
          m_arColorKey.r = v;
@@ -74,7 +74,7 @@ VRSettingsPage::VRSettingsPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::IntPropertyDef(""s, ""s, "Color Key Green"s, ""s, false, 0, 255, 128), "%3d / 255"s, //
       [this]() { return m_arColorKey.g; }, //
-      [this](Settings& settings) { return (settings.GetPlayerVR_PassthroughColor() >> 8) & 0xFF; }, //
+      [this](const Settings& settings) { return (settings.GetPlayerVR_PassthroughColor() >> 8) & 0xFF; }, //
       [this](int, int v)
       {
          m_arColorKey.g = v;
@@ -85,7 +85,7 @@ VRSettingsPage::VRSettingsPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::IntPropertyDef(""s, ""s, "Color Key Blue"s, ""s, false, 0, 255, 128), "%3d / 255"s, //
       [this]() { return m_arColorKey.b; }, //
-      [this](Settings& settings) { return (settings.GetPlayerVR_PassthroughColor() >> 16) & 0xFF; }, //
+      [this](const Settings& settings) { return (settings.GetPlayerVR_PassthroughColor() >> 16) & 0xFF; }, //
       [this](int, int v)
       {
          m_arColorKey.b = v;

@@ -231,9 +231,9 @@ void LightSeq::RenderSetup(RenderDevice *device)
          {
              Flasher* const pFlasher = (Flasher*)m_pcollection->m_visel.ElementAt(i);
              pFlasher->get_X(&x);
-             pFlasher->get_Y(&y);             
+             pFlasher->get_Y(&y);
          }
-         else if (type == eItemPrimitive)
+         else //if (type == eItemPrimitive)
          {
              Primitive* const pPrimitive = (Primitive*)m_pcollection->m_visel.ElementAt(i);
              pPrimitive->get_X(&x);

@@ -83,7 +83,7 @@ void MiscSettingsPage::BuildPage()
          VPX::Properties::EnumPropertyDef(
             ""s, ""s, "Scene Lighting"s, "Select how scene lighting is evaluated"s, false, 0, 0, vector { "Table's default"s, "Custom fixed value"s, "Time of day"s }),
          [this]() { return (int) m_player->m_renderer->m_sceneLighting.GetMode(); }, // Live
-         [this](Settings& settings)
+         [this](const Settings& settings)
          { 
             if (!settings.GetPlayer_OverrideTableEmissionScale())
                return 0;

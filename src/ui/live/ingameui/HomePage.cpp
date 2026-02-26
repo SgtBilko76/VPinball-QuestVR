@@ -157,7 +157,7 @@ void HomePage::Render(float elapsedMs)
          info << "By " << m_player->m_ptable->m_author << ", ";
       if (!m_player->m_ptable->m_version.empty())
          info << "Version: " << m_player->m_ptable->m_version;
-      info << " (" << (!m_player->m_ptable->m_dateSaved.empty() ? m_player->m_ptable->m_dateSaved : "N.A."s) << " Revision " << m_player->m_ptable->m_numTimesSaved << ")\n";
+      info << " (" << (!m_player->m_ptable->m_dateSaved.empty() ? m_player->m_ptable->m_dateSaved : "N/A"s) << " Revision " << m_player->m_ptable->m_numTimesSaved << ")\n";
 
       constexpr ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus // Prevent focus issues
          | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings;

@@ -708,7 +708,7 @@ void Surface::ExportMesh(ObjLoader& loader)
    {
       Vertex3D_NoTex2 * const tmp = new Vertex3D_NoTex2[m_numVertices * 5];
       memcpy(tmp, sideBuf.data(), sizeof(Vertex3D_NoTex2) * m_numVertices * 4);
-      memcpy(&tmp[m_numVertices * 4], topBuf.data(), sizeof(Vertex3D_NoTex2)*m_numVertices);
+      memcpy(tmp + m_numVertices * 4, topBuf.data(), sizeof(Vertex3D_NoTex2)*m_numVertices);
       loader.WriteObjectName(name);
       loader.WriteVertexInfo(tmp, m_numVertices * 5);
       delete[] tmp;
@@ -716,7 +716,7 @@ void Surface::ExportMesh(ObjLoader& loader)
       const Material * const mat = m_ptable->GetMaterial(m_d.m_szTopMaterial);
       loader.WriteMaterial(m_d.m_szTopMaterial, string(), mat);
       loader.UseTexture(m_d.m_szTopMaterial);
-      WORD * const idx = new WORD[topBottomIndices.size() + sideIndices.size()];
+      WORD * const __restrict idx = new WORD[topBottomIndices.size() + sideIndices.size()];
       memcpy(idx, sideIndices.data(), sideIndices.size()*sizeof(WORD));
       for (size_t i = 0; i < topBottomIndices.size(); i++)
          idx[sideIndices.size() + i] = topBottomIndices[i] + m_numVertices * 4;
@@ -773,8 +773,8 @@ void Surface::RenderSetup(RenderDevice *device)
       const float slingtop = (m_d.m_heighttop - m_d.m_heightbottom) * 0.8f + m_d.m_heightbottom;
       const unsigned int n_lines = static_cast<const unsigned int>(m_vlinesling.size());
 
-      Vertex3D_NoTex2 *const rgv3D = new Vertex3D_NoTex2[n_lines * 9];
-      unsigned short *const rgIdx = new unsigned short[n_lines * 24];
+      Vertex3D_NoTex2 *const __restrict rgv3D = new Vertex3D_NoTex2[n_lines * 9];
+      unsigned short *const __restrict rgIdx = new unsigned short[n_lines * 24];
 
       unsigned int offset = 0, offsetIdx = 0;
       for (size_t i = 0; i < n_lines; i++, offset += 9, offsetIdx += 24)

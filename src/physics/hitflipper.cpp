@@ -774,7 +774,7 @@ float HitFlipper::HitTestFlipperFace(const BallS& ball, const float dtime, Colli
       dp = bffnd;                        // remember
    } //for loop
 
-   //+++ End time interation loop found time t soultion ++++++
+   //+++ End time interation loop found time t solution ++++++
 
    if (infNaN(t) || t < 0.f || t > dtime                             // time is outside this frame ... no collision
       ||
