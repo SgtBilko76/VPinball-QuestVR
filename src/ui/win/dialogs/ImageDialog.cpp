@@ -183,7 +183,7 @@ INT_PTR ImageDialog::DialogProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
                {
                   return FALSE;
                }
-               ListView_SetItemText(hSoundlist, pinfo->item.iItem, 0, pinfo->item.pszText);
+               ListView_SetItemText_Safe(hSoundlist, pinfo->item.iItem, 0, pinfo->item.pszText);
                LVITEM lvitem;
                lvitem.mask = LVIF_PARAM;
                lvitem.iItem = pinfo->item.iItem;
@@ -876,20 +876,17 @@ int ImageDialog::AddListImage(HWND hwndListView, const Texture *const ppi)
 
    const int index = ListView_InsertItem(hwndListView, &lvitem);
 
-   {
-   ListView_SetItemText(hwndListView, index, 1, (LPSTR)ppi->GetFilePath().c_str());
-   const string sizeString = std::to_string(ppi->m_width) + 'x' + std::to_string(ppi->m_height);
-   ListView_SetItemText(hwndListView, index, 2, (LPSTR)sizeString.c_str());
-   ListView_SetItemText(hwndListView, index, 3, (LPSTR)usedStringNo);
-   }
+   ListView_SetItemText_Safe(hwndListView, index, 1, ppi->GetFilePath().string().c_str());
+   ListView_SetItemText_Safe(hwndListView, index, 2, (std::to_string(ppi->m_width) + 'x' + std::to_string(ppi->m_height)).c_str());
+   ListView_SetItemText_Safe(hwndListView, index, 3, usedStringNo);
 
    m_overallFilesize += ppi->GetFileSize();
    m_overallGPUsize += ppi->GetEstimatedGPUSize();
-   ListView_SetItemText(hwndListView, index, 4, (LPSTR)SizeToReadable(ppi->GetFileSize()).c_str());
-   ListView_SetItemText(hwndListView, index, 5, (LPSTR)SizeToReadable(ppi->GetEstimatedGPUSize()).c_str());
+   ListView_SetItemText_Safe(hwndListView, index, 4, SizeToReadable(ppi->GetFileSize()).c_str());
+   ListView_SetItemText_Safe(hwndListView, index, 5, SizeToReadable(ppi->GetEstimatedGPUSize()).c_str());
 
    const char *format = ppi->IsHDR() ? (ppi->IsOpaque() ? "RGB_ HDR" : "RGBA HDR") : (ppi->IsOpaque() ? "RGB_" : "RGBA");
-   ListView_SetItemText(hwndListView, index, 6, (LPSTR)format);
+   ListView_SetItemText_Safe(hwndListView, index, 6, format);
 
    CCO(PinTable) *const pt = g_pvp->GetActiveTable();
    if (pt)
@@ -899,7 +896,7 @@ int ImageDialog::AddListImage(HWND hwndListView, const Texture *const ppi)
        || StrCompareNoCase(pt->m_BG_image[BG_DESKTOP], ppi->m_name) || StrCompareNoCase(pt->m_BG_image[BG_FSS], ppi->m_name)
        || StrCompareNoCase(pt->m_BG_image[BG_FULLSCREEN], ppi->m_name) || StrCompareNoCase(pt->m_imageColorGrade, ppi->m_name))
       {
-         ListView_SetItemText(hwndListView, index, 3, (LPSTR)usedStringYes);
+         ListView_SetItemText_Safe(hwndListView, index, 3, usedStringYes);
       }
       else
       {
@@ -1003,7 +1000,7 @@ int ImageDialog::AddListImage(HWND hwndListView, const Texture *const ppi)
 
             if (inUse)
             {
-               ListView_SetItemText(hwndListView, index, 3, (LPSTR)usedStringYes);
+               ListView_SetItemText_Safe(hwndListView, index, 3, usedStringYes);
                break;
             }
          } //for

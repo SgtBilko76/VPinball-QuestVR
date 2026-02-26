@@ -893,7 +893,7 @@ HRESULT PinTable::SaveToStorage(IStorage *pstgRoot, VPXFileFeedback& feedback)
          if (SUCCEEDED(hr = SaveData(pstmGame, hch, false)))
          {
             // Move PartGroup ahead of objects they contain, so that they are saved first
-            std::stable_partition(m_vedit.begin(), m_vedit.end(), [](IEditable *p) { return p->GetItemType() == ItemTypeEnum::eItemPartGroup; });
+            std::ranges::stable_partition(m_vedit.begin(), m_vedit.end(), [](IEditable *p) { return p->GetItemType() == ItemTypeEnum::eItemPartGroup; });
             for (size_t i = 0; i < m_vedit.size(); i++)
             {
                const wstring wStmName = L"GameItem" + std::to_wstring(i);
@@ -1852,7 +1852,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
          }
 
          // Since 10.8.1, layers have been replaced by groups with properties, remove temporary groups created during loading, and keep partgroups at the beginning of the list.
-         std::stable_partition(m_vedit.begin(), m_vedit.end(), [](IEditable *p) { return p->GetItemType() == ItemTypeEnum::eItemPartGroup; });
+         std::ranges::stable_partition(m_vedit.begin(), m_vedit.end(), [](IEditable *p) { return p->GetItemType() == ItemTypeEnum::eItemPartGroup; });
          auto removeLegacyLayers = std::stable_partition(m_vedit.begin(), m_vedit.end(),
             [&](IEditable *editable)
             {
@@ -2039,7 +2039,7 @@ void PinTable::LoadScriptOverride(const std::filesystem::path& scriptPath)
    
    std::streamsize size = file.tellg();
    file.seekg(0, std::ios::beg);
-   std::vector<char> buffer(size);
+   std::vector<char> buffer((size_t)size);
    if (!file.read(buffer.data(), size)) {
       PLOGE << "Failed to read script file";
       return;
@@ -2653,7 +2653,7 @@ int PinTable::AddListBinary(HWND hwndListView, PinBinary *ppb)
 
    const int index = ListView_InsertItem(hwndListView, &lvitem);
 
-   ListView_SetItemText(hwndListView, index, 1, (LPSTR)ppb->m_path.c_str());
+   ListView_SetItemText_Safe(hwndListView, index, 1, ppb->m_path.string().c_str());
 
    return index;
 #else
@@ -2715,8 +2715,7 @@ int PinTable::AddListCollection(HWND hwndListView, CComObject<Collection> *pcol)
    const int index = ListView_InsertItem(hwndListView, &lvitem);
    delete [] szT;
 
-   string count = std::to_string(pcol->m_visel.size());
-   ListView_SetItemText(hwndListView, index, 1, const_cast<char*>(count.c_str()));
+   ListView_SetItemText_Safe(hwndListView, index, 1, std::to_string(pcol->m_visel.size()).c_str());
    return index;
 #else
    return 0;
@@ -3297,7 +3296,7 @@ void PinTable::ExportTableMesh()
    // user cancelled
    if (ret == 0)
       return;// S_FALSE;
-   const string filename = string(szObjFileName);
+   const string filename = szObjFileName;
 
    ObjLoader loader;
    loader.ExportStart(filename);
@@ -3369,7 +3368,7 @@ void PinTable::ImportBackdropPOV(const std::filesystem::path &filename)
          std::ifstream myFile(file);
          buffer << myFile.rdbuf();
          myFile.close();
-         const string xml = buffer.str();
+         const string& xml = buffer.str();
          if (xmlDoc.Parse(xml.c_str()))
          {
             ShowError("Error parsing POV XML file");
@@ -4355,10 +4354,10 @@ int PinTable::AddListMaterial(HWND hwndListView, Material * const pmat)
    lvitem.lParam = (size_t)pmat;
 
    const int index = ListView_InsertItem(hwndListView, &lvitem);
-   ListView_SetItemText(hwndListView, index, 1, (LPSTR)usedStringNo);
+   ListView_SetItemText_Safe(hwndListView, index, 1, usedStringNo);
    if(pmat->m_name == m_playfieldMaterial)
    {
-      ListView_SetItemText(hwndListView, index, 1, (LPSTR)usedStringYes);
+      ListView_SetItemText_Safe(hwndListView, index, 1, usedStringYes);
    }
    else
    {
@@ -4462,7 +4461,7 @@ int PinTable::AddListMaterial(HWND hwndListView, Material * const pmat)
 
          if (inUse)
          {
-            ListView_SetItemText(hwndListView, index, 1, (LPSTR)usedStringYes);
+            ListView_SetItemText_Safe(hwndListView, index, 1, usedStringYes);
             break;
          }
       }//for
@@ -4748,7 +4747,7 @@ int PinTable::AddListItem(HWND hwndListView, const string& szName, const string&
 
    const int index = ListView_InsertItem(hwndListView, &lvitem);
 
-   ListView_SetItemText(hwndListView, index, 1, (char*)szValue1.c_str());
+   ListView_SetItemText_Safe(hwndListView, index, 1, szValue1.c_str());
 
    return index;
 #else
@@ -6275,7 +6274,7 @@ void PinTable::ImportVPP(const std::filesystem::path &filename)
       std::ifstream myFile(filename);
       buffer << myFile.rdbuf();
       myFile.close();
-      const string xml = buffer.str();
+      const string& xml = buffer.str();
 
       if (xmlDoc.Parse(xml.c_str()))
       {

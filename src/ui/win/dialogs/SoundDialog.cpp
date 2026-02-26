@@ -166,34 +166,31 @@ int SoundDialog::AddListSound(const VPX::Sound *const pps)
 
    const int index = ListView_InsertItem(hSoundList, &lvitem);
 
-   ListView_SetItemText(hSoundList, index, 1, (LPSTR)pps->GetImportPath().c_str());
+   ListView_SetItemText_Safe(hSoundList, index, 1, pps->GetImportPath().string().c_str());
 
    const string pan = f2sz(dequantizeSignedPercent(pps->GetPan()));
-   ListView_SetItemText(hSoundList, index, 3, (LPSTR)pan.c_str());
+   ListView_SetItemText_Safe(hSoundList, index, 3, pan.c_str());
    const string frontRear = f2sz(dequantizeSignedPercent(pps->GetFrontRearFade()));
-   ListView_SetItemText(hSoundList, index, 4, (LPSTR)frontRear.c_str());
+   ListView_SetItemText_Safe(hSoundList, index, 4, frontRear.c_str());
    const string volume = f2sz(dequantizeSignedPercent(pps->GetVolume()));
-   ListView_SetItemText(hSoundList, index, 5, (LPSTR)volume.c_str());
+   ListView_SetItemText_Safe(hSoundList, index, 5, volume.c_str());
 
    auto infos = m_audioPlayer->GetSoundInformations(pps);
-   string tmp = std::to_string(infos.sampleFrequency);
-   ListView_SetItemText(hSoundList, index, 6, (LPSTR)tmp.c_str());
-   tmp = std::to_string(infos.nChannels);
-   ListView_SetItemText(hSoundList, index, 7, (LPSTR)tmp.c_str());
-   tmp = f2sz(infos.lengthInSeconds);
-   ListView_SetItemText(hSoundList, index, 8, (LPSTR)tmp.c_str());
+   ListView_SetItemText_Safe(hSoundList, index, 6, std::to_string(infos.sampleFrequency).c_str());
+   ListView_SetItemText_Safe(hSoundList, index, 7, std::to_string(infos.nChannels).c_str());
+   ListView_SetItemText_Safe(hSoundList, index, 8, f2sz(infos.lengthInSeconds).c_str());
 
    switch (pps->GetOutputTarget())
    {
    case VPX::SNDOUT_BACKGLASS:
-      ListView_SetItemText(hSoundList, index, 2, (LPSTR) "Backglass");
+      ListView_SetItemText_Safe(hSoundList, index, 2, "Backglass");
       break;
    case VPX::SNDOUT_TABLE:
-      ListView_SetItemText(hSoundList, index, 2, (LPSTR)(infos.nChannels != 1 ? "** Table **" : "Table"));
+      ListView_SetItemText_Safe(hSoundList, index, 2, infos.nChannels != 1 ? "** Table **" : "Table");
       break;
    default:
       assert(false);
-      ListView_SetItemText(hSoundList, index, 2, (LPSTR) "Table");
+      ListView_SetItemText_Safe(hSoundList, index, 2, "Table");
       break;
    }
 
@@ -233,7 +230,7 @@ INT_PTR SoundDialog::DialogProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
                     NMLVDISPINFO *const pinfo = (NMLVDISPINFO *)lParam;
                     if (pinfo->item.pszText == nullptr || pinfo->item.pszText[0] == '\0')
                         return FALSE;
-                    ListView_SetItemText( hSoundList, pinfo->item.iItem, 0, pinfo->item.pszText );
+                    ListView_SetItemText_Safe(hSoundList, pinfo->item.iItem, 0, pinfo->item.pszText);
                     LVITEM lvitem;
                     lvitem.mask = LVIF_PARAM;
                     lvitem.iItem = pinfo->item.iItem;
@@ -438,7 +435,7 @@ void SoundDialog::ReImportFrom()
                 VPX::Sound *const pps = (VPX::Sound *)lvitem.lParam;
 
                 pt->ReImportSound(pps, szFileName[0] );
-                ListView_SetItemText( hSoundList, sel, 1, (LPSTR)szFileName[0].c_str() );
+                ListView_SetItemText_Safe(hSoundList, sel, 1, szFileName[0].c_str());
 
                 const size_t index = szFileName[0].find_last_of(PATH_SEPARATOR_CHAR);
                 if (index != string::npos)
@@ -571,11 +568,11 @@ void SoundDialog::SoundToBG()
             switch (pps->GetOutputTarget())
             {
                case VPX::SNDOUT_BACKGLASS:
-                  ListView_SetItemText(hSoundList, sel, 2, (LPSTR)"Backglass");
+                  ListView_SetItemText_Safe(hSoundList, sel, 2, "Backglass");
                   break;
                case VPX::SNDOUT_TABLE:
                default:
-                  ListView_SetItemText(hSoundList, sel, 2, (LPSTR)"Table");
+                  ListView_SetItemText_Safe(hSoundList, sel, 2, "Table");
                   break;
             }
             pt->SetNonUndoableDirty(eSaveDirty);

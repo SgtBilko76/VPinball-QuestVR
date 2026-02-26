@@ -75,11 +75,8 @@ void CollectionManagerDialog::EditCollection()
         if (colDlg->DoModal() >= 0)
             pt->m_table->SetNonUndoableDirty(eSaveDirty);
 
-        char * const szT = MakeChar(pcol->m_wzName);
-        ListView_SetItemText(hListHwnd, sel, 0, szT);
-        delete [] szT;
-        string count = std::to_string(pcol->m_visel.size());
-        ListView_SetItemText(hListHwnd, sel, 1, const_cast<char*>(count.c_str()));
+        ListView_SetItemText_Safe(hListHwnd, sel, 0, MakeString(pcol->m_wzName).c_str());
+        ListView_SetItemText_Safe(hListHwnd, sel, 1, std::to_string(pcol->m_visel.size()).c_str());
     }
 }
 
@@ -118,8 +115,7 @@ INT_PTR CollectionManagerDialog::DialogProc(UINT uMsg, WPARAM wParam, LPARAM lPa
                        lvitem.iSubItem = 0;
                        ListView_GetItem(hListHwnd, &lvitem);
                        const Collection * const pcol = (Collection *)lvitem.lParam;
-                       const string tmp = std::to_string(pcol->m_visel.size());
-                       ListView_SetItemText(hListHwnd, i, 1, (LPSTR)tmp.c_str());
+                       ListView_SetItemText_Safe(hListHwnd, i, 1, std::to_string(pcol->m_visel.size()).c_str());
                     }
                 }
             }
@@ -143,7 +139,7 @@ INT_PTR CollectionManagerDialog::DialogProc(UINT uMsg, WPARAM wParam, LPARAM lPa
                 }
                 pt->m_table->RenameCollection(pcol, newName);
                 if (hListHwnd)
-                   ListView_SetItemText(hListHwnd, pinfo->item.iItem, 0, (char *)MakeString(pcol->m_wzName).c_str());
+                   ListView_SetItemText_Safe(hListHwnd, pinfo->item.iItem, 0, MakeString(pcol->m_wzName).c_str());
                 pt->m_table->SetNonUndoableDirty(eSaveDirty);
                 return TRUE;
             }
@@ -215,11 +211,8 @@ BOOL CollectionManagerDialog::OnCommand(WPARAM wParam, LPARAM lParam)
                 lvitem1.mask = LVIF_PARAM;
                 lvitem1.iItem = idx - 1;
                 ListView_InsertItem(hListHwnd, &lvitem1);
-                char * const szT = MakeChar(pcol->m_wzName);
-                ListView_SetItemText(hListHwnd, idx - 1, 0, szT);
-                delete [] szT;
-                const string tmp = std::to_string(pcol->m_visel.size());
-                ListView_SetItemText(hListHwnd, idx - 1, 1, (LPSTR)tmp.c_str());
+                ListView_SetItemText_Safe(hListHwnd, idx - 1, 0, MakeString(pcol->m_wzName).c_str());
+                ListView_SetItemText_Safe(hListHwnd, idx - 1, 1, std::to_string(pcol->m_visel.size()).c_str());
 
                 ListView_SetItemState(hListHwnd, -1, 0, LVIS_SELECTED);
                 ListView_SetItemState(hListHwnd, idx - 1, LVIS_SELECTED, LVIS_SELECTED);
@@ -244,11 +237,8 @@ BOOL CollectionManagerDialog::OnCommand(WPARAM wParam, LPARAM lParam)
                 lvitem1.mask = LVIF_PARAM;
                 lvitem1.iItem = idx + 1;
                 ListView_InsertItem(hListHwnd, &lvitem1);
-                char * const szT = MakeChar(pcol->m_wzName);
-                ListView_SetItemText(hListHwnd, idx + 1, 0, szT);
-                delete [] szT;
-                const string tmp = std::to_string(pcol->m_visel.size());
-                ListView_SetItemText(hListHwnd, idx + 1, 1, (LPSTR)tmp.c_str());
+                ListView_SetItemText_Safe(hListHwnd, idx + 1, 0, MakeString(pcol->m_wzName).c_str());
+                ListView_SetItemText_Safe(hListHwnd, idx + 1, 1, std::to_string(pcol->m_visel.size()).c_str());
 
                 ListView_SetItemState(hListHwnd, -1, 0, LVIS_SELECTED);
                 ListView_SetItemState(hListHwnd, idx + 1, LVIS_SELECTED, LVIS_SELECTED);

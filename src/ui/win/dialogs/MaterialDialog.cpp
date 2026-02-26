@@ -749,7 +749,7 @@ INT_PTR MaterialDialog::DialogProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
                if (pt->IsMaterialNameUnique(pinfo->item.pszText))
                {
                   pmat->m_name = pinfo->item.pszText;
-                  ListView_SetItemText(m_hMaterialList, pinfo->item.iItem, 0, pinfo->item.pszText);
+                  ListView_SetItemText_Safe(m_hMaterialList, pinfo->item.iItem, 0, pinfo->item.pszText);
                }
                else
                {
@@ -761,7 +761,7 @@ INT_PTR MaterialDialog::DialogProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
                      suffix++;
                   } while (!pt->IsMaterialNameUnique(textBuf));
                   pmat->m_name = textBuf;
-                  ListView_SetItemText(m_hMaterialList, pinfo->item.iItem, 0, (LPSTR)pmat->m_name.c_str());
+                  ListView_SetItemText_Safe(m_hMaterialList, pinfo->item.iItem, 0, pmat->m_name.c_str());
                }
                pt->SetNonUndoableDirty(eSaveDirty);
                pt->UpdatePropertyMaterialList();
