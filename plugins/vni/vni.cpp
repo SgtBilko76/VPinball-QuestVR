@@ -206,8 +206,8 @@ static void OnControllerGameStart(const unsigned int eventId, void* userData, vo
 
    std::filesystem::path vniBasePath = vniPathProp_Get();
    const std::string gameId = msg->gameId;
-   const std::filesystem::path palFile = gameId + ".pal"s;
-   const std::filesystem::path vniFile = gameId + ".vni"s;
+   const std::filesystem::path palFile = gameId + ".pal";
+   const std::filesystem::path vniFile = gameId + ".vni";
    const std::filesystem::path pin2dmdPal = "pin2dmd.pal"s;
    const std::filesystem::path pin2dmdVni = "pin2dmd.vni"s;
 

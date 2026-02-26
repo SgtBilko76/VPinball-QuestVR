@@ -592,9 +592,9 @@ void FormBackglass::LoadB2SData()
    }
 
    // get all score infos
-   int dream7index = 1;
-   int renderedandreelindex = 1;
    if (topnode->FirstChildElement("Scores")) {
+      int dream7index = 1;
+      int renderedandreelindex = 1;
       int rollinginterval = 0;
       if (topnode->FirstChildElement("Scores")->FindAttribute("ReelRollingInterval"))
          rollinginterval = topnode->FirstChildElement("Scores")->IntAttribute("ReelRollingInterval");

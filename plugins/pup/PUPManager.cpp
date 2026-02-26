@@ -16,19 +16,19 @@ MSGPI_INT_VAL_SETTING(pupBGPadLeft, "BGPadLeft", "Backglass Left Pad", "Left Pad
 MSGPI_INT_VAL_SETTING(pupBGPadRight, "BGPadRight", "Backglass Right Pad", "Right Padding of backglass", true, 0, 4096, 0);
 MSGPI_INT_VAL_SETTING(pupBGPadTop, "BGPadTop", "Backglass Top Pad", "Top Padding of backglass", true, 0, 4096, 0);
 MSGPI_INT_VAL_SETTING(pupBGPadBottom, "BGPadBottom", "Backglass Bottom Pad", "Bottom Padding of backglass", true, 0, 4096, 0);
-MSGPI_STRING_VAL_SETTING(pupBGFrameOverlayPath, "BGFrameOverlay", "Backglass Frame Overlay", "Path to an image that will be rendered as an ovelray on the backglass display", true, "", 1024);
+MSGPI_STRING_VAL_SETTING(pupBGFrameOverlayPath, "BGFrameOverlay", "Backglass Frame Overlay", "Path to an image that will be rendered as an overlay on the backglass display", true, "", 1024);
 
 MSGPI_INT_VAL_SETTING(pupSVPadLeft, "SVPadLeft", "Score View Left Pad", "Left Padding of Score View", true, 0, 4096, 0);
 MSGPI_INT_VAL_SETTING(pupSVPadRight, "SVPadRight", "Score View Right Pad", "Right Padding of Score View", true, 0, 4096, 0);
 MSGPI_INT_VAL_SETTING(pupSVPadTop, "SVPadTop", "Score View Top Pad", "Top Padding of Score View", true, 0, 4096, 0);
 MSGPI_INT_VAL_SETTING(pupSVPadBottom, "SVPadBottom", "Score View Bottom Pad", "Bottom Padding of Score View", true, 0, 4096, 0);
-MSGPI_STRING_VAL_SETTING(pupSVFrameOverlayPath, "SVFrameOverlay", "Score View Frame Overlay", "Path to an image that will be rendered as an ovelray on the Score View display", true, "", 1024);
+MSGPI_STRING_VAL_SETTING(pupSVFrameOverlayPath, "SVFrameOverlay", "Score View Frame Overlay", "Path to an image that will be rendered as an overlay on the Score View display", true, "", 1024);
 
 MSGPI_INT_VAL_SETTING(pupTopperPadLeft, "TopperPadLeft", "Topper Left Pad", "Left Padding of topper", true, 0, 4096, 0);
 MSGPI_INT_VAL_SETTING(pupTopperPadRight, "TopperPadRight", "Topper Right Pad", "Right Padding of topper", true, 0, 4096, 0);
 MSGPI_INT_VAL_SETTING(pupTopperPadTop, "TopperPadTop", "Topper Top Pad", "Top Padding of topper", true, 0, 4096, 0);
 MSGPI_INT_VAL_SETTING(pupTopperPadBottom, "TopperPadBottom", "Topper Bottom Pad", "Bottom Padding of topper", true, 0, 4096, 0);
-MSGPI_STRING_VAL_SETTING(pupTopperFrameOverlayPath, "TopperFrameOverlay", "Topper Frame Overlay", "Path to an image that will be rendered as an ovelray on the topper display", true, "", 1024);
+MSGPI_STRING_VAL_SETTING(pupTopperFrameOverlayPath, "TopperFrameOverlay", "Topper Frame Overlay", "Path to an image that will be rendered as an overlay on the topper display", true, "", 1024);
 
 PUPManager::PUPManager(const MsgPluginAPI* msgApi, uint32_t endpointId, const std::filesystem::path& rootPath)
    : m_szRootPath(rootPath)
@@ -295,14 +295,14 @@ bool PUPManager::AddScreen(std::shared_ptr<PUPScreen> pScreen)
       }
       else {
          switch (pCustomPos->GetSourceScreen()) {
-         case 0: parent = std::move(PUPScreen::CreateFromCSV(this, R"(0,"Topper","",,0,ForceBack,0,)"s, m_playlists)); break;
-         case 1: parent = std::move(PUPScreen::CreateFromCSV(this, R"(1,"DMD 4x1","",,0,ForceBack,0,)"s, m_playlists)); break;
-         case 2: parent = std::move(PUPScreen::CreateFromCSV(this, R"(2,"Backglass 16x9","",,0,ForceBack,0,)"s, m_playlists)); break;
-         case 3: parent = std::move(PUPScreen::CreateFromCSV(this, R"(3,"Playfield","",,0,Off,0,)"s, m_playlists)); break;
-         case 4: parent = std::move(PUPScreen::CreateFromCSV(this, R"(4,"Music","",,0,MusicOnly,0,)"s, m_playlists)); break;
-         case 5: parent = std::move(PUPScreen::CreateFromCSV(this, R"(5,"FullDMD 16x9","",,0,ForceBack,0,)"s, m_playlists)); break;
-         case 6: parent = std::move(PUPScreen::CreateFromCSV(this, R"(6,"Backglass 4x3-5x4","",,0,ForceBack,0,)"s, m_playlists)); break;
-         default: parent = std::move(PUPScreen::CreateFromCSV(this, '(' + std::to_string(pCustomPos->GetSourceScreen()) + R"(,"","",,0,ForceBack,0,)"s, m_playlists)); break;
+         case 0:  parent = /*std::move*/(PUPScreen::CreateFromCSV(this, R"(0,"Topper","",,0,ForceBack,0,)"s, m_playlists)); break;
+         case 1:  parent = /*std::move*/(PUPScreen::CreateFromCSV(this, R"(1,"DMD 4x1","",,0,ForceBack,0,)"s, m_playlists)); break;
+         case 2:  parent = /*std::move*/(PUPScreen::CreateFromCSV(this, R"(2,"Backglass 16x9","",,0,ForceBack,0,)"s, m_playlists)); break;
+         case 3:  parent = /*std::move*/(PUPScreen::CreateFromCSV(this, R"(3,"Playfield","",,0,Off,0,)"s, m_playlists)); break;
+         case 4:  parent = /*std::move*/(PUPScreen::CreateFromCSV(this, R"(4,"Music","",,0,MusicOnly,0,)"s, m_playlists)); break;
+         case 5:  parent = /*std::move*/(PUPScreen::CreateFromCSV(this, R"(5,"FullDMD 16x9","",,0,ForceBack,0,)"s, m_playlists)); break;
+         case 6:  parent = /*std::move*/(PUPScreen::CreateFromCSV(this, R"(6,"Backglass 4x3-5x4","",,0,ForceBack,0,)"s, m_playlists)); break;
+         default: parent = /*std::move*/(PUPScreen::CreateFromCSV(this, '(' + std::to_string(pCustomPos->GetSourceScreen()) + R"(,"","",,0,ForceBack,0,)"s, m_playlists)); break;
          }
          if (parent)
          {

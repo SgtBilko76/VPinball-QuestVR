@@ -535,7 +535,7 @@ PUPLabel::RenderState PUPLabel::UpdateLabelTexture(int outHeight, TTF_Font* pFon
 
    const float fontHeight = (size / 100.0f) * static_cast<float>(outHeight);
    TTF_FontStyleFlags style = TTF_STYLE_NORMAL;
-   // FIXME TTF_STYLE_BOLD gives bad results (test with Blood Machines, during Bonnus sequence)
+   // FIXME TTF_STYLE_BOLD gives bad results (test with Blood Machines, during Bonus sequence)
    // style |= m_bold ? TTF_STYLE_BOLD : 0;
    TTF_SetFontSize(pFont, fontHeight);
    // FIXME TTF_SetFontOutline does not gives clean outlines
@@ -614,7 +614,7 @@ string PUPLabel::ToString() const
       m_xPos, m_yPos, m_pagenum, m_szPath.string());
 }
 
-PUPLabel::Animation::Animation(PUPLabel* label, int lengthMs, int foregroundColor, int flashingPeriod)
+PUPLabel::Animation::Animation(PUPLabel* label, unsigned int lengthMs, int foregroundColor, int flashingPeriod)
    : m_color(label->m_color)
    , m_label(label)
    , m_lengthMs(lengthMs)
@@ -624,7 +624,7 @@ PUPLabel::Animation::Animation(PUPLabel* label, int lengthMs, int foregroundColo
 {
 }
 
-PUPLabel::Animation::Animation(PUPLabel* label, int lengthMs, int foregroundColor, int xps, int xpe, int yps, int ype, int motionLen, int motionTween, int motionColor)
+PUPLabel::Animation::Animation(PUPLabel* label, unsigned int lengthMs, int foregroundColor, int xps, int xpe, int yps, int ype, int motionLen, int motionTween, int motionColor)
    : m_label(label)
    , m_color(label->m_color)
    , m_lengthMs(lengthMs)

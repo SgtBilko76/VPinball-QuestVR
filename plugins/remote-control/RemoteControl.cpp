@@ -141,7 +141,7 @@ public:
    {
       return recvfrom(_sock, (char*)buf, (int)len, 0, (struct sockaddr*)&_si_other, &_slen);
    }
-   bool hasTimedOut()
+   static bool hasTimedOut()
    {
       #ifdef _WIN32
          return WSAGetLastError() == WSAETIMEDOUT;

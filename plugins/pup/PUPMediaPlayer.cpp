@@ -388,7 +388,7 @@ void PUPMediaPlayer::Run()
    // Main loop which loops over read/decode/convert and handle video seeking/looping
    #ifdef _DEBUG
       string name;
-      bool paused;
+      bool paused = false;
    #endif
    while (true)
    {
@@ -518,7 +518,7 @@ void PUPMediaPlayer::HandleVideoFrame(AVFrame* frame, bool sync)
    // Lazily create video frame conversion context and frame queue, adjusted to the render size
    const int targetWidth = m_bounds.w > 0 ? m_bounds.w : m_pVideoContext->width;
    const int targetHeight = m_bounds.h > 0 ? m_bounds.h : m_pVideoContext->height;
-   const AVPixelFormat targetFormat = AV_PIX_FMT_RGBA;
+   constexpr AVPixelFormat targetFormat = AV_PIX_FMT_RGBA;
    AVFrame* rgbFrame = m_rgbFrames[nextFrame];
    if ((rgbFrame != nullptr) && ((rgbFrame->width != targetWidth) || (rgbFrame->height != targetHeight)))
    {
@@ -600,13 +600,13 @@ void PUPMediaPlayer::HandleVideoFrame(AVFrame* frame, bool sync)
          {
             SDL_LockSurface(sdlMask);
             const uint32_t* __restrict mask = static_cast<uint32_t*>(sdlMask->pixels);
-            uint32_t* __restrict frame = reinterpret_cast<uint32_t*>(rgbFrame->data[0]);
+            uint32_t* __restrict frame2 = reinterpret_cast<uint32_t*>(rgbFrame->data[0]);
             for (int i = 0; i < sdlMask->h; i++)
             {
-               for (int j = 0; j < sdlMask->w; j++, mask++, frame++)
-                  *frame = *mask ? *frame : 0x00000000u;
+               for (int j = 0; j < sdlMask->w; j++, mask++, frame2++)
+                  *frame2 = *mask ? *frame2 : 0x00000000u;
                mask += sdlMask->pitch - sdlMask->w * sizeof(uint32_t);
-               frame += rgbFrame->linesize[0] - sdlMask->w * sizeof(uint32_t);
+               frame2 += rgbFrame->linesize[0] - sdlMask->w * sizeof(uint32_t);
             }
             SDL_UnlockSurface(sdlMask);
          }
@@ -671,7 +671,7 @@ void PUPMediaPlayer::HandleAudioFrame(AVFrame* pFrame, bool sync)
    m_pAudioLoop = pFrame->opaque;
 
    const AVSampleFormat frameFormat = static_cast<AVSampleFormat>(pFrame->format);
-   const AVChannelLayout destChLayout = AV_CHANNEL_LAYOUT_STEREO;
+   constexpr AVChannelLayout destChLayout = AV_CHANNEL_LAYOUT_STEREO;
    const enum AVSampleFormat destFmt = (frameFormat == AV_SAMPLE_FMT_FLT) ? AV_SAMPLE_FMT_FLT : AV_SAMPLE_FMT_S16;
    const int destFreq = pFrame->sample_rate;
 

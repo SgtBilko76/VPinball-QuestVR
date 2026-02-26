@@ -48,9 +48,9 @@ void B2SReelBox::OnPaint(VPXRenderContext2D* const ctx)
                m_intermediates2go = 2;
             }
             else {
-               const auto& img = pImages->find(m_szReelType + '_' + ConvertText(m_currentText + 1) + (m_setID > 0 && m_illuminated ? '_' + std::to_string(m_setID) : string()));
-               if (img != pImages->end())
-                  VPXGraphics::DrawImage(m_vpxApi, ctx, img->second, nullptr, &rect);
+               const auto& img2 = pImages->find(m_szReelType + '_' + ConvertText(m_currentText + 1) + (m_setID > 0 && m_illuminated ? '_' + std::to_string(m_setID) : string()));
+               if (img2 != pImages->end())
+                  VPXGraphics::DrawImage(m_vpxApi, ctx, img2->second, nullptr, &rect);
                m_intermediates = m_firstintermediatecount - 1;
                m_intermediates2go = 1;
             }

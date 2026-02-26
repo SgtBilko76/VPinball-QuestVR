@@ -3,7 +3,7 @@
 #include <sstream>
 
 namespace {
-static const char point = (std::use_facet<std::numpunct<char>>(std::locale("")).thousands_sep() == 0xA0/*NBSP grouping separator*/) ? ' ' : std::use_facet<std::numpunct<char>>(std::locale("")).thousands_sep(); // gets the OS locale thousands separator (e.g. ',' or '.' or ''' or ' ')
+static const char point = ((unsigned char)std::use_facet<std::numpunct<char>>(std::locale("")).thousands_sep() == 0xA0u/*NBSP grouping separator*/) ? ' ' : std::use_facet<std::numpunct<char>>(std::locale("")).thousands_sep(); // gets the OS locale thousands separator (e.g. ',' or '.' or ''' or ' ')
 
 string FormatScore(const int value)
 {

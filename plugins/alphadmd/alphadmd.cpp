@@ -545,7 +545,7 @@ static void OnSegSrcChanged(const unsigned int, void* userData, void* msgData)
    };
    for (int i = 0; (dmdLayout == DmdLayouts::Undefined) && (i < 12); i++)
    {
-      if (layouts[i][1] == selectedSources.size())
+      if (layouts[i][1] == (int)selectedSources.size())
       {
          dmdLayout = static_cast<DmdLayouts>(layouts[i][0]);
          for (size_t j = 0; j < selectedSources.size(); j++)

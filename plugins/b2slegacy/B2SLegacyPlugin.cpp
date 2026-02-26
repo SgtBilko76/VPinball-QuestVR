@@ -129,11 +129,10 @@ static void OnPluginLoaded(const unsigned int, void*, void* msgData)
          RegisterServerSCD(regLambda);
          Server_SCD->CreateObject = []()
          {
-            Server* server = nullptr;
             if (nServer > 0)
                LOGE("Invalid script: multiple B2S server are created.");
             nServer++;
-            server = new Server(msgApi, endpointId, vpxApi, pinmameClassDef, pinmameMemberStartIndex);
+            Server* server = new Server(msgApi, endpointId, vpxApi, pinmameClassDef, pinmameMemberStartIndex);
             server->SetOnDestroyHandler([](Server*) { nServer--; });
             return static_cast<void*>(server);
          };

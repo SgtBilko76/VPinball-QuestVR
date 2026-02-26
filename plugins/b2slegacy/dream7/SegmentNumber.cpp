@@ -150,7 +150,7 @@ void SegmentNumber::InitSegments(const SegmentNumberType type, const float thick
       pSegment->SetStyle(&m_pStyle);
 }
 
-void SegmentNumber::InitMatrix(const SDL_FPoint& location, Matrix* pMatrix)
+void SegmentNumber::InitMatrix(const SDL_FPoint& location, const Matrix* pMatrix)
 {
    delete m_pNumberMatrix;
    m_pNumberMatrix = pMatrix->Clone();

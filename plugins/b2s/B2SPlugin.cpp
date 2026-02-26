@@ -167,11 +167,10 @@ static void RegisterServerObject()
    RegisterB2SServerSCD(regLambda);
    B2SServer_SCD->CreateObject = []()
    {
-      B2SServer* server = nullptr;
       if (nServer > 0)
          LOGE("Invalid script: multiple B2S server are created.");
       nServer++;
-      server = new B2SServer(msgApi, endpointId, vpxApi, pinmameClassDef);
+      B2SServer* server = new B2SServer(msgApi, endpointId, vpxApi, pinmameClassDef);
       server->SetOnDestroyHandler([](B2SServer*) { nServer--; });
       return static_cast<void*>(server);
    };

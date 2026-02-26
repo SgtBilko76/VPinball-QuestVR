@@ -230,7 +230,7 @@ bool B2SRenderer::Render(VPXRenderContext2D* ctx, B2SServer* server)
    }
 }
 
-void B2SRenderer::RenderBulbs(VPXRenderContext2D* ctx, B2SServer* server, const vector<std::unique_ptr<B2SBulb>>& bulbs)
+void B2SRenderer::RenderBulbs(VPXRenderContext2D* ctx, const B2SServer* server, const vector<std::unique_ptr<B2SBulb>>& bulbs)
 {
    for (const auto& bulb : bulbs)
    {

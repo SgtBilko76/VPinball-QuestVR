@@ -319,12 +319,12 @@ void ScoreView::Parse(const std::filesystem::path& path)
       {
          CHECK_FIELD((indent == 2) && (visual != nullptr) && (visual->type == VisualType::SegDisplay)); // Seg display sub element offsets
          visual->xOffsets = parseArray(value);
-         CHECK_FIELD(!visual->xOffsets.empty() && (visual->nElements == -1 || visual->xOffsets.size() == visual->nElements));
+         CHECK_FIELD(!visual->xOffsets.empty() && (visual->nElements == -1 || (int)visual->xOffsets.size() == visual->nElements));
       }
       else if (key == "NElements")
       {
          CHECK_FIELD((indent == 2) && (visual != nullptr) && (visual->type == VisualType::SegDisplay) && try_parse_int(value, visual->nElements)); // Number of seg display elements
-         CHECK_FIELD(visual->xOffsets.empty() || visual->xOffsets.size() == visual->nElements);
+         CHECK_FIELD(visual->xOffsets.empty() || (int)visual->xOffsets.size() == visual->nElements);
       }
       else if (key == "Glass")
       {

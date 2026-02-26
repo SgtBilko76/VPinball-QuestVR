@@ -12,7 +12,7 @@ class Game;
 class Controller final
 {
 public:
-   Controller(const MsgPluginAPI* api, unsigned int endpointId, PinmameConfig& config);
+   Controller(const MsgPluginAPI* api, unsigned int endpointId, const PinmameConfig& config);
    ~Controller();
 
    PSC_IMPLEMENT_REFCOUNT()
