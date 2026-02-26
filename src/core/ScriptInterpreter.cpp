@@ -89,6 +89,7 @@ ScriptInterpreter::~ScriptInterpreter()
             //eiInterrupt.scode = E_NOTIMPL;
             eiInterrupt.wCode = 2345;
             m_pScript->InterruptScriptThread(SCRIPTTHREADID_BASE /*SCRIPTTHREADID_ALL*/, &eiInterrupt, /*SCRIPTINTERRUPT_DEBUG*/ SCRIPTINTERRUPT_RAISEEXCEPTION);
+            SysFreeString(eiInterrupt.bstrDescription);
          }
          else
          {
@@ -152,6 +153,7 @@ void ScriptInterpreter::Stop(PinTable *table, bool interruptDirectly)
          //eiInterrupt.scode = E_NOTIMPL;
          eiInterrupt.wCode = 2345;
          m_pScript->InterruptScriptThread(SCRIPTTHREADID_BASE /*SCRIPTTHREADID_ALL*/, &eiInterrupt, /*SCRIPTINTERRUPT_DEBUG*/ SCRIPTINTERRUPT_RAISEEXCEPTION);
+         SysFreeString(eiInterrupt.bstrDescription);
       }
    }
 
@@ -272,15 +274,19 @@ void ScriptInterpreter::HandleScriptError(IActiveScriptError *pScriptError, IAct
                   for (ULONG i2 = 0; i2 < numInfos; i2++)
                   {
                      callSite << infos[i2].m_bstrFullName << L'=' << infos[i2].m_bstrValue;
+                     SysFreeString(infos[i2].m_bstrFullName);
+                     SysFreeString(infos[i2].m_bstrValue);
                      // Add a comma if this isn't the last item in the list
                      if (i2 != numInfos - 1)
                         callSite << L", ";
                   }
-                  callSite << L")";
+                  callSite << L')';
                }
 
                propInfoEnum->Release();
                debugProp->Release();
+
+               stackFrames[i].pdsf->Release();
 
                stackDump.push_back(MakeString(callSite.str()));
             }
