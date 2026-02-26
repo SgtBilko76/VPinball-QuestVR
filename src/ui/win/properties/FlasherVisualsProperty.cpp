@@ -111,18 +111,18 @@ void FlasherVisualsProperty::UpdateVisuals(const int dispid /*=-1*/)
          m_linkEdit.ShowWindow(isDisplay);
 
          const int isDmdOrAlpha = ((mode == FlasherData::DMD) || (mode == FlasherData::ALPHASEG)) ? SW_SHOWNORMAL : SW_HIDE;
-         GetDlgItem(IDC_STATIC25).ShowWindow(isDisplay);
-         m_glassImageCombo.ShowWindow(isDisplay);
-         GetDlgItem(IDC_STATIC26).ShowWindow(isDisplay);
-         m_glassRoughnessEdit.ShowWindow(isDisplay);
-         GetDlgItem(IDC_STATIC27).ShowWindow(isDisplay);
-         m_glassAmbientButton.ShowWindow(isDisplay);
-         GetDlgItem(IDC_STATIC28).ShowWindow(isDisplay);
-         m_glassPadTopEdit.ShowWindow(isDisplay);
-         m_glassPadBottomEdit.ShowWindow(isDisplay);
-         GetDlgItem(IDC_STATIC29).ShowWindow(isDisplay);
-         m_glassPadLeftEdit.ShowWindow(isDisplay);
-         m_glassPadRightEdit.ShowWindow(isDisplay);
+         GetDlgItem(IDC_STATIC25).ShowWindow(isDmdOrAlpha);
+         m_glassImageCombo.ShowWindow(isDmdOrAlpha);
+         GetDlgItem(IDC_STATIC26).ShowWindow(isDmdOrAlpha);
+         m_glassRoughnessEdit.ShowWindow(isDmdOrAlpha);
+         GetDlgItem(IDC_STATIC27).ShowWindow(isDmdOrAlpha);
+         m_glassAmbientButton.ShowWindow(isDmdOrAlpha);
+         GetDlgItem(IDC_STATIC28).ShowWindow(isDmdOrAlpha);
+         m_glassPadTopEdit.ShowWindow(isDmdOrAlpha);
+         m_glassPadBottomEdit.ShowWindow(isDmdOrAlpha);
+         GetDlgItem(IDC_STATIC29).ShowWindow(isDmdOrAlpha);
+         m_glassPadLeftEdit.ShowWindow(isDmdOrAlpha);
+         m_glassPadRightEdit.ShowWindow(isDmdOrAlpha);
 
          const int isFlasher = mode == FlasherData::FLASHER ? SW_SHOWNORMAL : SW_HIDE;
          GetDlgItem(IDC_STATIC4).ShowWindow(isFlasher);
@@ -232,7 +232,7 @@ void FlasherVisualsProperty::UpdateLightmapComboBox(const PinTable *table, const
       if (pe->GetItemType() == ItemTypeEnum::eItemLight)
          lights.push_back((Light *)pe);
 
-   bool need_reset = combo.GetCount() != lights.size() + 1; // Not the same number of items
+   bool need_reset = combo.GetCount() != (int)lights.size() + 1; // Not the same number of items
    need_reset |= combo.FindStringExact(1, selectName.c_str()) == CB_ERR; // Selection is not part of combo
    if (!need_reset)
    {
