@@ -56,22 +56,22 @@ typedef struct LoggingPluginAPI
 #if LOGPI_DEFAULT_LEVEL <= LPI_LVL_DEBUG
 #define LPI_LOGD_CPP(x) LPILog_CPP(LPI_LVL_DEBUG, x)
 #else
-#define LPI_LOGD_CPP(x)
+#define LPI_LOGD_CPP(x) LPILog_CPP(LPI_LVL_DEBUG, ""s)
 #endif
 #if LOGPI_DEFAULT_LEVEL <= LPI_LVL_INFO
 #define LPI_LOGI_CPP(x) LPILog_CPP(LPI_LVL_INFO, x)
 #else
-#define LPI_LOGI_CPP(x)
+#define LPI_LOGI_CPP(x) LPILog_CPP(LPI_LVL_INFO, ""s)
 #endif
 #if LOGPI_DEFAULT_LEVEL <= LPI_LVL_WARN
 #define LPI_LOGW_CPP(x) LPILog_CPP(LPI_LVL_WARN, x)
 #else
-#define LPI_LOGW_CPP(x)
+#define LPI_LOGW_CPP(x) LPILog_CPP(LPI_LVL_WARN, ""s)
 #endif
 #if LOGPI_DEFAULT_LEVEL <= LPI_LVL_ERROR
 #define LPI_LOGE_CPP(x) LPILog_CPP(LPI_LVL_ERROR, x)
 #else
-#define LPI_LOGE_CPP(x)
+#define LPI_LOGE_CPP(x) LPILog_CPP(LPI_LVL_ERROR, ""s)
 #endif
 
 #define LPI_IMPLEMENT_CPP \
