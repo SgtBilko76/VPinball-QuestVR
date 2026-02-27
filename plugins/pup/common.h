@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cstdarg>
 #include <cstdlib>
+#include <format>
 
 #include <thread>
 #include <mutex>

@@ -7,6 +7,7 @@
 #include <charconv>
 #include <thread>
 #include <mutex>
+#include <format>
 #if defined(__APPLE__) || defined(__linux__) || defined(__ANDROID__)
 #include <pthread.h>
 #endif

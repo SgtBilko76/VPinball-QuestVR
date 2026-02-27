@@ -20,6 +20,7 @@ using std::vector;
 #include <memory> // needed for std::shared_ptr on Linux
 #include <functional>
 #include <filesystem>
+#include <format>
 
 // Shared logging
 #include "plugins/LoggingPlugin.h"

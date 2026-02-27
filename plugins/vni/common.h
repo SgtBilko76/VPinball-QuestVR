@@ -6,6 +6,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <filesystem>
+#include <format>
 
 #include <string>
 using namespace std::string_literals;

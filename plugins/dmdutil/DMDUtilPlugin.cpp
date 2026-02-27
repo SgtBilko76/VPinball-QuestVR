@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstring>
 #include <charconv>
+#include <format>
 
 #include "plugins/VPXPlugin.h"
 #include "plugins/ControllerPlugin.h"
@@ -21,7 +22,7 @@
 using namespace std;
 
 namespace DMDUtilPlugin {
-   
+
 static const MsgPluginAPI* msgApi = nullptr;
 static uint32_t endpointId;
 

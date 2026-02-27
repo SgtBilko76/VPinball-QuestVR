@@ -20,6 +20,7 @@ using namespace std::string_literals;
 #include <chrono>
 #include <thread>
 #include <semaphore>
+//#include <format>
 
 // Shared logging
 #include "plugins/LoggingPlugin.h"

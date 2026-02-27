@@ -15,6 +15,7 @@
 #include <memory>
 #include <algorithm>
 #include <filesystem>
+#include <format>
 
 // Shared logging
 #include "plugins/LoggingPlugin.h"
