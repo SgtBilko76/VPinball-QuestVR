@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <vector>
+#include <format>
 
 #include "common.h"
 #include "plugins/VPXPlugin.h"

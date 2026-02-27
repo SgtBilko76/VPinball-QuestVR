@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <charconv>
+#include <format>
 
 #include <cstddef> // for size_t, ptrdiff_t
 // Define ssize_t for Windows
