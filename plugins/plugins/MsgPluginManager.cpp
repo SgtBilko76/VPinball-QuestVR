@@ -213,7 +213,7 @@ void MsgPluginManager::ReleaseMsgID(const unsigned int msgId)
    pm.m_msgs[msgId].refCount--;
    if (pm.m_msgs[msgId].refCount == 0)
    {
-      assert(pm.m_msgs[msgId].callbacks.empty()); // Callbacks must be unsbscribed before destroying the message
+      assert(pm.m_msgs[msgId].callbacks.empty()); // Callbacks must be unsubscribed before destroying the message
       while (!pm.m_msgs.empty() && pm.m_msgs.back().refCount == 0)
          pm.m_msgs.pop_back();
    }

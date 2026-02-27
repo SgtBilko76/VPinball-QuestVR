@@ -134,7 +134,7 @@ void PinMAMEAPI::HandleCall(int memberIndex, int memberStartIndex, ScriptVariant
          string gameName;
          if (pArgs[0].vString.string)
             gameName = pArgs[0].vString.string;
-         LOGI("B2SLegacy: Setting GameName to '%s' in B2S settings", gameName.c_str());
+         LOGI("B2SLegacy: Setting GameName to '" + gameName + "' in B2S settings");
          m_server->GetB2SSettings()->SetGameName(gameName);
          m_server->GetB2SSettings()->SetB2SName(""s);
       }

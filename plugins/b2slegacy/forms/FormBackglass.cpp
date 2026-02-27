@@ -364,7 +364,7 @@ void FormBackglass::LoadB2SData()
       throw std::exception();
    }
 
-   LOGI("directb2s file found at: %s", b2sFilename.string().c_str());
+   LOGI("directb2s file found at: " + b2sFilename.string());
 
    m_pB2SData->SetBackglassFileName(b2sFilename.string());
 
@@ -380,12 +380,12 @@ void FormBackglass::LoadB2SData()
 
    auto xml = buffer.str();
    if (b2sTree.Parse(xml.c_str(), xml.size())) {
-      LOGE("Failed to parse directb2s file: %s", b2sFilename.string().c_str());
+      LOGE("Failed to parse directb2s file: " + b2sFilename.string());
       throw std::exception();
    }
 
    if (!b2sTree.FirstChildElement("DirectB2SData")) {
-      LOGE("Invalid directb2s file: %s", b2sFilename.string().c_str());
+      LOGE("Invalid directb2s file: " + b2sFilename.string());
       throw std::exception();
    }
 
@@ -393,13 +393,13 @@ void FormBackglass::LoadB2SData()
 
    // current backglass version is not allowed to be larger than server version and to be smaller minimum B2S version
    if (m_pB2SSettings->GetBackglassFileVersion() > string(B2S_VERSION_STRING)) {
-      LOGE("B2S backglass server version (%s) doesn't match directb2s file version (%s). Please update the B2S backglass server.",
-         B2S_VERSION_STRING, m_pB2SSettings->GetBackglassFileVersion().c_str());
+      LOGE(std::format("B2S backglass server version ({}) doesn't match directb2s file version ({}). Please update the B2S backglass server.",
+         B2S_VERSION_STRING, m_pB2SSettings->GetBackglassFileVersion()));
       return;
    }
    else if (m_pB2SSettings->GetBackglassFileVersion() < m_pB2SSettings->GetMinimumDirectB2SVersion()) {
-      LOGE("directb2s file version (%s) doesn't match minimum directb2s version. Please update the directb2s backglass file.",
-         m_pB2SSettings->GetBackglassFileVersion().c_str());
+      LOGE(std::format("directb2s file version ({}) doesn't match minimum directb2s version. Please update the directb2s backglass file.",
+         m_pB2SSettings->GetBackglassFileVersion()));
       return;
    }
 
@@ -1137,7 +1137,7 @@ void FormBackglass::LoadB2SData()
          bool startAnimationAtBackglassStartup = (innerNode->Attribute("StartAnimationAtBackglassStartup") == "1"s);
          eLightsStateAtAnimationStart lightsStateAtAnimationStart = eLightsStateAtAnimationStart_NoChange;
          eLightsStateAtAnimationEnd lightsStateAtAnimationEnd = eLightsStateAtAnimationEnd_InvolvedLightsOff;
-         eAnimationStopBehaviour animationstopbehaviour = eAnimationStopBehaviour_StopImmediatelly;
+         eAnimationStopBehaviour animationstopbehaviour = eAnimationStopBehaviour_StopImmediately;
          bool lockInvolvedLamps = false;
          bool hidescoredisplays = false;
          bool bringtofront = false;
@@ -1154,7 +1154,7 @@ void FormBackglass::LoadB2SData()
          if (innerNode->FindAttribute("AnimationStopBehaviour"))
             animationstopbehaviour = (eAnimationStopBehaviour)innerNode->IntAttribute("AnimationStopBehaviour");
          else if (innerNode->FindAttribute("RunAnimationTilEnd"))
-            animationstopbehaviour = (innerNode->Attribute("RunAnimationTilEnd") == "1"s) ? eAnimationStopBehaviour_RunAnimationTillEnd : eAnimationStopBehaviour_StopImmediatelly;
+            animationstopbehaviour = (innerNode->Attribute("RunAnimationTilEnd") == "1"s) ? eAnimationStopBehaviour_RunAnimationTillEnd : eAnimationStopBehaviour_StopImmediately;
          lockInvolvedLamps = (innerNode->Attribute("LockInvolvedLamps") == "1"s);
          if (innerNode->FindAttribute("HideScoreDisplays"))
             hidescoredisplays = (innerNode->Attribute("HideScoreDisplays") == "1"s);
@@ -1169,7 +1169,7 @@ void FormBackglass::LoadB2SData()
          if (lightsStateAtAnimationEnd == eLightsStateAtAnimationEnd_Undefined)
             lightsStateAtAnimationEnd = eLightsStateAtAnimationEnd_InvolvedLightsOff;
          if (animationstopbehaviour == eAnimationStopBehaviour_Undefined)
-            animationstopbehaviour = eAnimationStopBehaviour_StopImmediatelly;
+            animationstopbehaviour = eAnimationStopBehaviour_StopImmediately;
          vector<PictureBoxAnimationEntry*> entries;
          for (auto stepnode = innerNode->FirstChildElement("AnimationStep"); stepnode != nullptr; stepnode = stepnode->NextSiblingElement("AnimationStep")) {
             //int step = stepnode->IntAttribute("Step");
@@ -1697,7 +1697,7 @@ VPXTexture FormBackglass::Base64ToImage(const char* image)
    VPXTexture pImage = m_vpxApi->CreateTexture(decoded.data(), static_cast<int>(decoded.size()));
    if (!pImage) {
       size_t len = std::min<size_t>(image_len, 40);
-      LOGE("Base64ToImage: Failed to create texture from data: %s", string(image, len).c_str());
+      LOGE("Base64ToImage: Failed to create texture from data: " + string(image, len));
    }
 
    return pImage;

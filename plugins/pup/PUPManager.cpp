@@ -125,7 +125,7 @@ void PUPManager::SetGameDir(const string& szRomName)
       return;
 
    m_szPath = path;
-   LOGI("PUP path: %s", m_szPath.string().c_str());
+   LOGI("PUP path: " + m_szPath.string());
 
    // Load Fonts
    LoadFonts();
@@ -164,7 +164,7 @@ void PUPManager::LoadConfig(const string& szRomName)
          }
       }
       else {
-         LOGE("Unable to load %s", szScreensPath.c_str());
+         LOGE("Unable to load " + szScreensPath.string());
       }
    }
    else {
@@ -224,7 +224,7 @@ void PUPManager::LoadFonts()
                }
                else
                {
-                  LOGE("Failed to load font: %s %s", szFontPath.string().c_str(), SDL_GetError());
+                  LOGE("Failed to load font: " + szFontPath.string() + ' ' + SDL_GetError());
                }
             }
          }
@@ -256,7 +256,7 @@ void PUPManager::LoadPlaylists()
                lowerPlaylistNames.insert(folderNameLower);
             }
             else {
-               LOGE("Duplicate playlist: playlist=%s", pPlaylist->ToString().c_str());
+               LOGE("Duplicate playlist: playlist=" + pPlaylist->ToString());
                delete pPlaylist;
             }
          }
@@ -270,7 +270,7 @@ bool PUPManager::AddScreen(std::shared_ptr<PUPScreen> pScreen)
 
    if (std::shared_ptr<PUPScreen> existing = GetScreen(pScreen->GetScreenNum()); existing)
    {
-      LOGI("Replacing previously defined PUP screen: existing={%s} ne<={%s}", existing->ToString(false).c_str(), pScreen->ToString(false).c_str());
+      LOGI("Replacing previously defined PUP screen: existing={" + existing->ToString(false) + "} ne<={" + pScreen->ToString(false) + '}');
       if (existing->GetParent())
          existing->GetParent()->ReplaceChild(existing, pScreen);
       for (const auto& [key, screen] : m_screenMap)
@@ -315,7 +315,7 @@ bool PUPManager::AddScreen(std::shared_ptr<PUPScreen> pScreen)
          parent->AddChild(pScreen);
    }
 
-   LOGI("Screen added: screen={%s}", pScreen->ToString().c_str());
+   LOGI("Screen added: screen={" + pScreen->ToString() + '}');
 
    return true;
 }
@@ -328,7 +328,7 @@ bool PUPManager::AddScreen(int screenNum)
 
 void PUPManager::SendScreenToBack(const PUPScreen* screen)
 {
-   LOGD("Send screen to back %d", screen->GetScreenNum());
+   LOGD("Send screen to back " + std::to_string(screen->GetScreenNum()));
    auto it = std::ranges::find_if(m_screenOrder, [screen](std::shared_ptr<PUPScreen> s) { return s.get() == screen; });
    if (it != m_screenOrder.end())
    {
@@ -340,7 +340,7 @@ void PUPManager::SendScreenToBack(const PUPScreen* screen)
 
 void PUPManager::SendScreenToFront(const PUPScreen* screen)
 {
-   LOGD("Send screen to front %d", screen->GetScreenNum());
+   LOGD("Send screen to front " + std::to_string(screen->GetScreenNum()));
    auto it = std::ranges::find_if(m_screenOrder, [screen](std::shared_ptr<PUPScreen> s) { return s.get() == screen; });
    if (it != m_screenOrder.end())
    {
@@ -356,7 +356,7 @@ std::shared_ptr<PUPScreen> PUPManager::GetScreen(int screenNum, bool logMissing)
       return it->second;
    if (logMissing)
    {
-      LOGE("Screen not found: screenNum=%d", screenNum);
+      LOGE("Screen not found: screenNum=" + std::to_string(screenNum));
    }
    return nullptr;
 }
@@ -384,7 +384,7 @@ bool PUPManager::AddFont(TTF_Font* pFont, const string& szFilename)
    const string szNormalizedFilename = lowerCase(szFilename.substr(0, szFilename.length() - 4));
    m_fontFilenameMap[szNormalizedFilename] = pFont;
 
-   LOGI("Font added: familyName=%s, styleName=%s, filename=%s", szFamilyName.c_str(), szStyleName.c_str(), szFilename.c_str());
+   LOGI(std::format("Font added: familyName={}, styleName={}, filename={}", szFamilyName, szStyleName, szFilename));
 
    return true;
 }
@@ -495,7 +495,7 @@ int PUPManager::ProcessDmdFrame(const DisplaySrcId& src, const uint8_t* frame)
 
 void PUPManager::QueueDOFEvent(char c, int id, int value)
 {
-   // LOGD("DOF Event %c%03d = %d", c, id, value);
+   //LOGD(std::format("DOF Event {}{:03} = {}", c, id, value));
 
    std::lock_guard lock(m_eventMutex);
    for (const auto& [key, screen] : m_screenMap)
@@ -648,7 +648,7 @@ int PUPManager::Render(VPXRenderContext2D* const renderCtx, void* context)
          });
    #if LOG_RENDER
    renderLog << ']';
-   LOGD("Render: %s", renderLog.str().c_str());
+   LOGD("Render: " + renderLog.str());
    #endif
    std::ranges::for_each(screens,
       [&renderCtx](const auto& screen)

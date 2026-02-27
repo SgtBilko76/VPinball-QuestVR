@@ -24,11 +24,11 @@ using std::vector;
 
 namespace PinMAME {
 
-LPI_USE();
-#define LOGD PinMAME::LPI_LOGD
-#define LOGI PinMAME::LPI_LOGI
-#define LOGW PinMAME::LPI_LOGW
-#define LOGE PinMAME::LPI_LOGE
+LPI_USE_CPP();
+#define LOGD PinMAME::LPI_LOGD_CPP
+#define LOGI PinMAME::LPI_LOGI_CPP
+#define LOGW PinMAME::LPI_LOGW_CPP
+#define LOGE PinMAME::LPI_LOGE_CPP
 
 PSC_USE_ERROR();
 

@@ -8,7 +8,7 @@
 
 namespace B2S {
    
-LPI_IMPLEMENT // Implement shared log support
+LPI_IMPLEMENT_CPP // Implement shared log support
 
 ///////////////////////////////////////////////////////////////////////////////
 // B2S plugin

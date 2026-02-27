@@ -47,7 +47,7 @@ void WMPCore::Close()
 void WMPCore::SetURL(const string& url)
 {
    m_url = url;
-   LOGI("WMP Core URL set to: %s", url.c_str());
+   LOGI("WMP Core URL set to: " + url);
 
    m_url = find_case_insensitive_file_path(m_url);
    m_playState = (!m_url.empty() && LoadAudio(m_url)) ? wmppsReady : wmppsUndefined;
@@ -66,7 +66,7 @@ WMPPlayState WMPCore::GetPlayState() const
 
 bool WMPCore::LoadAudio(const string& url)
 {
-   LOGI("Loading audio file: %s", url.c_str());
+   LOGI("Loading audio file: " + url);
    return m_pAudioPlayer->LoadFile(url);
 }
 

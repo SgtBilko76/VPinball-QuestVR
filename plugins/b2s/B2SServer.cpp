@@ -51,7 +51,7 @@ B2SServer::B2SServer(const MsgPluginAPI* const msgApi, unsigned int endpointId, 
          }
          catch (...)
          {
-            LOGE("Failed to load B2S file: %s", path.c_str());
+            LOGE("Failed to load B2S file: " + path.string());
          }
          return b2s;
       };

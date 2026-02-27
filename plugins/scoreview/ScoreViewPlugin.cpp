@@ -21,7 +21,7 @@
 namespace ScoreView
 {
 
-LPI_IMPLEMENT // Implement shared log support
+LPI_IMPLEMENT_CPP // Implement shared log support
 
 static const MsgPluginAPI* msgApi = nullptr;
 static unsigned int getVpxApiId;

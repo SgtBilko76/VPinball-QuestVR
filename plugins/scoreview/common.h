@@ -40,14 +40,6 @@ using std::vector;
 namespace ScoreView
 {
 
-LPI_USE();
-#ifndef LOGD
-#define LOGD LPI_LOGD
-#define LOGI LPI_LOGI
-#define LOGW LPI_LOGW
-#define LOGE LPI_LOGE
-#endif
-
 #ifdef _MSC_VER
 #define PATH_SEPARATOR_CHAR '\\'
 #else

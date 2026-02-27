@@ -5,7 +5,7 @@
 #include "plugins/LoggingPlugin.h"
 #include "plugins/ScriptablePlugin.h"
 #include "plugins/ControllerPlugin.h"
-#include "plugins/VPXPlugin.h" // Only used for optional feature (locating pinmame files along a VPX table)
+#include "plugins/VPXPlugin.h" // Only used for optional feature (locating PinMAME files along a VPX table)
 
 #include <filesystem>
 #include <cassert>
@@ -207,7 +207,7 @@ static Controller* controller = nullptr;
 
 PSC_ERROR_IMPLEMENT(scriptApi); // Implement script error
 
-LPI_IMPLEMENT // Implement shared log support
+LPI_IMPLEMENT_CPP // Implement shared log support
 
 MSGPI_BOOL_VAL_SETTING(enableSoundProp, "Sound", "Enable Sound", "Enable sound emulation", true, true);
 MSGPI_STRING_VAL_SETTING(pinMAMEPathProp, "PinMAMEPath", "PinMAME Path", "Folder that contains PinMAME subfolders (roms, nvram, ...)", true, "", 1024);
@@ -220,21 +220,21 @@ void PINMAMECALLBACK OnLogMessage(PINMAME_LOG_LEVEL logLevel, const char* format
    int size = vsnprintf(nullptr, 0, format, args_copy);
    va_end(args_copy);
    if (size > 0) {
-      char* const buffer = new char[size + 1];
-      vsnprintf(buffer, size + 1, format, args);
-      if (string(buffer).starts_with("Average FPS:"s))
+      string buffer(size + 1, '\0');
+      vsnprintf(buffer.data(), size + 1, format, args);
+      buffer.pop_back(); // remove null terminator
+      if (buffer.starts_with("Average FPS:"s))
       {
          // Skip as the FPS does not correspond to anything here
       }
       else if (logLevel == PINMAME_LOG_LEVEL_INFO)
       {
-         LOGI("PinMAME: %s", buffer);
+         LOGI("PinMAME: " + buffer);
       }
       else if (logLevel == PINMAME_LOG_LEVEL_ERROR)
       {
-         LOGE("PinMAME: %s", buffer);
+         LOGE("PinMAME: " + buffer);
       }
-      delete [] buffer;
    }
 }
 
@@ -279,8 +279,9 @@ static void StopAudioStream()
 
 int PINMAMECALLBACK OnAudioAvailable(PinmameAudioInfo* p_audioInfo, void* const pUserData)
 {
-   LOGI("PinMAME: format=%d, channels=%d, sampleRate=%.2f, framesPerSecond=%.2f, samplesPerFrame=%d, bufferSize=%d", p_audioInfo->format, p_audioInfo->channels, p_audioInfo->sampleRate,
-      p_audioInfo->framesPerSecond, p_audioInfo->samplesPerFrame, p_audioInfo->bufferSize);
+   LOGI(std::format("PinMAME: format={}, channels={}, sampleRate={:.2f}, framesPerSecond={:.2f}, samplesPerFrame={}, bufferSize={}", p_audioInfo->format == PINMAME_AUDIO_FORMAT_INT16 ? "INT16" : "FLOAT",
+      p_audioInfo->channels, p_audioInfo->sampleRate,
+      p_audioInfo->framesPerSecond, p_audioInfo->samplesPerFrame, p_audioInfo->bufferSize));
    if (((p_audioInfo->format == PINMAME_AUDIO_FORMAT_INT16) || (p_audioInfo->format == PINMAME_AUDIO_FORMAT_FLOAT))
       && ((p_audioInfo->channels == 1) || (p_audioInfo->channels == 2)))
    {

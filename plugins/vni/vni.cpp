@@ -21,7 +21,7 @@ using namespace std::string_literals;
 
 namespace Vni {
 
-LPI_IMPLEMENT
+LPI_IMPLEMENT_CPP // Implement shared log support
 
 static const MsgPluginAPI* msgApi = nullptr;
 static VPXPluginAPI* vpxApi = nullptr;
@@ -254,13 +254,13 @@ static void OnControllerGameStart(const unsigned int eventId, void* userData, vo
 
    if (palPath.empty())
    {
-      LOGI("VNI: No PAL file found for %s", gameId.c_str());
+      LOGI("VNI: No PAL file found for " + gameId);
       return;
    }
 
-   LOGI("VNI: Loading PAL from %s", palPath.string().c_str());
+   LOGI("VNI: Loading PAL from " + palPath.string());
    if (!vniPath.empty())
-      LOGI("VNI: Loading VNI from %s", vniPath.string().c_str());
+      LOGI("VNI: Loading VNI from " + vniPath.string());
 
    pVni = Vni_LoadFromPaths(palPath.string().c_str(), vniPath.empty() ? nullptr : vniPath.string().c_str(), nullptr, nullptr);
    OnDmdSrcChanged(onDmdSrcChangedId, nullptr, nullptr);

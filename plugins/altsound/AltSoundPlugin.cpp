@@ -17,7 +17,7 @@ using namespace std::string_literals;
 
 namespace AltSound {
 
-LPI_IMPLEMENT
+LPI_IMPLEMENT_CPP // Implement shared log support
 
 MSGPI_STRING_VAL_SETTING(altsoundFolderProp, "Folder", "AltSound Folder", "", true, "", 1024);
 
@@ -124,7 +124,7 @@ static void StartAltSound(const string& gameId, const string& basePath, uint64_t
     vpxApi->GetVpxInfo(&vpxInfo);
     AltSoundSetLogger(vpxInfo.prefPath, ALTSOUND_LOG_LEVEL_INFO, false);
 
-    LOGI("Initializing AltSound for game: %s, basePath: %s", gameId.c_str(), basePath.c_str());
+    LOGI(std::format("Initializing AltSound for game: {}, basePath: {}", gameId, basePath));
 
     if (AltSoundInit(basePath, gameId, 44100, 2, 128)) {
         AltSoundSetAudioCallback(AudioCallback, nullptr);
@@ -141,9 +141,9 @@ static void StartAltSound(const string& gameId, const string& basePath, uint64_t
         audioSrcDef.sampleRate = 44100;
         msgApi->BroadcastMsg(endpointId, onAudioSrcChangedId, nullptr);
 
-        LOGI("AltSound initialized successfully for game: %s", gameId.c_str());
+        LOGI("AltSound initialized successfully for game: " + gameId);
     } else {
-        LOGE("Failed to initialize AltSound for game: %s", gameId.c_str());
+        LOGE("Failed to initialize AltSound for game: " + gameId);
     }
 }
 
@@ -202,7 +202,7 @@ static void OnControllerGameStart(const unsigned int eventId, void* userData, vo
     if (!basePath.empty()) {
         std::filesystem::path altsoundGamePath = basePath / "altsound" / msg->gameId;
         if (std::filesystem::exists(altsoundGamePath)) {
-            LOGI("Found altsound directory for game: %s at %s", msg->gameId, altsoundGamePath.c_str());
+            LOGI(std::format("Found altsound directory for game: {} at {}", msg->gameId, altsoundGamePath.string()));
             StartAltSound(msg->gameId, basePath.string(), msg->hardwareGen);
         }
     }

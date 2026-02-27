@@ -64,7 +64,7 @@ static unsigned int onAudioUpdateId = 0;
 
 PSC_ERROR_IMPLEMENT(scriptApi);
 
-LPI_IMPLEMENT
+LPI_IMPLEMENT_CPP // Implement shared log support
 
 }
 

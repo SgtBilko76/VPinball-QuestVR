@@ -194,7 +194,7 @@ typedef enum {
 
 typedef enum {
     eAnimationStopBehaviour_Undefined = 0,
-    eAnimationStopBehaviour_StopImmediatelly = 1,
+    eAnimationStopBehaviour_StopImmediately = 1,
     eAnimationStopBehaviour_RunAnimationTillEnd = 2,
     eAnimationStopBehaviour_RunAnimationToFirstStep = 3
 } eAnimationStopBehaviour;
@@ -210,11 +210,11 @@ typedef enum {
     eSnippitRotationDirection_AntiClockwise = 1
 } eSnippitRotationDirection;
 
-LPI_USE();
-#define LOGD B2SLegacy::LPI_LOGD
-#define LOGI B2SLegacy::LPI_LOGI
-#define LOGW B2SLegacy::LPI_LOGW
-#define LOGE B2SLegacy::LPI_LOGE
+LPI_USE_CPP();
+#define LOGD B2SLegacy::LPI_LOGD_CPP
+#define LOGI B2SLegacy::LPI_LOGI_CPP
+#define LOGW B2SLegacy::LPI_LOGW_CPP
+#define LOGE B2SLegacy::LPI_LOGE_CPP
 
 PSC_USE_ERROR();
 

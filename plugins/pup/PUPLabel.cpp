@@ -49,7 +49,7 @@ PUPLabel::PUPLabel(PUPManager* manager, const string& szName, const string& szFo
 {
    if (!szFont.empty() && !m_pFont)
    {
-      LOGE("Font not found: label=%s, font=%s", szName.c_str(), szFont.c_str());
+      LOGE("Font not found: label=" + szName + ", font=" + szFont);
    }
 }
 
@@ -92,14 +92,14 @@ void PUPLabel::SetCaption(const string& szCaption)
                }
                else
                {
-                  LOGE("Image not found: screen=%d, label=%s, path=%s", m_pScreen->GetScreenNum(), m_szName.c_str(), szText.c_str());
+                  LOGE(std::format("Image not found: screen={}, label={}, path={}", m_pScreen->GetScreenNum(), m_szName, szText));
                   // we need to set a path otherwise the caption will be used as text
                   m_szPath = szText;
                }
             }
             else
             {
-               LOGE("Image playlist not found: screen=%d, label=%s, path=%s, playlist=%s", m_pScreen->GetScreenNum(), m_szName.c_str(), szText.c_str(), playlistFolder.c_str());
+               LOGE(std::format("Image playlist not found: screen={}, label={}, path={}, playlist={}", m_pScreen->GetScreenNum(), m_szName, szText, playlistFolder));
             }
          }
 
@@ -118,7 +118,7 @@ void PUPLabel::SetVisible(bool visible)
 void PUPLabel::SetSpecial(const string& szSpecial)
 {
    #if LOG_PUPLABEL
-   LOGD("PUPLabel::SetSpecial: name=%s, caption=%s, json=%s", m_szName.c_str(), m_szCaption.c_str(), szSpecial.c_str());
+   LOGD(std::format("PUPLabel::SetSpecial: name={}, caption={}, json={}", m_szName, m_szCaption, szSpecial));
    #endif
 
    string str = trim_string(szSpecial);
@@ -153,7 +153,7 @@ void PUPLabel::SetSpecial(const string& szSpecial)
                m_animation = std::make_unique<Animation>(this, json["len"s].as<int>(), json["fc"s].as<int>(), 1000 / json["fq"s].as<int>());
             else
             {
-               LOGE("Invalid label animation specified: {%s}", szSpecial.c_str());
+               LOGE("Invalid label animation specified: {" + szSpecial + '}');
             }
             break;
             
@@ -164,12 +164,12 @@ void PUPLabel::SetSpecial(const string& szSpecial)
                   json["mlen"s].as<int>(0), json["tt"s].as<int>(0), json["mColor"s].as<int>(0));
             else
             {
-               LOGE("Invalid label animation specified: {%s}", szSpecial.c_str());
+               LOGE("Invalid label animation specified: {" + szSpecial + '}');
             }
             break;
 
          default:
-            LOGE("Unsupported Label.SetSpecial animation type: %d", json["at"s].as<int>(0));
+            LOGE("Unsupported Label.SetSpecial animation type: " + std::to_string(json["at"s].as<int>(0)));
             break;
          }
       }
@@ -214,7 +214,7 @@ void PUPLabel::SetSpecial(const string& szSpecial)
             string szFont = value.as_str();
             m_pFont = m_pManager->GetFont(szFont);
             if (!m_pFont)
-               LOGE("Label font not found: name=%s, font=%s", m_szName.c_str(), szFont.c_str());
+               LOGE("Label font not found: name=" + m_szName + ", font=" + szFont);
             m_dirty = true;
          }
          else if (key == "fonth")
@@ -353,14 +353,14 @@ void PUPLabel::SetSpecial(const string& szSpecial)
          }
          else
          {
-            NOT_IMPLEMENTED(key.c_str(), " not implemented");
+            NOT_IMPLEMENTED(key + " not implemented");
          }
       }
    }
       break;
 
    default:
-      LOGE("Unsupported Label.SetSpecial mt mode: %d", json["mt"s].as<int>(0));
+      LOGE("Unsupported Label.SetSpecial mt mode: " + std::to_string(json["mt"s].as<int>(0)));
       break;
    }
 }
@@ -496,7 +496,7 @@ PUPLabel::RenderState PUPLabel::UpdateImageTexture(PUP_LABEL_TYPE type, const st
       }
       else
       {
-         LOGE("Unable to load image: %s", szPath.c_str());
+         LOGE("Unable to load image: " + szPath.string());
       }
    }
    else if (type == PUP_LABEL_TYPE_GIF)
@@ -517,7 +517,7 @@ PUPLabel::RenderState PUPLabel::UpdateImageTexture(PUP_LABEL_TYPE type, const st
          }
       }
       else
-         LOGE("Unable to load animation: %s", szPath.c_str());
+         LOGE("Unable to load animation: " + szPath.string());
    }
    return rs;
 }
@@ -551,7 +551,7 @@ PUPLabel::RenderState PUPLabel::UpdateLabelTexture(int outHeight, TTF_Font* pFon
    SDL_Surface* pTextSurface = TTF_RenderText_Blended_Wrapped(pFont, text.c_str(), text.length(), textColor, 0);
    if (!pTextSurface)
    {
-      LOGE("Unable to render text: label=%s, error=%s", m_szName.c_str(), SDL_GetError());
+      LOGE("Unable to render text: label=" + m_szName + ", error=" + SDL_GetError());
       return rs;
    }
 
@@ -560,7 +560,7 @@ PUPLabel::RenderState PUPLabel::UpdateLabelTexture(int outHeight, TTF_Font* pFon
    SDL_Surface* pMergedSurface = SDL_CreateSurface(pTextSurface->w + abs(xoffset), pTextSurface->h + abs(yoffset), SDL_PIXELFORMAT_RGBA32);
    if (!pMergedSurface)
    {
-      LOGE("Unable to render text: label=%s, error=%s", m_szName.c_str(), SDL_GetError());
+      LOGE("Unable to render text: label=" + m_szName + ", error=" + SDL_GetError());
       return rs;
    }
    //SDL_FillSurfaceRect(pMergedSurface, NULL, SDL_MapRGBA(SDL_GetPixelFormatDetails(pMergedSurface->format), nullptr, 255, 255, 0, 255));
@@ -580,7 +580,7 @@ PUPLabel::RenderState PUPLabel::UpdateLabelTexture(int outHeight, TTF_Font* pFon
       }
       else
       {
-         LOGE("Failed to render shadow: label=%s, error=%s", m_szName.c_str(), SDL_GetError());
+         LOGE("Failed to render shadow: label=" + m_szName + ", error=" + SDL_GetError());
          SDL_Rect textRect = { (xoffset < 0) ? -xoffset : 0, (yoffset < 0) ? -yoffset : 0, pTextSurface->w, pTextSurface->h };
          SDL_BlitSurface(pTextSurface, nullptr, pMergedSurface, &textRect);
       }

@@ -56,7 +56,7 @@ static unsigned int onPinMAMEGameStartId, onGameEndId;
 // through script interface. The script interface gives access to this context even when it has been created due to PinMAME.
 static std::unique_ptr<PUPManager> pupManager;
 
-LPI_IMPLEMENT // Implement shared log support
+LPI_IMPLEMENT_CPP // Implement shared log support
 
 MSGPI_STRING_VAL_SETTING(pupPathProp, "PUPFolder", "PinUp Player Folder", "", true, "", 1024);
 
@@ -275,7 +275,7 @@ MSGPI_EXPORT void MSGPIAPI PUPPluginLoad(const uint32_t sessionId, const MsgPlug
    std::filesystem::path rootPath = find_case_insensitive_directory_path(pupFolder / "pupvideos");
    if (rootPath.empty())
    {
-      LOGW("PUP folder was not found (settings is '%s')", pupFolder.string().c_str());
+      LOGW("PUP folder was not found (settings is '" + pupFolder.string() + "')");
    }
    pupManager = std::make_unique<PUPManager>(msgApi, endpointId, rootPath);
 }

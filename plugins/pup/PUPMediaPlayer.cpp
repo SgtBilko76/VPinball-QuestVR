@@ -85,7 +85,7 @@ void PUPMediaPlayer::Play(const std::filesystem::path& filename, float volume)
    m_commandQueue.enqueue(
       [this, filename, volume]()
    {
-      LOGD("> Playing filename=%s", filename.string().c_str());
+      LOGD("> Playing filename=" + filename.string());
 
       //Should we do the callback when we are switching from a video to another ?
       //std::function<void(PUPMediaPlayer*)> onEndCallback = m_onEndCallback;
@@ -103,9 +103,9 @@ void PUPMediaPlayer::Play(const std::filesystem::path& filename, float volume)
       m_startTimestamp = m_syncOnGameTime ? m_gameTime : (static_cast<double>(SDL_GetTicks()) / 1000.0);
 
       // Open file
-      if (m_libAv._avformat_open_input(&m_pFormatContext, filename.string().c_str(), NULL, NULL) != 0)
+      if (m_libAv._avformat_open_input(&m_pFormatContext, filename.string().c_str(), nullptr, nullptr) != 0)
       {
-         LOGE("Unable to open: filename=%s", filename.c_str());
+         LOGE("Unable to open: filename=" + filename.string());
          m_pendingPlay--;
          return;
       }
@@ -131,11 +131,11 @@ void PUPMediaPlayer::Play(const std::filesystem::path& filename, float volume)
          m_pVideoContext = OpenStream(m_pFormatContext, m_videoStream);
          if (m_pVideoContext)
          {
-            LOGD("Video stream: %s %dx%d", m_libAv._avcodec_get_name(m_pVideoContext->codec_id), pCodecParameters->width, pCodecParameters->height);
+            LOGD(std::format("Video stream: {} {}x{}", m_libAv._avcodec_get_name(m_pVideoContext->codec_id), pCodecParameters->width, pCodecParameters->height));
          }
          else
          {
-            LOGE("Unable to open video stream: filename=%s", filename.c_str());
+            LOGE("Unable to open video stream: filename=" + filename.string());
          }
       }
       else
@@ -149,7 +149,7 @@ void PUPMediaPlayer::Play(const std::filesystem::path& filename, float volume)
          m_audioStream = m_libAv._av_find_best_stream(m_pFormatContext, AVMEDIA_TYPE_AUDIO, -1, m_videoStream, NULL, 0);
          if (m_audioStream == AVERROR_DECODER_NOT_FOUND)
          {
-            LOGE("No audio stream found: filename=%s", filename.c_str());
+            LOGE("No audio stream found: filename=" + filename.string());
          }
       }
       else
@@ -172,17 +172,17 @@ void PUPMediaPlayer::Play(const std::filesystem::path& filename, float volume)
          m_pAudioContext = OpenStream(m_pFormatContext, m_audioStream);
          if (m_pAudioContext)
          {
-            LOGD("Audio stream: %s %d channels, %d Hz", m_libAv._avcodec_get_name(m_pAudioContext->codec_id), pCodecParameters->ch_layout.nb_channels, pCodecParameters->sample_rate);
+            LOGD(std::format("Audio stream: {} {} channels, {} Hz", m_libAv._avcodec_get_name(m_pAudioContext->codec_id), pCodecParameters->ch_layout.nb_channels, pCodecParameters->sample_rate));
          }
          else
          {
-            LOGE("Unable to open audio stream: filename=%s", filename.c_str());
+            LOGE("Unable to open audio stream: filename=" + filename.string());
          }
       }
 
       if (!m_pVideoContext && !m_pAudioContext)
       {
-         LOGE("No video or audio stream found: filename=%s", filename.c_str());
+         LOGE("No video or audio stream found: filename=" + filename.string());
          StopBlocking();
          m_pendingPlay--;
          return;
@@ -225,7 +225,7 @@ void PUPMediaPlayer::StopBlocking()
 {
    if (IsPlaying())
    {
-      LOGD("Stop: %s", m_filename.string().c_str());
+      LOGD("Stop: " + m_filename.string());
    }
 
    // Stop decoder thread and flush queue
@@ -286,7 +286,7 @@ void PUPMediaPlayer::SetLoop(bool loop)
       std::lock_guard lock(m_mutex);
       if (m_loop != loop)
       {
-         LOGD("setting loop: loop=%d", loop);
+         LOGD("Setting loop: loop=" + std::to_string(loop));
          m_loop = loop;
       }
    });
@@ -299,7 +299,7 @@ void PUPMediaPlayer::SetVolume(float volume)
       std::lock_guard lock(m_mutex);
       if (m_volume != volume)
       {
-         LOGD("setting volume: volume=%.1f%%", volume);
+         LOGD(std::format("Setting volume: volume={:.1f}%%", volume));
          m_volume = volume;
       }
    });
@@ -312,7 +312,7 @@ void PUPMediaPlayer::SetLength(int length)
       std::lock_guard lock(m_mutex);
       if (m_length != length)
       {
-         LOGD("setting length: length=%d", length);
+         LOGD("Setting length: length=" + std::to_string(length));
          m_length = length;
       }
    });
@@ -355,9 +355,9 @@ void PUPMediaPlayer::Render(VPXRenderContext2D* const ctx, const SDL_Rect& destR
          VPXTextureInfo* texInfo = GetTextureInfo(m_videoTexture);
          UpdateTexture(&m_videoTexture, texInfo->width, texInfo->height, texInfo->format, texInfo->data);
          // TODO to optimize a bit more we should update & upload a texture on a frame, then use it on the following render, this would remove the barrier between
-         // the GPU upload/mipmap generation and the GPU render use, allowing more parallellism. Note that for the time being upload is only done on use
+         // the GPU upload/mipmap generation and the GPU render use, allowing more parallelism. Note that for the time being upload is only done on use
          //const double framePts = (static_cast<double>(rgbFrame->pts) * m_pVideoContext->pkt_timebase.num) / m_pVideoContext->pkt_timebase.den;
-         //LOGD("Video tex update: play time: %8.3fs / frame pts: %8.3fs / delta: %8.3fs  [%s]", playPts, framePts, framePts - playPts, m_filename.c_str());
+         //LOGD(std::format("Video tex update: play time: {:8.3f}s / frame pts: {:8.3f}s / delta: {:8.3f}s  [{}]", playPts, framePts, framePts - playPts, m_filename.string()));
       }
    }
 
@@ -503,7 +503,7 @@ void PUPMediaPlayer::Run()
       m_onEndCallback(this);
    }
 
-   LOGD("Play done %s", m_filename.string().c_str());
+   LOGD("Play done " + m_filename.string());
 }
 
 void PUPMediaPlayer::HandleVideoFrame(AVFrame* frame, bool sync)
@@ -640,7 +640,7 @@ AVCodecContext* PUPMediaPlayer::OpenStream(AVFormatContext* pInputFormatContext,
 
    const AVCodec* pCodec = m_libAv._avcodec_find_decoder(pContext->codec_id);
    if (!pCodec) {
-      LOGE("Couldn't find codec %s", m_libAv._avcodec_get_name(pContext->codec_id));
+      LOGE("Couldn't find codec "s + m_libAv._avcodec_get_name(pContext->codec_id));
       m_libAv._avcodec_free_context(&pContext);
       return nullptr;
    }
@@ -648,7 +648,7 @@ AVCodecContext* PUPMediaPlayer::OpenStream(AVFormatContext* pInputFormatContext,
    pContext->codec_id = pCodec->id;
    if (m_libAv._avcodec_open2(pContext, pCodec, NULL) != 0)
    {
-      LOGE("Couldn't open codec %s", m_libAv._avcodec_get_name(pContext->codec_id));
+      LOGE("Couldn't open codec "s + m_libAv._avcodec_get_name(pContext->codec_id));
       m_libAv._avcodec_free_context(&pContext);
       return nullptr;
    }

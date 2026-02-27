@@ -21,7 +21,7 @@ using namespace std::string_literals;
 
 namespace Serum {
 
-LPI_IMPLEMENT
+LPI_IMPLEMENT_CPP // Implement shared log support
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serum Colorization plugin

@@ -3,6 +3,7 @@
 #include "WMPAudioPlayer.h"
 #include "WMPCore.h"
 #include <algorithm>
+#include <format>
 
 namespace WMP {
 
@@ -40,12 +41,12 @@ bool WMPAudioPlayer::LoadFile(const string& filepath)
 {
    UnloadFile();
 
-   LOGI("Loading audio file: %s", filepath.c_str());
+   LOGI("Loading audio file: " + filepath);
 
    const ma_decoder_config config = wmp_ma_decoder_config_init(ma_format_f32, 0, 0);
    ma_result result = wmp_ma_decoder_init_file(filepath.c_str(), &config, &m_decoder);
    if (result != MA_SUCCESS) {
-      LOGE("Failed to initialize decoder for file: %s (error: %d)", filepath.c_str(), result);
+      LOGE("Failed to initialize decoder for file: " + filepath + " (error: " + std::to_string(result) + ')');
       return false;
    }
 
@@ -64,7 +65,7 @@ bool WMPAudioPlayer::LoadFile(const string& filepath)
    m_loadedFile = filepath;
    m_isLoaded = true;
 
-   LOGD("Audio loaded: %d Hz, %d channels, format: f32", sampleRate, channels);
+   LOGD("Audio loaded: " + std::to_string(sampleRate) + " Hz, " + std::to_string(channels) + " channels, format: f32");
    return true;
 }
 
@@ -147,17 +148,17 @@ void WMPAudioPlayer::SetPosition(double positionInSeconds)
    const ma_result result = wmp_ma_decoder_seek_to_pcm_frame(&m_decoder, targetFrame);
 
    if (result == MA_SUCCESS) {
-      LOGI("Seek to position: %.2f seconds (frame %llu)", positionInSeconds, targetFrame);
+      LOGI(std::format("Seek to position: {:.2f} seconds (frame {})", positionInSeconds, targetFrame));
    }
    else {
-      LOGE("Failed to seek to position: %.2f seconds", positionInSeconds);
+      LOGE(std::format("Failed to seek to position: {:.2f} seconds", positionInSeconds));
    }
 }
 
 void WMPAudioPlayer::SetVolume(float volume)
 {
    m_volume = volume;
-   LOGI("Volume set to: %.2f", m_volume.load());
+   LOGI(std::format("Volume set to: {:.2f}", m_volume.load()));
 }
 
 void WMPAudioPlayer::UpdateVolume(int volume, bool mute)
@@ -169,7 +170,7 @@ void WMPAudioPlayer::UpdateVolume(int volume, bool mute)
       audioVolume = 0.0f;
 
    m_volume = audioVolume;
-   LOGI("Volume updated: %ld%s -> %.2f", clampedVolume, mute ? " (muted)" : "", m_volume.load());
+   LOGI(std::format("Volume updated: {}{} -> {:.2f}", clampedVolume, mute ? " (muted)" : "", m_volume.load()));
 }
 
 void WMPAudioPlayer::StartStreaming()

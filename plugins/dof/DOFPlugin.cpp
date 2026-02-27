@@ -65,13 +65,13 @@ static DOF::DOF* pDOF = nullptr;
 
 static void OnPollStates(void* userData);
 
-LPI_USE();
-#define LOGD LPI_LOGD
-#define LOGI LPI_LOGI
-#define LOGW LPI_LOGW
-#define LOGE LPI_LOGE
+LPI_USE_CPP();
+#define LOGD DOFPlugin::LPI_LOGD_CPP
+#define LOGI DOFPlugin::LPI_LOGI_CPP
+#define LOGW DOFPlugin::LPI_LOGW_CPP
+#define LOGE DOFPlugin::LPI_LOGE_CPP
 
-LPI_IMPLEMENT
+LPI_IMPLEMENT_CPP // Implement shared log support
 
 void LIBDOFCALLBACK OnDOFLog(DOF_LogLevel logLevel, const char* format, va_list args)
 {
@@ -80,22 +80,22 @@ void LIBDOFCALLBACK OnDOFLog(DOF_LogLevel logLevel, const char* format, va_list 
    int size = vsnprintf(nullptr, 0, format, args_copy);
    va_end(args_copy);
    if (size > 0) {
-      char* const buffer = new char[size + 1];
-      vsnprintf(buffer, size + 1, format, args);
+      string buffer(size + 1, '\0');
+      vsnprintf(buffer.data(), size + 1, format, args);
+      buffer.pop_back(); // remove null terminator
       switch(logLevel) {
          case DOF_LogLevel_INFO:
-            LOGI("%s", buffer);
+            LOGI(buffer);
             break;
          case DOF_LogLevel_DEBUG:
-            LOGD("%s", buffer);
+            LOGD(buffer);
             break;
          case DOF_LogLevel_ERROR:
-            LOGE("%s", buffer);
+            LOGE(buffer);
             break;
          default:
             break;
       }
-      delete [] buffer;
    }
 }
 
@@ -193,7 +193,7 @@ static void OnControllerGameStart(const unsigned int eventId, void* userData, vo
    }
 
    if (pDOF) {
-      LOGI("DOFPlugin: OnControllerGameStart: gameId=%s", msg->gameId);
+      LOGI("DOFPlugin: OnControllerGameStart: gameId="s + msg->gameId);
       isRunning = true;
       VPXTableInfo tableInfo;
       vpxApi->GetTableInfo(&tableInfo);
@@ -273,8 +273,8 @@ static void OnDevSrcChanged(const unsigned int eventId, void* userData, void* ms
          nPmSolenoids++;
    }
 
-   LOGI("DOFPlugin: OnDevSrcChanged - Found %d PinMAME devices (Sol:%d, Lamps:%d, GI:%d)", 
-        pinmameDevSrc.nDevices, nPmSolenoids, nPmLamps, nPmGIs);
+   LOGI(std::format("DOFPlugin: OnDevSrcChanged - Found {} PinMAME devices (Sol:{}, Lamps:{}, GI:{})", 
+        pinmameDevSrc.nDevices, nPmSolenoids, nPmLamps, nPmGIs));
 }
 
 static void OnInputSrcChanged(const unsigned int eventId, void* userData, void* msgData)
@@ -304,7 +304,7 @@ static void OnInputSrcChanged(const unsigned int eventId, void* userData, void* 
    }
    delete[] getSrcMsg.entries;
 
-   LOGI("DOFPlugin: OnInputSrcChanged - Found %d PinMAME inputs", pinmameInputSrc.nInputs);
+   LOGI(std::format("DOFPlugin: OnInputSrcChanged - Found {} PinMAME inputs", pinmameInputSrc.nInputs));
 }
 
 }

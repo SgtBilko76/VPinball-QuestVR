@@ -76,7 +76,7 @@ void Controller::SetGameName(const string& name)
    }, this);
    if (status == PINMAME_STATUS_OK)
    {
-      LOGI("Game found: name=%s, description=%s, manufacturer=%s, year=%s", m_pPinmameGame->name, m_pPinmameGame->description, m_pPinmameGame->manufacturer, m_pPinmameGame->year);
+      LOGI(std::format("Game found: name={}, description={}, manufacturer={}, year={}", m_pPinmameGame->name, m_pPinmameGame->description, m_pPinmameGame->manufacturer, m_pPinmameGame->year));
       //m_hidden = false;
    }
    else if (status == PINMAME_STATUS_GAME_ALREADY_RUNNING)
@@ -111,7 +111,7 @@ void Controller::Run(long hParentWnd, int nMinVersion)
    }
    else
    {
-      LOGE("Failed to start emulation of rom '%s'", m_pPinmameGame->name);
+      LOGE("Failed to start emulation of rom '"s + m_pPinmameGame->name + '\'');
       VPXPluginAPI* vpxApi = nullptr;
       unsigned int getVpxApiId = m_msgApi->GetMsgID(VPXPI_NAMESPACE, VPXPI_MSG_GET_API);
       m_msgApi->BroadcastMsg(m_endpointId, getVpxApiId, &vpxApi);

@@ -15,6 +15,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
+using namespace std::string_literals;
 #include <chrono>
 #include <thread>
 #include <semaphore>
@@ -24,11 +26,11 @@
 
 namespace RemoteControl {
 
-LPI_USE();
-#define LOGD RemoteControl::LPI_LOGD
-#define LOGI RemoteControl::LPI_LOGI
-#define LOGW RemoteControl::LPI_LOGW
-#define LOGE RemoteControl::LPI_LOGE
+LPI_USE_CPP();
+#define LOGD RemoteControl::LPI_LOGD_CPP
+#define LOGI RemoteControl::LPI_LOGI_CPP
+#define LOGW RemoteControl::LPI_LOGW_CPP
+#define LOGE RemoteControl::LPI_LOGE_CPP
 
 ///////////////////////////////////////////////////////////////////////////////
 // Minimal portable sockets
@@ -261,7 +263,7 @@ MSGPI_INT_VAL_SETTING(portProp, "Port", "Port", "", true, 0, 0xFFFF, 0);
 MSGPI_STRING_VAL_SETTING(hostProp, "Host", "Host", "", true, "", 1024);
 
 
-void onPrepareFrame(const unsigned int eventId, void* userData, void* eventData)
+static void onPrepareFrame(const unsigned int eventId, void* userData, void* eventData)
 {
    switch (connectionState)
    {
@@ -283,7 +285,7 @@ void onPrepareFrame(const unsigned int eventId, void* userData, void* eventData)
    }
 }
 
-void onControllerActionEvent(const unsigned int eventId, void* userData, void* eventData)
+static void onControllerActionEvent(const unsigned int eventId, void* userData, void* eventData)
 {
    if (connectionState == ConnectionState::Connected)
    {
@@ -301,7 +303,7 @@ void onControllerActionEvent(const unsigned int eventId, void* userData, void* e
    }
 }
 
-void onControllerUpdatePhysics(const unsigned int eventId, void* userData, void* eventData)
+static void onControllerUpdatePhysics(const unsigned int eventId, void* userData, void* eventData)
 {
    // Gather input state and broadcast it to the server
    // FIXME reimplement
@@ -319,25 +321,25 @@ void onControllerUpdatePhysics(const unsigned int eventId, void* userData, void*
    }*/
 }
 
-void onPlayerUpdatePhysics(const unsigned int eventId, void* userData, void* eventData)
+static void onPlayerUpdatePhysics(const unsigned int eventId, void* userData, void* eventData)
 {
    // Process any pending message from the controller
    if (lastState.timestamp != lastPlayerAppliedStateTimestamp)
    {
-      // LOGI(">>> New InputState %08x", lastState.timestamp);
+      // LOGI(std::format(">>> New InputState {:08x}", lastState.timestamp));
       lastPlayerAppliedStateTimestamp = lastState.timestamp;
       actionState = lastState.keyState;
       // FIXME vpxApi->SetInputState(actionState, lastState.nudgeX, lastState.nudgeY, lastState.plunger);
    }
 }
 
-void onGameStart(const unsigned int eventId, void* userData, void* eventData)
+static void onGameStart(const unsigned int eventId, void* userData, void* eventData)
 {
    lastState.timestamp = 0;
    if (runModeProp_Val == 1)
    {
       runMode = RunMode::RunModeController;
-      LOGI("RemoteControl plugin started as controller (client mode, server ip is %s:%d)", hostProp_Get(), portProp_Val);
+      LOGI("RemoteControl plugin started as controller (client mode, server ip is "s + hostProp_Get() + ':' + std::to_string(portProp_Val) + ')');
       udpThread = std::thread([]()
          {
             using namespace std::literals;
@@ -368,7 +370,7 @@ void onGameStart(const unsigned int eventId, void* userData, void* eventData)
                   }
                   sent += n;
                }
-               // LOGD("Sent %08x", stateMsg.timestamp);
+               // LOGD(std::format("Sent {:08x}", stateMsg.timestamp));
                int n = client.receiveData(reinterpret_cast<char*>(&stateMsg), 1);
                if (n == 1) // Acked, therefore connected
                {
@@ -392,7 +394,7 @@ void onGameStart(const unsigned int eventId, void* userData, void* eventData)
    else if (runModeProp_Val == 2)
    {
       runMode = RunMode::RunModePlayer;
-      LOGI("RemoteControl plugin started as player (server mode, using port: %d)", portProp_Val);
+      LOGI("RemoteControl plugin started as player (server mode, using port: "s + std::to_string(portProp_Val) + ')');
       udpThread = std::thread([]()
          {
             StateMsg stateMsg;
@@ -427,7 +429,7 @@ void onGameStart(const unsigned int eventId, void* userData, void* eventData)
                      runMode = RunMode::RunModeNone;
                      break;
                   }
-                  //LOGD("Rcv ok %08x", stateMsg.timestamp);
+                  // LOGD(std::format("Rcv ok {:08x}", stateMsg.timestamp));
                   lastState = stateMsg;
                   server.sendData(&stateMsg, 1);
                }
@@ -444,7 +446,7 @@ void onGameStart(const unsigned int eventId, void* userData, void* eventData)
    }
 }
 
-void stopThread()
+static void stopThread()
 {
    if (runMode == RunMode::RunModePlayer)
    {
@@ -465,12 +467,12 @@ void stopThread()
    }
 }
 
-void onGameEnd(const unsigned int eventId, void* userData, void* eventData)
+static void onGameEnd(const unsigned int eventId, void* userData, void* eventData)
 {
    stopThread();
 }
 
-LPI_IMPLEMENT // Implement shared log support
+LPI_IMPLEMENT_CPP // Implement shared log support
 
 }
 

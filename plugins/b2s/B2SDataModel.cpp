@@ -93,7 +93,7 @@ static VPXTexture GetTextureAttribute(const tinyxml2::XMLNode& doc, const std::s
                   path = "/"s + parent->ToElement()->Name() + path;
                parent = parent->Parent();
             }
-            LOGE("Failed to decode image at line %d (%s)", node->GetLineNum(), path.c_str());
+            LOGE(std::format("Failed to decode image at line {} ({})", node->GetLineNum(), path));
          }
          return CreateTexture(decoded.data(), static_cast<int>(decoded.size()));
       }

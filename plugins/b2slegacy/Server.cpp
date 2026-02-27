@@ -197,8 +197,8 @@ void Server::OnDevSrcChanged(const unsigned int msgId, void* userData, void* msg
       }
    }
 
-   LOGI("B2SLegacy: Device state updated - Solenoids: %d, Lamps: %d, GI: %d, Mechs: %d",
-        m_nSolenoids, m_nLamps, m_nGIs, m_nMechs);
+   LOGI(std::format("B2SLegacy: Device state updated - Solenoids: {}, Lamps: {}, GI: {}, Mechs: {}",
+        m_nSolenoids, m_nLamps, m_nGIs, m_nMechs));
 }
 
 int Server::OnRenderStatic(VPXRenderContext2D* ctx, void* userData)
@@ -291,7 +291,7 @@ void Server::TimerElapsed(Timer* pTimer)
          }
 
          if (!logged || changed) {
-            LOGI("B2S polling status: lamps=%d, solenoids=%d, giStrings=%d, leds=%d", callLamps, callSolenoids, callGIStrings, callLEDs);
+            LOGI(std::format("B2S polling status: lamps={}, solenoids={}, giStrings={}, leds={}", callLamps, callSolenoids, callGIStrings, callLEDs));
 
             if (!callLamps && !callSolenoids && !callGIStrings && !callLEDs)
                pTimer->Stop();
@@ -1652,7 +1652,7 @@ void Server::Startup()
     m_vpxApi->GetTableInfo(&tableInfo);
     m_pB2SData->SetTableFileName(tableInfo.path);
 
-    LOGI("B2S table filename set to '%s'", tableInfo.path);
+    LOGI("B2S table filename set to '"s + tableInfo.path + '\'');
 }
 
 void Server::ShowBackglassForm()

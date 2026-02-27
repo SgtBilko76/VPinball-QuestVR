@@ -33,11 +33,11 @@ using std::vector;
 namespace B2S
 {
 
-LPI_USE();
-#define LOGD LPI_LOGD
-#define LOGI LPI_LOGI
-#define LOGW LPI_LOGW
-#define LOGE LPI_LOGE
+LPI_USE_CPP();
+#define LOGD B2S::LPI_LOGD_CPP
+#define LOGI B2S::LPI_LOGI_CPP
+#define LOGW B2S::LPI_LOGW_CPP
+#define LOGE B2S::LPI_LOGE_CPP
 
 PSC_USE_ERROR();
 
