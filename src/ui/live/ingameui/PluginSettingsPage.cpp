@@ -34,9 +34,9 @@ void PluginHomePage::Open(bool isBackwardAnimation)
 
 
 PluginSettingsPage::PluginSettingsPage(const string& pluginId)
-   : InGameUIPage(m_player->m_pluginManager.GetPlugin(pluginId)->m_name,
-        m_player->m_pluginManager.GetPlugin(pluginId)->m_description + "\nBy " + m_player->m_pluginManager.GetPlugin(pluginId)->m_author + "\nVersion "
-           + m_player->m_pluginManager.GetPlugin(pluginId)->m_version,
+   : InGameUIPage(g_pplayer->m_pluginManager.GetPlugin(pluginId)->m_name,
+        std::format("{}\nBy {}\nVersion {}", g_pplayer->m_pluginManager.GetPlugin(pluginId)->m_description, g_pplayer->m_pluginManager.GetPlugin(pluginId)->m_author,
+           g_pplayer->m_pluginManager.GetPlugin(pluginId)->m_version),
         SaveMode::Both)
    , m_pluginId(pluginId)
 {
