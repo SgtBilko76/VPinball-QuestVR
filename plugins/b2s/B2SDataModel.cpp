@@ -183,8 +183,11 @@ static std::vector<std::string> GetStringList(const std::string& str, char delim
    return tokens;
 }
 
-static bool StartsWithCaseInsensitive(const std::string& str, const std::string& prepend) { return string_to_lower(str).starts_with(string_to_lower(prepend)); }
-
+static bool StartsWithCaseInsensitive(const std::string& str, const std::string& prefix)
+{
+   if (prefix.length() > str.length()) return false;
+   return std::equal(prefix.begin(), prefix.end(), str.begin(), [](char a, char b) { return cLower(a) == cLower(b); });
+}
 
 B2SSound::B2SSound(const tinyxml2::XMLNode& root)
    : m_name(GetStringAttribute(root, ""s, "Name"s, ""s))

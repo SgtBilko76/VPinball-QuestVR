@@ -93,24 +93,26 @@ vector<string> parse_csv_line(const string& line)
 
 string string_replace_all(const string& szStr, const string& szFrom, const string& szTo, const size_t offs)
 {
-   size_t startPos = szStr.find(szFrom, offs);
-   if (startPos == string::npos)
-      return szStr;
-
-   string szNewStr = szStr;
-   szNewStr.replace(startPos, szFrom.length(), szTo);
-   return string_replace_all(szNewStr, szFrom, szTo, startPos+szTo.length());
+   string result = szStr;
+   size_t pos = offs;
+   while ((pos = result.find(szFrom, pos)) != string::npos)
+   {
+      result.replace(pos, szFrom.length(), szTo);
+      pos += szTo.length();
+   }
+   return result;
 }
 
 string string_replace_all(const string& szStr, const string& szFrom, const char szTo, const size_t offs)
 {
-   size_t startPos = szStr.find(szFrom, offs);
-   if (startPos == string::npos)
-      return szStr;
-
-   string szNewStr = szStr;
-   szNewStr.replace(startPos, szFrom.length(), 1, szTo);
-   return string_replace_all(szNewStr, szFrom, szTo, startPos+1);
+   string result = szStr;
+   size_t pos = offs;
+   while ((pos = result.find(szFrom, pos)) != string::npos)
+   {
+      result.replace(pos, szFrom.length(), 1, szTo);
+      ++pos;
+   }
+   return result;
 }
 
 constexpr inline char cLower(char c)
@@ -120,7 +122,8 @@ constexpr inline char cLower(char c)
    return c;
 }
 
-CONSTEXPR inline void StrToLower(string& str) {
+CONSTEXPR inline void StrToLower(string& str)
+{
    std::ranges::transform(str.begin(), str.end(), str.begin(), cLower);
 }
 
@@ -132,7 +135,7 @@ string lowerCase(string input)
 
 inline void StrToLower(std::filesystem::path& path)
 {
-   std::u8string str = path.u8string();
+   std::string str = path.string();
    std::ranges::transform(str.begin(), str.end(), str.begin(), cLower);
    path = str;
 }

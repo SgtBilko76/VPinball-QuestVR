@@ -102,7 +102,7 @@ PinTable::PinTable()
    CComObject<ScriptGlobalTable>::CreateInstance(&m_psgt);
    m_psgt->AddRef();
    m_psgt->Init(this);
-   m_scriptableNames[L"debug"] = nullptr; // Debug global object (for Debug.Print)
+   m_scriptableNames[L"debug"s] = nullptr; // Debug global object (for Debug.Print)
    for (const wstring& methodName : m_psgt->GetMethodNames()) // Add all global methods as reserved keywords
       m_scriptableNames[lowerCase(methodName)] = nullptr;
 
@@ -1231,8 +1231,7 @@ HRESULT PinTable::LoadCustomInfo(IStorage* pstg, IStream *pstmTags, HCRYPTHASH h
       {
          if (tag == FID(CUST))
          {
-            string tmp;
-            tmp = reader.AsString();
+            string tmp = reader.AsString();
             m_vCustomInfoTag.push_back(std::move(tmp));
          }
          return true;
@@ -1393,7 +1392,7 @@ void PinTable::Save(IObjectWriter& writer, const bool saveForUndo)
       }
       writer.WriteRaw(FID(PHMA), phymats.data(), (int)(sizeof(SavePhysicsMaterial)*m_materials.size()));
    }
-   // 10.8+ material saving (this format supports new properties, can be extended in future versions, and does not perform quantizations)
+   // 10.8+ material saving (this format supports new properties, can be extended in future versions, and does not perform quantization)
    for (size_t i = 0; i < m_materials.size(); i++)
       m_materials[i]->Save(writer, saveForUndo);
 
@@ -1686,7 +1685,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                std::ranges::stable_partition(parts.begin(), parts.end(), [](IEditable *p) { return p && !p->GetScriptable()->m_wzName.empty(); });
                for (size_t i = 0; i < parts.size(); ++i)
                {
-                  IEditable *part = parts[i];
+                  IEditable * const part = parts[i];
                   if (part == nullptr)
                   {
                      PLOGE << "Failed to load one of the table parts";
@@ -1712,7 +1711,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                      // we keep the original object. This is not perfect as the table script will not tweak this one, but at least, it makes updating table easy.
                      if (part->GetItemType() == eItemPrimitive && StrCompareNoCase(((Primitive *)part)->m_d.m_szImage, "backglassimage"s))
                      {
-                        Primitive * primitive = (Primitive *)part;
+                        Primitive * const primitive = (Primitive *)part;
                         if (primitive->m_d.m_use3DMesh)
                         {
                            // We need to reduce the primitive to a flasher rectangle. The algorithm is:
@@ -1721,20 +1720,20 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                            // - to evaluate an axis align square in this plane and define a flasher accordingly (a rotated backglass is unlikely)
                            const Matrix3D& transform = primitive->RecalculateMatrices();
                            vector<vec3> vertices(primitive->m_mesh.m_vertices.size());
-                           for (size_t i = 0; i < primitive->m_mesh.m_vertices.size(); i++)
-                              vertices[i] = transform * primitive->m_mesh.m_vertices[i];
+                           for (size_t i2 = 0; i2 < primitive->m_mesh.m_vertices.size(); i2++)
+                              vertices[i2] = transform * primitive->m_mesh.m_vertices[i2];
                            vec3 planeNormal(0.f, 0.f, 0.f);
                            float planeNormalWeight = 0.f;
-                           for (size_t i = 0; i < primitive->m_mesh.m_indices.size(); i += 3)
+                           for (size_t i2 = 0; i2 < primitive->m_mesh.m_indices.size(); i2 += 3)
                            {
-                              vec3 &a = vertices[primitive->m_mesh.m_indices[i]];
-                              vec3 &b = vertices[primitive->m_mesh.m_indices[i + 1]];
-                              vec3 &c = vertices[primitive->m_mesh.m_indices[i + 2]];
+                              vec3 &a = vertices[primitive->m_mesh.m_indices[i2]];
+                              vec3 &b = vertices[primitive->m_mesh.m_indices[i2 + 1]];
+                              vec3 &c = vertices[primitive->m_mesh.m_indices[i2 + 2]];
                               vec3 ab(b.x - a.x, b.y - a.y, b.z - a.z);
                               vec3 ac(c.x - a.x, c.y - a.y, c.z - a.z);
                               vec3 n = CrossProduct(ac, ab);
                               n.Normalize();
-                              const float weight = n.Dot(vec3(0.f, 0.f, -1.f));
+                              const float weight = -n.z; //= n.Dot(vec3(0.f, 0.f, -1.f));
                               if (weight > 0.f)
                               {
                                  planeNormal += weight * n;
@@ -1748,15 +1747,15 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                               planeNormal /= normalLength;
 
                               float planeDist = FLT_MAX;
-                              for (const int idx : primitive->m_mesh.m_indices)
+                              for (const unsigned int idx : primitive->m_mesh.m_indices)
                                  planeDist = min(planeDist, planeNormal.Dot(vertices[idx]));
 
                               float minx = FLT_MAX; // min/max along the x axis
                               float miny = FLT_MAX; // min/max along planeYAxis
                               float maxx = FLT_MIN;
                               float maxy = FLT_MIN;
-                              const vec3 planeYAxis = CrossProduct(planeNormal, vec3(1.f, 0.f, 0.f));
-                              for (const int idx : primitive->m_mesh.m_indices)
+                              const vec3 planeYAxis(0.f,planeNormal.z,-planeNormal.y); //= CrossProduct(planeNormal, vec3(1.f, 0.f, 0.f));
+                              for (const unsigned int idx : primitive->m_mesh.m_indices)
                                  if (const float proj = planeNormal.Dot(vertices[idx]); proj < planeDist + 1.f)
                                  {
                                     const float px = vertices[idx].x; // since we aligned the x axis, planeXAxis is (1, 0, 0)
@@ -1770,7 +1769,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                               const float backglassHeight = maxy - miny;
                               if (backglassWidth > 0.f && backglassHeight > 0.f)
                               {
-                                 Flasher *backglass = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, this, 0.f, 0.f);
+                                 Flasher *const backglass = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, this, 0.f, 0.f);
                                  if (backglass)
                                  {
                                     backglass->m_wzName = GetUniqueName(primitive->GetWName());
@@ -1895,11 +1894,10 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                   // Part group was not found and the name is in use: find a suitable one
                   while (partGroupF == m_vedit.end() && !IsNameUnique(layerName))
                   {
-                     const wstring oldName = layerName;
-                     if (!oldName.ends_with(L"_Layer"s))
+                     if (!layerName.ends_with(L"_Layer"))
                      {
                         // Postpend "layer" to keep alphabetic order of layer
-                        layerName = layerName + L"_Layer";
+                        layerName += L"_Layer";
                      }
                      else
                      {
@@ -1910,15 +1908,14 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                         {
                            // If it ends by a number, then inc the number
                            std::wstring numberStr = layerName.substr(lastNonDigit);
-                           unsigned long number = std::stoul(numberStr);
-                           number++;
-                           std::wstring base = layerName.substr(0, lastNonDigit);
-                           layerName = base + std::to_wstring(number);
+                           const int number = std::stoi(numberStr);
+                           layerName.resize(lastNonDigit); // base
+                           layerName += std::to_wstring(number+1);
                         }
                         else
                         {
                            // If not, add it
-                           layerName = layerName + L"_001";
+                           layerName += L"_001";
                         }
                      }
                      partGroupF = std::ranges::find_if(m_vedit,
@@ -2074,8 +2071,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
          if (loadfileversion < 1081)
          {
             // Rename layers that have been automatically converted to group if there aren't any name conflict (checking for collection objects, as well as script variable names)
-            string script = m_script_text;
-            StrToLower(script);
+            const string script = lowerCase(m_script_text);
             std::ranges::for_each(m_vedit,
                [&](IEditable *editable)
                {
@@ -2477,7 +2473,7 @@ void PinTable::Load(IObjectReader& reader)
          }
          case FID(CODE):
             m_original_table_script = reader.AsScript(m_script_protected); // save original script, in case an external vbs is loaded
-            m_script_text = string_from_utf8_or_iso8859_1(m_original_table_script.c_str(), m_original_table_script.size());
+            m_script_text = string_from_utf8_or_iso8859_1(m_original_table_script.c_str(), m_original_table_script.length());
             break;
          case FID(CCUS): reader.AsRaw(m_rgcolorcustom, sizeof(COLORREF) * 16); break;
          case FID(TDFT): m_difficulty = reader.AsFloat(); break;
@@ -2783,18 +2779,15 @@ void PinTable::NewCollection(const HWND hwndListView, const bool fromSelection)
 int PinTable::AddListCollection(HWND hwndListView, CComObject<Collection> *pcol)
 {
 #ifndef __STANDALONE__
-   char *const szT = MakeChar(pcol->m_wzName.c_str());
-
    LVITEM lvitem;
    lvitem.mask = LVIF_DI_SETITEM | LVIF_TEXT | LVIF_PARAM;
    lvitem.iItem = 0;
    lvitem.iSubItem = 0;
-   lvitem.pszText = szT;
+   string name = MakeString(pcol->m_wzName);
+   lvitem.pszText = name.data();
    lvitem.lParam = (size_t)pcol;
 
    const int index = ListView_InsertItem(hwndListView, &lvitem);
-   delete [] szT;
-
    ListView_SetItemText_Safe(hwndListView, index, 1, std::to_string(pcol->m_visel.size()).c_str());
    return index;
 #else
@@ -3861,7 +3854,7 @@ void PinTable::Paste(const bool atLocation, const int x, const int y)
             if (!IsNameUnique(peditNew->GetWName()))
             {
                //first remove the existing suffix
-               wstring input = peditNew->GetWName();
+               const wstring input = peditNew->GetWName();
                size_t lastNonDigit = input.length();
                while (lastNonDigit > 0 && iswdigit(input[lastNonDigit - 1]))
                   --lastNonDigit;
@@ -5114,15 +5107,11 @@ STDMETHODIMP PinTable::GetPredefinedValue(DISPID dispID, DWORD dwCookie, VARIANT
    {
       if (dwCookie == -1)
       {
-         wzDst = (WCHAR *)malloc(1 * sizeof(WCHAR));
+         wzDst = new WCHAR[1];
          wzDst[0] = L'\0';
       }
       else
-      {
-         const int cwch = MultiByteToWideChar(CP_ACP, 0, m_vimage[dwCookie]->m_name.c_str(), -1, nullptr, 0); //(int)m_vimage[dwCookie]->m_name.length() + 1;
-         wzDst = (WCHAR *)malloc(cwch*sizeof(WCHAR));
-         MultiByteToWideChar(CP_ACP, 0, m_vimage[dwCookie]->m_name.c_str(), -1, wzDst, cwch);
-      }
+         wzDst = MakeWide(m_vimage[dwCookie]->m_name);
    }
    break;
    case IDC_MATERIAL_COMBO:
@@ -5132,56 +5121,37 @@ STDMETHODIMP PinTable::GetPredefinedValue(DISPID dispID, DWORD dwCookie, VARIANT
    {
       if (dwCookie == -1)
       {
-         wzDst = (WCHAR *)malloc(1 * sizeof(WCHAR));
+         wzDst = new WCHAR[1];
          wzDst[0] = L'\0';
       }
       else
-      {
-         const int cwch = MultiByteToWideChar(CP_ACP, 0, m_materials[dwCookie]->m_name.c_str(), -1, nullptr, 0); //(int)m_materials[dwCookie]->m_name.length() + 1;
-         wzDst = (WCHAR *)malloc(cwch*sizeof(WCHAR));
-         MultiByteToWideChar(CP_ACP, 0, m_materials[dwCookie]->m_name.c_str(), -1, wzDst, cwch);
-      }
+         wzDst = MakeWide(m_materials[dwCookie]->m_name);
       break;
    }
    case DISPID_Sound:
    {
       if (dwCookie == -1)
       {
-         wzDst = (WCHAR *)malloc(1 * sizeof(WCHAR));
-         if (wzDst == nullptr)
-            ShowError("DISPID_Sound alloc failed");
-         else
-            wzDst[0] = L'\0';
+         wzDst = new WCHAR[1];
+         wzDst[0] = L'\0';
       }
       else
-      {
-         const int cwch = MultiByteToWideChar(CP_ACP, 0, m_vsound[dwCookie]->GetName().c_str(), -1, nullptr, 0); //(int)m_vsound[dwCookie]->m_name.length() + 1;
-         wzDst = (WCHAR *)malloc(cwch*sizeof(WCHAR));
-         if (wzDst == nullptr)
-            ShowError("DISPID_Sound alloc failed");
-         else
-            MultiByteToWideChar(CP_ACP, 0, m_vsound[dwCookie]->GetName().c_str(), -1, wzDst, cwch);
-      }
+         wzDst = MakeWide(m_vsound[dwCookie]->GetName());
    }
    break;
    case DISPID_Collection:
    {
       if (dwCookie == -1)
       {
-         wzDst = (WCHAR *)malloc(1 * sizeof(WCHAR));
+         wzDst = new WCHAR[1];
          wzDst[0] = L'\0';
       }
       else
       {
          const size_t len = m_vcollection[(int)dwCookie].m_wzName.length();
-         wzDst = (WCHAR *)malloc((len+1) * sizeof(WCHAR));
-         if (wzDst == nullptr)
-            ShowError("DISPID_Collection alloc failed (2)");
-         else
-         {
-            memcpy(wzDst, m_vcollection[(int)dwCookie].m_wzName.c_str(), len * sizeof(WCHAR));
-            wzDst[len] = L'\0';
-         }
+         wzDst = new WCHAR[len+1];
+         memcpy(wzDst, m_vcollection[(int)dwCookie].m_wzName.c_str(), len * sizeof(WCHAR));
+         wzDst[len] = L'\0';
       }
    }
    break;
@@ -5190,7 +5160,7 @@ STDMETHODIMP PinTable::GetPredefinedValue(DISPID dispID, DWORD dwCookie, VARIANT
       const int idx = (dwCookie == -1) ? 0 : dwCookie;
       static const wstring filterNames[5] = { L"None"s, L"Additive"s, L"Multiply"s, L"Overlay"s, L"Screen"s };
       const size_t cwch = filterNames[idx].length() + 1;
-      wzDst = (WCHAR *)malloc(cwch*sizeof(WCHAR));
+      wzDst = new WCHAR[cwch];
       wcsncpy_s(wzDst, cwch, filterNames[idx].c_str());
       break;
    }
@@ -5198,23 +5168,16 @@ STDMETHODIMP PinTable::GetPredefinedValue(DISPID dispID, DWORD dwCookie, VARIANT
    {
       if (dwCookie == -1)
       {
-         wzDst = (WCHAR *)malloc(1 * sizeof(WCHAR));
+         wzDst = new WCHAR[1];
          wzDst[0] = L'\0';
       }
       else
       {
          const wstring& sname = m_vedit[dwCookie]->GetScriptable()->m_wzName;
          const size_t len = sname.length();
-         //wzDst = ::SysAllocString(sname);
-
-         wzDst = (WCHAR *)malloc((len+1) * sizeof(WCHAR));
-         if (wzDst == nullptr)
-            ShowError("DISPID_Surface alloc failed (2)");
-         else
-         {
-            memcpy(wzDst, sname.c_str(), len * sizeof(WCHAR));
-            wzDst[len] = L'\0';
-         }
+         wzDst = new WCHAR[len+1];
+         memcpy(wzDst, sname.c_str(), len * sizeof(WCHAR));
+         wzDst[len] = L'\0';
       }
    }
    break;
@@ -5222,7 +5185,7 @@ STDMETHODIMP PinTable::GetPredefinedValue(DISPID dispID, DWORD dwCookie, VARIANT
 
    CComVariant var(wzDst);
 
-   free(wzDst);
+   delete [] wzDst;
 
    return var.Detach(pVarOut);
 }

@@ -702,13 +702,11 @@ void ImageDialog::Reimport()
             Texture * const ppi = (Texture*)lvitem.lParam;
             if (ppi != nullptr)
             {
-               const HANDLE hFile = CreateFile(ppi->GetFilePath().string().c_str(), GENERIC_READ, FILE_SHARE_READ,
-                                               nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+               const auto &filePath = ppi->GetFilePath();
 
-               if (hFile != INVALID_HANDLE_VALUE)
+               if (std::filesystem::exists(filePath))
                {
-                  CloseHandle(hFile);
-                  CCO(PinTable) * const pt = g_pvp->GetActiveTable();
+                  CCO(PinTable) *const pt = g_pvp->GetActiveTable();
                   m_overallFilesize -= ppi->GetFileSize();
                   m_overallGPUsize -= ppi->GetEstimatedGPUSize();
                   Texture *newImage = pt->ImportImage(ppi->GetFilePath(), ppi->m_name);
@@ -724,7 +722,7 @@ void ImageDialog::Reimport()
                   pt->UpdatePropertyImageList();
                }
                else
-                  MessageBox(ppi->GetFilePath().string().c_str(), "FILE NOT FOUND!", MB_OK);
+                  MessageBox(filePath.string().c_str(), "FILE NOT FOUND!", MB_OK);
 
                sel = ListView_GetNextItem(hImageList, sel, LVNI_SELECTED);
             }
@@ -752,11 +750,10 @@ void ImageDialog::UpdateAll()
       Texture * const ppi = (Texture*)lvitem.lParam;
       if (ppi != nullptr)
       {
-         const HANDLE hFile = CreateFile(ppi->GetFilePath().string().c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-         if (hFile != INVALID_HANDLE_VALUE)
+         const auto &filePath = ppi->GetFilePath();
+         if (std::filesystem::exists(filePath))
          {
-            CloseHandle(hFile);
-            CCO(PinTable) * const pt = g_pvp->GetActiveTable();
+            CCO(PinTable) *const pt = g_pvp->GetActiveTable();
             m_overallFilesize -= ppi->GetFileSize();
             m_overallGPUsize -= ppi->GetEstimatedGPUSize();
             Texture *newImage = pt->ImportImage(ppi->GetFilePath(), ppi->m_name);

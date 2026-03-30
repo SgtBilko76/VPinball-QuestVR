@@ -101,10 +101,8 @@ vector<uint8_t> base64_decode(const char * const __restrict value, const size_t 
 
 bool string_starts_with_case_insensitive(const string& str, const string& prefix)
 {
-   if (prefix.length() > str.length())
-      return false;
-   return std::equal(prefix.begin(), prefix.end(), str.begin(),
-      [](char a, char b) { return cLower(a) == cLower(b); });
+   if (prefix.length() > str.length()) return false;
+   return std::equal(prefix.begin(), prefix.end(), str.begin(), [](char a, char b) { return cLower(a) == cLower(b); });
 }
 
 // trims leading whitespace or similar, this is needed as e.g. B2S reels feature leading whitespace(s)

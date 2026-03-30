@@ -439,13 +439,13 @@ void CodeViewer::OnScriptError(ScriptInterpreter::ErrorType type, int line, int 
          std::wstringstream errorStream;
          errorStream << (type == ScriptInterpreter::ErrorType::Compile ? L"Compile error\r\n" : L"Runtime error\r\n");
          errorStream << L"-------------\r\n";
-         errorStream << L"Line: " << line << " Column: " << column << "\r\n";
-         errorStream << MakeWString(description) << "\r\n";
+         errorStream << L"Line: " << line << L" Column: " << column << L"\r\n";
+         errorStream << MakeWString(description) << L"\r\n";
          if (!stackDump.empty())
          {
             errorStream << L"\r\nStack trace (Most recent call first):\r\n";
             for (const string& callSite : stackDump)
-               errorStream << L"    " << MakeWString(callSite) << "\r\n";
+               errorStream << L"    " << MakeWString(callSite) << L"\r\n";
          }
          errorStream << L"\r\n";
          g_pvp->EnableWindow(FALSE);
@@ -480,7 +480,7 @@ HRESULT CodeViewer::AddItem(IScriptable * const piscript, const bool global)
    m_vcvd.AddSortedString(pcvd);
 
    // Add item to dropdown
-   char * const szT = MakeChar(pcvd->m_wName.c_str());
+   string szT = MakeString(pcvd->m_wName);
 
 #ifdef __STANDALONE__
    ITypeInfo* ti;
@@ -493,10 +493,9 @@ HRESULT CodeViewer::AddItem(IScriptable * const piscript, const bool global)
       ti->Release();
    }
 #else
-   const size_t index = ::SendMessage(m_hwndItemList, CB_ADDSTRING, 0, (size_t)szT);
+   const size_t index = ::SendMessage(m_hwndItemList, CB_ADDSTRING, 0, (size_t)szT.data());
    ::SendMessage(m_hwndItemList, CB_SETITEMDATA, index, (size_t)piscript);
 #endif
-   delete [] szT;
    //AndyS - WIP insert new item into autocomplete list??
    return S_OK;
 }
@@ -518,10 +517,9 @@ void CodeViewer::RemoveItem(IScriptable * const piscript)
 
    // Remove item from dropdown
 #ifndef __STANDALONE__
-   char* const szT = MakeChar(name.c_str());
-   const size_t index = ::SendMessage(m_hwndItemList, CB_FINDSTRINGEXACT, ~0u, (size_t)szT);
+   string szT = MakeString(name);
+   const size_t index = ::SendMessage(m_hwndItemList, CB_FINDSTRINGEXACT, ~0u, (size_t)szT.data());
    ::SendMessage(m_hwndItemList, CB_DELETESTRING, index, 0);
-   delete [] szT;
 #endif
 
    delete pcvd;
@@ -530,17 +528,14 @@ void CodeViewer::RemoveItem(IScriptable * const piscript)
 void CodeViewer::SelectItem(IScriptable * const piscript)
 {
 #ifndef __STANDALONE__
-   char* const szT = MakeChar(piscript->get_Name().c_str());
-
-   const LRESULT index = ::SendMessage(m_hwndItemList, CB_FINDSTRINGEXACT, ~0u, (size_t)szT);
+   string name = MakeString(piscript->get_Name());
+   const LRESULT index = ::SendMessage(m_hwndItemList, CB_FINDSTRINGEXACT, ~0u, (size_t)name.data());
    if (index != CB_ERR)
    {
       ::SendMessage(m_hwndItemList, CB_SETCURSEL, index, 0);
 
       ListEventsFromItem();
    }
-
-   delete [] szT;
 #endif
 }
 
@@ -567,18 +562,16 @@ HRESULT CodeViewer::ReplaceName(IScriptable *const piscript, const wstring &wzNe
 
    // Remove old name from dropdown and replace it with the new
 #ifndef __STANDALONE__
-   char* szT = MakeChar(name.c_str());
-   size_t index = ::SendMessage(m_hwndItemList, CB_FINDSTRINGEXACT, ~0u, (size_t)szT);
+   string szT = MakeString(name);
+   size_t index = ::SendMessage(m_hwndItemList, CB_FINDSTRINGEXACT, ~0u, (size_t)szT.data());
    ::SendMessage(m_hwndItemList, CB_DELETESTRING, index, 0);
-   delete [] szT;
 
-   szT = MakeChar(wzNew.c_str());
-   index = ::SendMessage(m_hwndItemList, CB_ADDSTRING, 0, (size_t)szT);
+   szT = MakeString(wzNew);
+   index = ::SendMessage(m_hwndItemList, CB_ADDSTRING, 0, (size_t)szT.data());
    ::SendMessage(m_hwndItemList, CB_SETITEMDATA, index, (size_t)piscript);
 
    ::SendMessage(m_hwndItemList, CB_SETCURSEL, index, 0);
    ListEventsFromItem(); // Just to get us into a good state
-   delete [] szT;
 #endif
 
    return S_OK;
@@ -1969,7 +1962,7 @@ string CodeViewer::ParseDelimtByColon(string &wholeline)
 	else
 	{
 		result = wholeline.substr(0, idx);
-		wholeline = wholeline.substr(idx + 1, wholeline.length() - result.length());
+		wholeline.erase(0, idx + 1);
 	}
 
 	return result;

@@ -71,17 +71,10 @@ public:
          default:            level = "UNKNOWN"s; break;
       }
 
-      std::string message;
       #ifdef _WIN32
-      auto msg = record.getMessage();
-      const int len = WideCharToMultiByte(CP_UTF8, 0, msg, -1, nullptr, 0, nullptr, nullptr); //(int)wcslen(msg) + 1;
-      if (len > 1)
-      {
-         message.resize(len - 1, '\0');
-         WideCharToMultiByte(CP_UTF8, 0, msg, -1, message.data(), len, nullptr, nullptr);
-      }
+      std::string message = MakeString(record.getMessage(), CP_UTF8);
       #else
-      message = std::string(record.getMessage());
+      std::string message(record.getMessage());
       #endif
 
       char timeBuffer[32];

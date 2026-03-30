@@ -356,10 +356,7 @@ void SoundDialog::Import()
    vector<string> szFileName;
    if (g_pvp->OpenFileDialog(szInitialDir, szFileName, "Sound Files (.wav/.ogg/.mp3)\0*.wav;*.ogg;*.mp3\0", "mp3", OFN_EXPLORER | OFN_ALLOWMULTISELECT))
    {
-      const size_t index = szFileName[0].find_last_of(PATH_SEPARATOR_CHAR);
-      if (index != string::npos)
-         g_app->m_settings.SetRecentDir_SoundDir(szFileName[0].substr(0, index), false);
-
+      g_app->m_settings.SetRecentDir_SoundDir(std::filesystem::path(szFileName[0]).parent_path().string(), false);
       for (const string &file : szFileName)
       {
          VPX::Sound* sound = pt->ImportSound(file);
@@ -392,18 +389,14 @@ void SoundDialog::ReImport()
                 ListView_GetItem( hSoundList, &lvitem );
                 VPX::Sound *const pps = (VPX::Sound *)lvitem.lParam;
 
-                const HANDLE hFile = CreateFile(pps->GetImportPath().string().c_str(), GENERIC_READ, FILE_SHARE_READ,
-                                                 nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr );
-
-                if (hFile != INVALID_HANDLE_VALUE)
+                const auto &importPath = pps->GetImportPath();
+                if (std::filesystem::exists(importPath))
                 {
-                    CloseHandle( hFile );
-
-                    pt->ReImportSound(pps, pps->GetImportPath());
-                    pt->SetNonUndoableDirty( eSaveDirty );
+                   pt->ReImportSound(pps, importPath);
+                   pt->SetNonUndoableDirty(eSaveDirty);
                 }
                 else
-                   MessageBox(pps->GetImportPath().string().c_str(), "FILE NOT FOUND!", MB_OK);
+                   MessageBox(importPath.string().c_str(), "FILE NOT FOUND!", MB_OK);
 
                 sel = ListView_GetNextItem( hSoundList, sel, LVNI_SELECTED );
             }
@@ -474,18 +467,11 @@ void SoundDialog::Export()
 
             char filename[MAXSTRING];
             if (!renameOnExport)
-            {
-               string filename2 = pps->GetImportPath().string();
-               const size_t pos = filename2.find_last_of(PATH_SEPARATOR_CHAR);
-               if (pos != string::npos)
-                  filename2 = filename2.substr(pos + 1);
-               strncpy_s(filename, std::size(filename), filename2.c_str());
-            }
+               strncpy_s(filename, std::size(filename), pps->GetImportPath().filename().string().c_str());
             else
             {
-               string filename2 = pps->GetName();
-               const size_t pos = pps->GetImportPath().string().find_last_of('.');
-               filename2 += pos != string::npos ? pps->GetImportPath().string().substr(pos) : ".ogg"s;
+               const auto ext = pps->GetImportPath().extension();
+               const string filename2 = pps->GetName() + (ext.empty() ? ".ogg"s : ext.string());
                strncpy_s(filename, std::size(filename), filename2.c_str());
             }
             ofn.lpstrFile = filename;
@@ -513,22 +499,12 @@ void SoundDialog::Export()
                      filen = pathName;
                      if (!renameOnExport)
                      {
-                        int begin;
-                        for (begin = (int)pps->GetImportPath().string().length(); begin >= 0; begin--)
-                        {
-                           if (pps->GetImportPath().string()[begin] == PATH_SEPARATOR_CHAR)
-                           {
-                              begin++;
-                              break;
-                           }
-                        }
-                        filen += pps->GetImportPath().string().c_str() + begin;
+                        filen += pps->GetImportPath().filename().string();
                      }
                      else
                      {
                         filen += pps->GetName();
-                        const size_t idx = pps->GetImportPath().string().find_last_of('.');
-                        filen += pps->GetImportPath().string().c_str() + idx;
+                        filen += pps->GetImportPath().extension().string();
                      }
                   }
 

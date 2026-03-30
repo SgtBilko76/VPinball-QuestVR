@@ -1220,7 +1220,7 @@ void Player::OnScriptError(ScriptInterpreter::ErrorType type, int line, int colu
       SetCloseState(Player::CloseState::CS_STOP_PLAY);
 
    const string errorType = (type == ScriptInterpreter::ErrorType::Runtime) ? "Runtime" : "Compile";
-   const string desc = string_from_utf8_or_iso8859_1(description.data(), description.size());
+   const string desc = string_from_utf8_or_iso8859_1(description.c_str(), description.length());
    PLOGE << errorType << " error on line " << line << ", col " << column << ": " << desc;
    if (m_liveUI && m_nScriptErrorNotification < 200)
    {

@@ -399,7 +399,7 @@ void Decal::RenderSetup(RenderDevice *device)
          for (int i = 0; i < len; i++)
          {
             rcOut.left = 0;
-            rcOut.top = 0;//-tm.tmInternalLeading + 2; // Leave a pixel for anti-aliasing;
+            rcOut.top = 0;//-tm.tmInternalLeading + 2; // Leave a pixel for anti-aliasing
             rcOut.right = 1;
             rcOut.bottom = 1;
             ::DrawText(clientDC.GetHDC(), m_d.m_text.c_str() + i, 1, &rcOut, alignment | DT_NOCLIP | DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
@@ -414,7 +414,7 @@ void Decal::RenderSetup(RenderDevice *device)
       else
       {
          rcOut.left = 0;
-         rcOut.top = 0;//-tm.tmInternalLeading + 2; // Leave a pixel for anti-aliasing;
+         rcOut.top = 0;//-tm.tmInternalLeading + 2; // Leave a pixel for anti-aliasing
          rcOut.right = 1;
          rcOut.bottom = 1;
          ::DrawText(clientDC.GetHDC(), m_d.m_text.c_str(), len, &rcOut, alignment | DT_NOCLIP | DT_NOPREFIX | DT_WORDBREAK | DT_CALCRECT);
@@ -468,7 +468,7 @@ void Decal::RenderSetup(RenderDevice *device)
       {
          for (int i = 0; i < len; i++)
          {
-            rcOut.top = AUTOLEADING * i;//-tm.tmInternalLeading + 2; // Leave a pixel for anti-aliasing;
+            rcOut.top = AUTOLEADING * i;//-tm.tmInternalLeading + 2; // Leave a pixel for anti-aliasing
             rcOut.bottom = rcOut.top + 100;
             dc.DrawText(m_d.m_text.c_str() + i, 1, rcOut, alignment | DT_NOCLIP | DT_NOPREFIX | DT_WORDBREAK);
          }

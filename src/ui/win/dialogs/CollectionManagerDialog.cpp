@@ -329,9 +329,8 @@ BOOL CollectionDialog::OnInitDialog()
         IScriptable * const piscript = piedit->GetScriptable();
         if (piscript)
         {
-            char * const szT = MakeChar(piscript->m_wzName.c_str());
-            const size_t index = ::SendMessage(hwndIn, LB_ADDSTRING, 0, (size_t)szT);
-            delete [] szT;
+            string name = MakeString(piscript->m_wzName);
+            const size_t index = ::SendMessage(hwndIn, LB_ADDSTRING, 0, (size_t)name.data());
             ::SendMessage(hwndIn, LB_SETITEMDATA, index, (size_t)piscript);
         }
     }
@@ -354,9 +353,8 @@ BOOL CollectionDialog::OnInitDialog()
         if ((l == pcol->m_visel.size()) && piscript)
         //if (!piedit->m_pcollection)
         {
-            char * const szT = MakeChar(piscript->m_wzName.c_str());
-            const size_t index = ::SendMessage(hwndOut, LB_ADDSTRING, 0, (size_t)szT);
-            delete [] szT;
+            string name = MakeString(piscript->m_wzName);
+            const size_t index = ::SendMessage(hwndOut, LB_ADDSTRING, 0, (size_t)name.data());
             ::SendMessage(hwndOut, LB_SETITEMDATA, index, (size_t)piscript);
         }
     }

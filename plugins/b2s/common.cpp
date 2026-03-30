@@ -22,13 +22,6 @@ typedef int ssize_t;
 namespace B2S
 {
 
-constexpr inline char cLower(char c)
-{
-   if (c >= 'A' && c <= 'Z')
-      c ^= 32; //ASCII convention
-   return c;
-}
-
 static inline bool StrCompareNoCase(const string& strA, const string& strB)
 {
    return strA.length() == strB.length() && std::equal(strA.begin(), strA.end(), strB.begin(), [](char a, char b) { return cLower(a) == cLower(b); });

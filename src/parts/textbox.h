@@ -83,7 +83,7 @@ public:
    // ISupportsErrorInfo
    STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
-   string GetFontName() const;
+   const string& GetFontName() const;
 
    TextboxData m_d;
 

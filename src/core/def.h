@@ -641,19 +641,17 @@ string f2sz(const float f, const bool can_convert_decimal_point = true);
 
 string SizeToReadable(const size_t bytes);
 
-WCHAR* MakeWide(const char* const sz);
 #ifndef MINIMAL_DEF_H
-BSTR MakeWideBSTR(const string& sz);
+BSTR MakeWideBSTR(const string& sz, const UINT codepage = CP_ACP);
 #endif
-WCHAR* MakeWide(const string& sz);
-char *MakeChar(const WCHAR* const wz);
-string MakeString(const wstring& wz);
-string MakeString(const WCHAR* const wz);
+WCHAR* MakeWide(const string& sz, const UINT codepage = CP_ACP);
+string MakeString(const wstring& wz, const UINT codepage = CP_ACP);
+string MakeString(const WCHAR* const wz, const UINT codepage = CP_ACP);
 #ifndef MINIMAL_DEF_H
-string MakeString(const BSTR wz);
+string MakeString(const BSTR wz, const UINT codepage = CP_ACP);
 #endif
-wstring MakeWString(const string& sz);
-wstring MakeWString(const char* const sz);
+wstring MakeWString(const string& sz, const UINT codepage = CP_ACP);
+wstring MakeWString(const char* const sz, const UINT codepage = CP_ACP);
 
 // in case the incoming string length is >= the maximum char length of the outgoing one, WideCharToMultiByte will not produce a zero terminated string
 // this variant always makes sure that the outgoing string is zero terminated
@@ -669,7 +667,7 @@ inline int WideCharToMultiByteNull(
 {
    const int res = WideCharToMultiByte(CodePage,dwFlags,lpWideCharStr,cchWideChar,lpMultiByteStr,cbMultiByte,lpDefaultChar,lpUsedDefaultChar);
    if(cbMultiByte > 0 && lpMultiByteStr)
-      lpMultiByteStr[cbMultiByte-1] = '\0';
+      lpMultiByteStr[min(res, cbMultiByte - 1)] = '\0';
    return res;
 }
 
@@ -686,7 +684,7 @@ inline int MultiByteToWideCharNull(
 {
    const int res = MultiByteToWideChar(CodePage,dwFlags,lpMultiByteStr,cbMultiByte,lpWideCharStr,cchWideChar);
    if(cchWideChar > 0 && lpWideCharStr)
-      lpWideCharStr[cchWideChar-1] = L'\0';
+      lpWideCharStr[min(res, cchWideChar - 1)] = L'\0';
    return res;
 }
 

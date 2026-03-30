@@ -336,7 +336,7 @@ public:
    void ReImportSound(VPX::Sound *const pps, const std::filesystem::path &filename);
    bool ExportSound(VPX::Sound *const pps, const std::filesystem::path &filename);
    void RemoveSound(VPX::Sound *const pps);
-   bool ExportImage(const Texture *const ppi, const string &filename);
+   static bool ExportImage(const Texture *const ppi, const string &filename);
    Texture* ImportImage(const std::filesystem::path &filename, const string &imageName);
    void RemoveImage(Texture *const ppi);
 
@@ -507,7 +507,7 @@ public:
 
    bool RenderSolid() const { return m_renderSolid; }
 
-   void InvokeBallBallCollisionCallback(const class HitBall *b1, const class HitBall *b2, float hitVelocity);
+   static void InvokeBallBallCollisionCallback(const class HitBall *b1, const class HitBall *b2, float hitVelocity);
 
    BEGIN_COM_MAP(PinTable)
    COM_INTERFACE_ENTRY(ITable)

@@ -140,7 +140,7 @@ void Textbox::Load(IObjectReader& reader)
    m_texture = nullptr;
 }
 
-string Textbox::GetFontName() const
+const string& Textbox::GetFontName() const
 {
    return m_d.m_font.name;
 }
@@ -288,8 +288,8 @@ void Textbox::Render(const unsigned int renderMask)
    float h = (rect_bottom - rect_top)*ymult;
 
    #ifdef ENABLE_DX9
-      x -= 0.5f / m_rd->GetOutputBackBuffer()->GetWidth();
-      y -= 0.5f / m_rd->GetOutputBackBuffer()->GetHeight();
+      x -= 0.5f / (float)m_rd->GetOutputBackBuffer()->GetWidth();
+      y -= 0.5f / (float)m_rd->GetOutputBackBuffer()->GetHeight();
    #endif
 
    if (is_dmd)
@@ -699,7 +699,7 @@ TTF_Font* Textbox::LoadFont()
    for (const auto& szStyle : styles) {
       path = find_case_insensitive_file_path(tablePath / (fontName + szStyle + ".ttf"));
       if (!path.empty()) {
-         pFont = TTF_OpenFont(path.string().c_str(), (float)m_d.m_font.size / 10000.f);
+         pFont = TTF_OpenFont(path.string().c_str(), (float)(m_d.m_font.size / 10000.));
          if (pFont) {
             PLOGI << "Font loaded: path=" << path.string();
             break;
@@ -712,7 +712,7 @@ TTF_Font* Textbox::LoadFont()
       PLOGW << "Unable to locate font: path=" << path.string();
 
       path = g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Assets) / "LiberationSans-Regular.ttf";
-      pFont = TTF_OpenFont(path.string().c_str(), (float)m_d.m_font.size / 10000.f);
+      pFont = TTF_OpenFont(path.string().c_str(), (float)(m_d.m_font.size / 10000.));
       if (pFont) {
          PLOGW << "Default font loaded: path=" << path.string();
       }

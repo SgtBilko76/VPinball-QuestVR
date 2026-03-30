@@ -106,15 +106,14 @@ void SearchSelectDialog::Update()
    for (int i = 0; i < m_curTable->m_table->m_vcollection.size(); i++)
    {
       CComObject<Collection> *const pcol = m_curTable->m_table->m_vcollection.ElementAt(i);
-      char *const szT = MakeChar(pcol->m_wzName.c_str());
       LVITEM lv;
       lv.mask = LVIF_TEXT | LVIF_PARAM;
       lv.iItem = idx;
       lv.iSubItem = 0;
       lv.lParam = (LPARAM)pcol;
-      lv.pszText = szT;
+      string name = MakeString(pcol->m_wzName);
+      lv.pszText = name.data();
       ListView_InsertItem(m_hElementList, &lv);
-      delete [] szT;
       ListView_SetItemText_Safe(m_hElementList, idx, 1, "Collection");
       idx++;
    }

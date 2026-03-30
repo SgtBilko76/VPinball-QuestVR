@@ -547,7 +547,7 @@ void StereoSettingsPage::RenderAnaglyphInformations() const
 
       const float leftPerceivedLuminance = VPX::Colors::LuminanceFromLinearRGB(leftPerceivedColor);
       const float rightPerceivedLuminance = VPX::Colors::LuminanceFromLinearRGB(rightPerceivedColor);
-      const float retinalRivalry = saturate(powf(leftPerceivedLuminance / leftFilterLuminance - rightPerceivedLuminance / rightFilterLuminance, 2.f) * 1.2f - 0.2f);
+      const float retinalRivalry = saturate(sqrf(leftPerceivedLuminance / leftFilterLuminance - rightPerceivedLuminance / rightFilterLuminance) * 1.2f - 0.2f);
       overallRetinalRivalry += retinalRivalry;
 
       //const float rejection = 1.f - 0.5f * retinalRivalry; // We could model part of the information rejection that happens at high retinal rivalry levels

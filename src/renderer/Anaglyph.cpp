@@ -20,7 +20,7 @@ void Anaglyph::LoadSetupFromRegistry(const Settings& settings, const int glasses
    m_sRGBDisplay = settings.GetPlayer_AnaglyphsRGB(set);
    m_dynDesatLevel = settings.GetPlayer_AnaglyphDynDesat(set);
    m_deghostLevel = settings.GetPlayer_AnaglyphDeghost(set);
-   // calibrated sRGB luminance transfer (for each primary, pereceived luminance level of the display emitted light, by the eye of the player through the glass filter)
+   // calibrated sRGB luminance transfer (for each primary, perceived luminance level of the display emitted light, by the eye of the player through the glass filter)
    const vec3 leftLumSRGB { settings.GetPlayer_AnaglyphLeftRed(set), settings.GetPlayer_AnaglyphLeftGreen(set), settings.GetPlayer_AnaglyphLeftBlue(set) };
    const vec3 rightLumSRGB { settings.GetPlayer_AnaglyphRightRed(set), settings.GetPlayer_AnaglyphRightGreen(set), settings.GetPlayer_AnaglyphRightBlue(set) };
    SetLuminanceCalibration(leftLumSRGB, rightLumSRGB);
@@ -333,7 +333,7 @@ static Vertex3Ds EvaluateGlassFilter(const Matrix3& M, const float eps = 1e-6f)
    filter.NormalizeSafe();
    if (filter.x < 0.0f || filter.y < 0.0f || filter.z < 0.0f)
    {
-      // We have a calibration issue as we are searching for a glass filter so only 0..1 values are valids, clamp and renormalize
+      // We have a calibration issue as we are searching for a glass filter so only 0..1 values are valid, clamp and renormalize
       filter.x = max(filter.x, 0.0f);
       filter.y = max(filter.y, 0.0f);
       filter.z = max(filter.z, 0.0f);
@@ -363,7 +363,7 @@ void Anaglyph::Update()
    m_rgb2Yr = m_rgb2Yr / (m_rgb2Yr.x + m_rgb2Yr.y + m_rgb2Yr.z);
 
    // Solve the equations for left and right eyes
-   vec3 lum { 0.2126f, 0.7152f, 0.0722f };
+   constexpr vec3 lum { 0.2126f, 0.7152f, 0.0722f };
    Matrix3 leftMat;
    leftMat._11 = lum.x * (m_rgb2Yl.x - 1.f);
    leftMat._12 = lum.y * m_rgb2Yl.x;
@@ -400,7 +400,7 @@ void Anaglyph::Update()
    };
    for (int i = 0; i < 6; i++)
    {
-      float dist = powf(angularDistance(leftHSV.x,i * 60.f), 2.f) + powf(angularDistance(rightHSV.x, i * 60.f + 180.f), 2.f);
+      float dist = sqrf(angularDistance(leftHSV.x,(float)(i * 60))) + sqrf(angularDistance(rightHSV.x, (float)(i * 60) + 180.f));
       if (dist < bestPairMatchDist)
       {
          bestPairMatchDist = dist;
@@ -491,9 +491,9 @@ void Anaglyph::Update()
       vec3 chromacity;
       switch (m_colorPair)
       {
-      case RED_CYAN: chromacity = vec3(0.f, 1.f, -1.f); break;
-      case GREEN_MAGENTA: chromacity = vec3(-1.f, 0.f, 1.f); break;
-      case BLUE_AMBER: chromacity = vec3(-1.f, 1.f, 0.f); break;
+      case RED_CYAN: chromacity = vec3{0.f, 1.f, -1.f}; break;
+      case GREEN_MAGENTA: chromacity = vec3{-1.f, 0.f, 1.f}; break;
+      case BLUE_AMBER: chromacity = vec3{-1.f, 1.f, 0.f}; break;
       }
       vec3 rgb2Yl(m_rgb2Yl);
       vec3 rgb2Yr(m_rgb2Yr);
@@ -508,16 +508,16 @@ void Anaglyph::Update()
       matYYC2RGB.m[2][1] = chromacity.y;
       matYYC2RGB.m[2][2] = chromacity.z;
       matYYC2RGB.Invert();
-      const Matrix3D matLeft2YYC( // Left image to left luminance, right luminance, chromacity
+      const Matrix3D matLeft2YYC{ // Left image to left luminance, right luminance, chromacity
          rgb2Yl.x, rgb2Yl.y, rgb2Yl.z, 0.f, //
          0.f, 0.f, 0.f, 0.f, //
          0.f, 0.f, 0.f, 0.f, //
-         0.f, 0.f, 0.f, 1.f);
-      const Matrix3D matRight2YYC( // Right image to left luminance, right luminance, chromacity
+         0.f, 0.f, 0.f, 1.f};
+      const Matrix3D matRight2YYC{ // Right image to left luminance, right luminance, chromacity
          0.f, 0.f, 0.f, 0.f, //
          rgb2Yr.x, rgb2Yr.y, rgb2Yr.z, 0.f, //
          chromacity.x, chromacity.y, chromacity.z, 0.f, //
-         0.f, 0.f, 0.f, 1.f);
+         0.f, 0.f, 0.f, 1.f};
       m_rgb2AnaglyphLeft = matYYC2RGB * matLeft2YYC;
       m_rgb2AnaglyphRight = matYYC2RGB * matRight2YYC;
       break;
@@ -669,21 +669,21 @@ vec3 Anaglyph::ComputeColor(const vec3& leftCol, const vec3& rightCol, bool isLi
    // 2. Apply Dynamic Desaturation if active and not Deghost
    if (m_filter != DEGHOST && m_dynDesatLevel > 0.f)
    {
-      const float scale = 0.25f * 0.5f;
+      constexpr float scale = 0.25f * 0.5f;
       vec3 lLumGamma = m_rgb2Yl * scale;
       vec3 rLumDynDesat = m_rgb2Yr * scale;
-      
+
       const float left2LeftLum = lCol.x * lLumGamma.x + lCol.y * lLumGamma.y + lCol.z * lLumGamma.z;
       const float left2RightLum = lCol.x * rLumDynDesat.x + lCol.y * rLumDynDesat.y + lCol.z * rLumDynDesat.z;
       const float right2LeftLum = rCol.x * lLumGamma.x + rCol.y * lLumGamma.y + rCol.z * lLumGamma.z;
       const float right2RightLum = rCol.x * rLumDynDesat.x + rCol.y * rLumDynDesat.y + rCol.z * rLumDynDesat.z;
-      
+
       const float leftLum = left2LeftLum + left2RightLum;
       const float rightLum = right2LeftLum + right2RightLum;
-      
+
       const float leftDesat = m_dynDesatLevel * fabsf((left2LeftLum - left2RightLum) / (leftLum + 0.0001f));
       const float rightDesat = m_dynDesatLevel * fabsf((right2LeftLum - right2RightLum) / (rightLum + 0.0001f));
-      
+
       lCol = lCol * (1.0f - leftDesat) + vec3(leftLum, leftLum, leftLum) * leftDesat;
       rCol = rCol * (1.0f - rightDesat) + vec3(rightLum, rightLum, rightLum) * rightDesat;
    }
@@ -696,10 +696,10 @@ vec3 Anaglyph::ComputeColor(const vec3& leftCol, const vec3& rightCol, bool isLi
    vec3 color = vec3(
        lCol.x * lMat.m[0][0] + lCol.y * lMat.m[1][0] + lCol.z * lMat.m[2][0] + lMat.m[3][0] +
        rCol.x * rMat.m[0][0] + rCol.y * rMat.m[1][0] + rCol.z * rMat.m[2][0] + rMat.m[3][0],
-       
+
        lCol.x * lMat.m[0][1] + lCol.y * lMat.m[1][1] + lCol.z * lMat.m[2][1] + lMat.m[3][1] +
        rCol.x * rMat.m[0][1] + rCol.y * rMat.m[1][1] + rCol.z * rMat.m[2][1] + rMat.m[3][1],
-       
+
        lCol.x * lMat.m[0][2] + lCol.y * lMat.m[1][2] + lCol.z * lMat.m[2][2] + lMat.m[3][2] +
        rCol.x * rMat.m[0][2] + rCol.y * rMat.m[1][2] + rCol.z * rMat.m[2][2] + rMat.m[3][2]
    );
@@ -712,7 +712,7 @@ vec3 Anaglyph::ComputeColor(const vec3& leftCol, const vec3& rightCol, bool isLi
           powf(max(color.y, 0.f), m_deghostGamma.y),
           powf(max(color.z, 0.f), m_deghostGamma.z)
       );
-      
+
       color = vec3(
           gammaColor.x * m_deghostFilter.m[0][0] + gammaColor.y * m_deghostFilter.m[1][0] + gammaColor.z * m_deghostFilter.m[2][0],
           gammaColor.x * m_deghostFilter.m[0][1] + gammaColor.y * m_deghostFilter.m[1][1] + gammaColor.z * m_deghostFilter.m[2][1],
