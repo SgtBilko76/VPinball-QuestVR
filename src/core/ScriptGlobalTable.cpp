@@ -22,7 +22,7 @@ ScriptGlobalTable::~ScriptGlobalTable()
 
 void ScriptGlobalTable::Init(PinTable *pt)
 {
-   m_pt = pt;   
+   m_pt = pt;
 }
 
 STDMETHODIMP ScriptGlobalTable::BeginModal()
@@ -67,22 +67,22 @@ STDMETHODIMP ScriptGlobalTable::NudgeSetCalibration(int XMax, int YMax, int XGai
 
 STDMETHODIMP ScriptGlobalTable::NudgeSensorStatus(VARIANT *XNudge, VARIANT *YNudge)
 {
-	CComVariant(m_pt->m_tblNudgeRead.x).Detach(XNudge);
-	CComVariant(m_pt->m_tblNudgeRead.y).Detach(YNudge);
-	m_pt->m_tblNudgeRead = Vertex2D(0.f,0.f);
+   CComVariant(m_pt->m_tblNudgeRead.x).Detach(XNudge);
+   CComVariant(m_pt->m_tblNudgeRead.y).Detach(YNudge);
+   m_pt->m_tblNudgeRead = Vertex2D(0.f,0.f);
 
-	return S_OK;
+   return S_OK;
 }
 
 STDMETHODIMP ScriptGlobalTable::NudgeTiltStatus(VARIANT *XPlumb, VARIANT *YPlumb, VARIANT *Tilt)
 {
-	CComVariant(m_pt->m_tblNudgePlumb.x).Detach(XPlumb);
-	CComVariant(m_pt->m_tblNudgePlumb.y).Detach(YPlumb);
-	m_pt->m_tblNudgePlumb = Vertex2D(0.f,0.f);
-	CComVariant(m_pt->m_tblNudgeReadTilt).Detach(Tilt);
-	m_pt->m_tblNudgeReadTilt = 0.0f;
+   CComVariant(m_pt->m_tblNudgePlumb.x).Detach(XPlumb);
+   CComVariant(m_pt->m_tblNudgePlumb.y).Detach(YPlumb);
+   m_pt->m_tblNudgePlumb = Vertex2D(0.f,0.f);
+   CComVariant(m_pt->m_tblNudgeReadTilt).Detach(Tilt);
+   m_pt->m_tblNudgeReadTilt = 0.0f;
 
-	return S_OK;
+   return S_OK;
 }
 
 STDMETHODIMP ScriptGlobalTable::PlaySound(BSTR bstr, LONG LoopCount, float volume, float pan, float randompitch, LONG pitch, VARIANT_BOOL usesame, VARIANT_BOOL restart, float front_rear_fade)
@@ -326,7 +326,7 @@ STDMETHODIMP ScriptGlobalTable::get_Setting(BSTR Section, BSTR SettingName, BSTR
       string value;
       switch (Settings::GetRegistry().GetProperty(propId.value())->m_type)
       {
-      case VPX::Properties::PropertyDef::Type::Float: value = f2sz(settings.GetBool(propId.value()), false); break;
+      case VPX::Properties::PropertyDef::Type::Float: value = f2sz(settings.GetFloat(propId.value()), false); break;
       case VPX::Properties::PropertyDef::Type::Int: value = std::to_string(settings.GetInt(propId.value())); break;
       case VPX::Properties::PropertyDef::Type::Bool: value = settings.GetBool(propId.value()) ? "1"s : "0"s; break;
       case VPX::Properties::PropertyDef::Type::Enum: value = std::to_string(settings.GetInt(propId.value())); break;
