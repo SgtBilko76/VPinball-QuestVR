@@ -4882,7 +4882,7 @@ STDMETHODIMP PinTable::GetPredefinedStrings(DISPID dispID, CALPOLESTR *pcaString
 
       const wstring tmp = LocalStringW(IDS_NONE).m_buffer;
       rgstr[0] = (WCHAR *)CoTaskMemAlloc((tmp.length()+1) * sizeof(WCHAR));
-      wcscpy_s(rgstr[0], tmp.length()+1, tmp.c_str());
+      wcsncpy_s(rgstr[0], tmp.length()+1, tmp.c_str());
       rgdw[0] = ~0u;
 
       for (size_t ivar = 0; ivar < cvar; ivar++)
@@ -4907,12 +4907,13 @@ STDMETHODIMP PinTable::GetPredefinedStrings(DISPID dispID, CALPOLESTR *pcaString
    case IDC_MATERIAL_COMBO4:
    {
       cvar = m_materials.size();
+
       rgstr = (WCHAR **)CoTaskMemAlloc((cvar + 1) * sizeof(WCHAR *));
       rgdw = (uint32_t *)CoTaskMemAlloc((cvar + 1) * sizeof(uint32_t));
 
       const wstring tmp = LocalStringW(IDS_NONE).m_buffer;
       rgstr[0] = (WCHAR *)CoTaskMemAlloc((tmp.length()+1) * sizeof(WCHAR));
-      wcscpy_s(rgstr[0], tmp.length()+1, tmp.c_str());
+      wcsncpy_s(rgstr[0], tmp.length()+1, tmp.c_str());
       rgdw[0] = ~0u;
 
       for (size_t ivar = 0; ivar < cvar; ivar++)
