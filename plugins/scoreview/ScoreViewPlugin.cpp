@@ -67,11 +67,11 @@ static int OnRender(VPXRenderContext2D* ctx, void*)
          #if (defined(__APPLE__) && ((defined(TARGET_OS_IOS) && TARGET_OS_IOS) || (defined(TARGET_OS_TV) && TARGET_OS_TV))) || defined(__ANDROID__)
          VPXInfo vpxInfo;
          vpxApi->GetVpxInfo(&vpxInfo);
-         path = std::filesystem::path(vpxInfo.path) / "plugins" / "scoreview";
+         path = std::filesystem::path(vpxInfo.path) / "plugins"sv / "scoreview"sv;
          #else
          path = GetPluginPath();
          #endif
-         path = path / "layouts"s;
+         path = path / "layouts"sv;
          scoreView->Load(path);
       }
    }

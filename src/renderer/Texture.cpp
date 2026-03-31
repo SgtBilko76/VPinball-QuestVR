@@ -997,7 +997,7 @@ Texture* Texture::CreateFromObjectReader(IObjectReader& reader, PinTable* const 
             if (!ext.empty())
             {
                path.erase(path.length() - ext.length());
-               path += "webp";
+               path += "webp"sv;
             }
             ppb->m_path = PathFromString(path);
             FreeImage_SeekMemory(memStream, 0, SEEK_SET);

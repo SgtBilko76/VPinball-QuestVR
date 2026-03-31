@@ -1807,9 +1807,9 @@ bool Shader::parseFile(const string& fileNameRoot, const string& filename, int l
          if (line.starts_with("////")) {
             string newMode = line.substr(4);
             if (newMode == "DEFINES") {
-               currentElement += "#define GLSL\n\n";
-               currentElement += UseGeometryShader() ? "#define USE_GEOMETRY_SHADER 1\n" : "#define USE_GEOMETRY_SHADER 0\n";
-               currentElement += m_isStereo ? "#define N_EYES 2\n" : "#define N_EYES 1\n";
+               currentElement += "#define GLSL\n\n"sv;
+               currentElement += UseGeometryShader() ? "#define USE_GEOMETRY_SHADER 1\n"sv : "#define USE_GEOMETRY_SHADER 0\n"sv;
+               currentElement += m_isStereo ? "#define N_EYES 2\n"sv : "#define N_EYES 1\n"sv;
             } else if (newMode != currentMode) {
                values[currentMode] = currentElement;
                currentElemIt = values.find(newMode);
@@ -2023,13 +2023,13 @@ Shader::ShaderTechnique* Shader::compileGLShader(const ShaderTechniques techniqu
    if ((WRITE_SHADER_FILES == 2) || ((WRITE_SHADER_FILES == 1) && !success))
    {
       std::ofstream shaderCode;
-      shaderCode.open(m_shaderPath / "log" / (shaderCodeName + ".vert"));
+      shaderCode.open(m_shaderPath / "log"sv / (shaderCodeName + ".vert"));
       shaderCode << vertex;
       shaderCode.close();
-      shaderCode.open(m_shaderPath / "log" / (shaderCodeName + ".geom"));
+      shaderCode.open(m_shaderPath / "log"sv / (shaderCodeName + ".geom"));
       shaderCode << geometry;
       shaderCode.close();
-      shaderCode.open(m_shaderPath / "log" / (shaderCodeName + ".frag"));
+      shaderCode.open(m_shaderPath / "log"sv / (shaderCodeName + ".frag"));
       shaderCode << fragment;
       shaderCode.close();
    }
@@ -2160,16 +2160,16 @@ string Shader::PreprocessGLShader(const string& shaderCode) {
    {
       if (line.starts_with("#version ")) {
          #if defined(__OPENGLES__)
-            header += "#version 300 es\n";
-            header += "#define SHADER_GLES30\n";
+            header += "#version 300 es\n"sv;
+            header += "#define SHADER_GLES30\n"sv;
          #elif defined(__APPLE__)
-            header += "#version 410\n";
-            header += "#define SHADER_GL410\n";
+            header += "#version 410\n"sv;
+            header += "#define SHADER_GL410\n"sv;
          #else
             header += line + '\n';
          #endif
          #ifdef __STANDALONE__
-            header += "#define SHADER_STANDALONE\n";
+            header += "#define SHADER_STANDALONE\n"sv;
          #endif
       }
       else if (line.starts_with("#extension "))
@@ -2318,14 +2318,14 @@ void Shader::Load()
    unsigned int codeSize;
    switch (m_shaderId)
    {
-   case UI_SHADER: m_shaderCodeName = "UIShader.hlsl"s; code = g_uiShaderCode; codeSize = sizeof(g_uiShaderCode); break;
-   case BASIC_SHADER: m_shaderCodeName = "BasicShader.hlsl"s; code = g_basicShaderCode; codeSize = sizeof(g_basicShaderCode); break;
-   case BALL_SHADER: m_shaderCodeName = "BallShader.hlsl"s; code = g_ballShaderCode; codeSize = sizeof(g_ballShaderCode); break;
-   case DMD_SHADER: m_shaderCodeName = "DMDShader.hlsl"s; code = g_dmdShaderCode; codeSize = sizeof(g_dmdShaderCode); break;
+   case UI_SHADER: m_shaderCodeName = "UIShader.hlsl"sv; code = g_uiShaderCode; codeSize = sizeof(g_uiShaderCode); break;
+   case BASIC_SHADER: m_shaderCodeName = "BasicShader.hlsl"sv; code = g_basicShaderCode; codeSize = sizeof(g_basicShaderCode); break;
+   case BALL_SHADER: m_shaderCodeName = "BallShader.hlsl"sv; code = g_ballShaderCode; codeSize = sizeof(g_ballShaderCode); break;
+   case DMD_SHADER: m_shaderCodeName = "DMDShader.hlsl"sv; code = g_dmdShaderCode; codeSize = sizeof(g_dmdShaderCode); break;
    case DMD_VR_SHADER: assert(false); break;
-   case FLASHER_SHADER: m_shaderCodeName = "FlasherShader.hlsl"s; code = g_flasherShaderCode; codeSize = sizeof(g_flasherShaderCode); break;
-   case LIGHT_SHADER: m_shaderCodeName = "LightShader.hlsl"s; code = g_lightShaderCode; codeSize = sizeof(g_lightShaderCode); break;
-   case POSTPROCESS_SHADER: m_shaderCodeName = "FBShader.hlsl"s; code = g_FBShaderCode; codeSize = sizeof(g_FBShaderCode); break;
+   case FLASHER_SHADER: m_shaderCodeName = "FlasherShader.hlsl"sv; code = g_flasherShaderCode; codeSize = sizeof(g_flasherShaderCode); break;
+   case LIGHT_SHADER: m_shaderCodeName = "LightShader.hlsl"sv; code = g_lightShaderCode; codeSize = sizeof(g_lightShaderCode); break;
+   case POSTPROCESS_SHADER: m_shaderCodeName = "FBShader.hlsl"sv; code = g_FBShaderCode; codeSize = sizeof(g_FBShaderCode); break;
    }
    LPD3DXBUFFER pBufferErrors;
    constexpr DWORD dwShaderFlags = 0; //D3DXSHADER_SKIPVALIDATION // these do not have a measurable effect so far (also if used in the offline fxc step): D3DXSHADER_PARTIALPRECISION, D3DXSHADER_PREFER_FLOW_CONTROL/D3DXSHADER_AVOID_FLOW_CONTROL

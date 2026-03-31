@@ -298,10 +298,10 @@ VRDevice::VRDevice(const Settings& settings)
          m_rendererType = bgfx::RendererType::Enum::Direct3D11;
          const string gfxBackend = g_pplayer->m_ptable->m_settings.GetPlayer_GfxBackend();
          #ifdef _DEBUG
-         if (gfxBackend == "Vulkan"s)
+         if (gfxBackend == "Vulkan"sv)
             m_rendererType = bgfx::RendererType::Enum::Vulkan;
          #else
-         if (gfxBackend != "Direct3D11"s && gfxBackend != "Default"s)
+         if (gfxBackend != "Direct3D11"sv && gfxBackend != "Default"sv)
          {
             PLOGI << "Renderer backend enforced to Direct3D11 as other backends are still experimental and not enabled in release builds";
          }
@@ -555,28 +555,28 @@ XrBool32 VRDevice::OpenXRMessageCallbackFunction(XrDebugUtilsMessageSeverityFlag
       std::string msgFlags;
       if (messageSeverity & XR_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
       {
-         msgFlags += "VERBOSE";
+         msgFlags += "VERBOSE"sv;
          separator = true;
       }
       if (messageSeverity & XR_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
       {
          if (separator)
             msgFlags += ',';
-         msgFlags += "INFO";
+         msgFlags += "INFO"sv;
          separator = true;
       }
       if (messageSeverity & XR_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
       {
          if (separator)
             msgFlags += ',';
-         msgFlags += "WARN";
+         msgFlags += "WARN"sv;
          separator = true;
       }
       if (messageSeverity & XR_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
       {
          if (separator)
             msgFlags += ',';
-         msgFlags += "ERROR";
+         msgFlags += "ERROR"sv;
       }
       return msgFlags;
    };
@@ -588,21 +588,21 @@ XrBool32 VRDevice::OpenXRMessageCallbackFunction(XrDebugUtilsMessageSeverityFlag
       std::string msgFlags;
       if (messageType & XR_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
       {
-         msgFlags += "GEN";
+         msgFlags += "GEN"sv;
          separator = true;
       }
       if (messageType & XR_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
       {
          if (separator)
             msgFlags += ',';
-         msgFlags += "SPEC";
+         msgFlags += "SPEC"sv;
          separator = true;
       }
       if (messageType & XR_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
       {
          if (separator)
             msgFlags += ',';
-         msgFlags += "PERF";
+         msgFlags += "PERF"sv;
       }
       return msgFlags;
    };

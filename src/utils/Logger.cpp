@@ -62,13 +62,13 @@ public:
 
       std::string level;
       switch (record.getSeverity()) {
-         case plog::fatal:   level = "FATAL"s; break;
-         case plog::error:   level = "ERROR"s; break;
-         case plog::warning: level = "WARN"s; break;
-         case plog::info:    level = "INFO"s; break;
-         case plog::debug:   level = "DEBUG"s; break;
-         case plog::verbose: level = "VERBOSE"s; break;
-         default:            level = "UNKNOWN"s; break;
+         case plog::fatal:   level = "FATAL"sv; break;
+         case plog::error:   level = "ERROR"sv; break;
+         case plog::warning: level = "WARN"sv; break;
+         case plog::info:    level = "INFO"sv; break;
+         case plog::debug:   level = "DEBUG"sv; break;
+         case plog::verbose: level = "VERBOSE"sv; break;
+         default:            level = "UNKNOWN"sv; break;
       }
 
       #ifdef _WIN32

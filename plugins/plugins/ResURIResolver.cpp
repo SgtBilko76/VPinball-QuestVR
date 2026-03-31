@@ -10,6 +10,7 @@
 #include <format>
 using std::string;
 using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 ResURIResolver::ResURIResolver(const MsgPluginAPI &msgAPI, unsigned int endpointId, bool trackDisplays, bool trackSegDisplays, bool trackInputs, bool trackDevices)
    : m_msgAPI(msgAPI)

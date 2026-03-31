@@ -122,7 +122,7 @@ std::unique_ptr<PUPScreen> PUPScreen::CreateDefault(PUPManager* manager, int scr
 void PUPScreen::LoadTriggers()
 {
    assert(std::this_thread::get_id() == m_apiThread);
-   std::filesystem::path szPlaylistsPath = find_case_insensitive_file_path(m_pManager->GetPath() / "triggers.pup");
+   std::filesystem::path szPlaylistsPath = find_case_insensitive_file_path(m_pManager->GetPath() / "triggers.pup"sv);
    std::ifstream triggersFile;
    triggersFile.open(szPlaylistsPath, std::ifstream::in);
    if (triggersFile.is_open())

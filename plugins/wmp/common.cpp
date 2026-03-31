@@ -51,7 +51,7 @@ string find_case_insensitive_file_path(const string& szPath)
       const auto& parent = p.parent_path();
       string base;
       if (parent.empty() || parent == p) {
-         base = "."s;
+         base = "."sv;
       } else {
          base = self(self, parent.string());
          if (base.empty())

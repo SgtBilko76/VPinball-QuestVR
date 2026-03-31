@@ -19,6 +19,7 @@ using std::vector;
 
 #include <string>
 using namespace std::string_literals;
+using namespace std::string_view_literals;
 using std::string;
 using std::wstring;
 
@@ -709,6 +710,7 @@ static_assert(sizeof(char16_t) == 2, "char16_t must be 2 bytes, otherwise u16str
 inline std::u16string utf32_to_utf16(const std::wstring& input)
 {
    std::u16string result;
+   result.reserve(input.size());
    for (wchar_t wc : input)
    {
       char32_t code = static_cast<char32_t>(wc);
@@ -727,6 +729,7 @@ inline std::u16string utf32_to_utf16(const std::wstring& input)
 inline std::wstring utf16_to_utf32(const std::u16string& input)
 {
    std::wstring result;
+   result.reserve(input.size()/2);
    for (size_t i = 0; i < input.size(); ++i)
    {
       const char16_t w1 = input[i];
@@ -837,7 +840,7 @@ CONSTEXPR inline size_t StrFindNoCase(const string& strA, const string& strB)
          ++i;
          if (i > strA.length() - strB.length())
             return string::npos;
-         j = 0;
+         j = -1;
       }
    return i;
 }

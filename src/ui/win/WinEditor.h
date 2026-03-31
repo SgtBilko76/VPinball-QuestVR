@@ -128,17 +128,17 @@ public:
            {
                case 0:
                {
-                   textBuf += " (inch)";
+                   textBuf += " (inch)"sv;
                    break;
                }
                case 1:
                {
-                   textBuf += " (mm)";
+                   textBuf += " (mm)"sv;
                    break;
                }
                case 2:
                {
-                   textBuf += " (VPUnits)";
+                   textBuf += " (VPUnits)"sv;
                    break;
                }
                default:

@@ -257,7 +257,7 @@ static void OnDevSrcChanged(const unsigned int eventId, void* userData, void* ms
    {
       memset(&info, 0, sizeof(info));
       msgApi->GetEndpointInfo(getSrcMsg.entries[i].id.endpointId, &info);
-      if (info.id != nullptr && info.id == "PinMAME"s)
+      if (info.id != nullptr && info.id == "PinMAME"sv)
       {
          pinmameDevSrc = getSrcMsg.entries[i];
          if (pinmameDevSrc.deviceDefs)
@@ -266,7 +266,7 @@ static void OnDevSrcChanged(const unsigned int eventId, void* userData, void* ms
             memcpy(pinmameDevSrc.deviceDefs, getSrcMsg.entries[i].deviceDefs, getSrcMsg.entries[i].nDevices * sizeof(DeviceDef));
          }
       }
-      else if (info.id != nullptr && (info.id == "B2S"s || info.id == "B2SLegacy"s))
+      else if (info.id != nullptr && (info.id == "B2S"sv || info.id == "B2SLegacy"sv))
       {
          b2sDevSrc = getSrcMsg.entries[i];
          for (unsigned int i = 0; i < b2sDevSrc.nDevices; i++)
@@ -293,7 +293,7 @@ static void OnInputSrcChanged(const unsigned int eventId, void* userData, void* 
    {
       memset(&info, 0, sizeof(info));
       msgApi->GetEndpointInfo(getSrcMsg.entries[i].id.endpointId, &info);
-      if (info.id != nullptr && info.id == "PinMAME"s)
+      if (info.id != nullptr && info.id == "PinMAME"sv)
       {
          pinmameInputSrc = getSrcMsg.entries[i];
          if (pinmameInputSrc.inputDefs)

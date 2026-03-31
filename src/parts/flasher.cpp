@@ -687,13 +687,13 @@ STDMETHODIMP Flasher::get_Filter(BSTR *pVal)
    wstring wz;
    switch (m_d.m_filter)
    {
-   case Filter_Additive: wz = L"Additive"s; break;
-   case Filter_Multiply: wz = L"Multiply"s; break;
-   case Filter_Overlay:  wz = L"Overlay"s; break;
-   case Filter_Screen:   wz = L"Screen"s; break;
+   case Filter_Additive: wz = L"Additive"sv; break;
+   case Filter_Multiply: wz = L"Multiply"sv; break;
+   case Filter_Overlay:  wz = L"Overlay"sv; break;
+   case Filter_Screen:   wz = L"Screen"sv; break;
    default:
       assert(!"Invalid Flasher Filter");
-   case Filter_None:     wz = L"None"s; break;
+   case Filter_None:     wz = L"None"sv; break;
    }
    *pVal = SysAllocStringLen(wz.c_str(),static_cast<UINT>(wz.length()));
 

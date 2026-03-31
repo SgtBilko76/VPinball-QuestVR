@@ -135,7 +135,7 @@ private:
       STDMETHOD(Print)(VARIANT *pvar) override;
 
    public:
-      DebuggerModule() { m_wzName = L"Debug"s; }
+      DebuggerModule() { m_wzName = L"Debug"sv; }
       IDispatch *GetDispatch() final { return (IDispatch *)this; }
       const IDispatch *GetDispatch() const final { return (const IDispatch *)this; }
 

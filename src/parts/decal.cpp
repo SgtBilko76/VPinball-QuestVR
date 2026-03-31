@@ -27,7 +27,7 @@ Decal *Decal::CopyForPlay() const
 
 HRESULT Decal::Init(const float x, const float y, const bool fromMouseClick, const bool forPlay)
 {
-   m_wzName = L"Decal"s;
+   m_wzName = L"Decal"sv;
    SetDefaults(fromMouseClick);
    m_d.m_vCenter.x = x;
    m_d.m_vCenter.y = y;

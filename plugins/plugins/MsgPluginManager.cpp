@@ -12,6 +12,7 @@
 #include <plog/Log.h>
 
 using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 #if defined(_WIN32) || defined(_WIN64)
    #ifndef WIN32_LEAN_AND_MEAN
@@ -361,26 +362,26 @@ void MsgPluginManager::ScanPluginFolder(std::shared_ptr<MsgModuleLoader> loader,
    std::string libraryKey;
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #if (INTPTR_MAX == INT32_MAX)
-   libraryKey = "windows.x86"s;
+   libraryKey = "windows.x86"sv;
 #else
-   libraryKey = "windows.x64"s;
+   libraryKey = "windows.x64"sv;
 #endif
 #elif defined(__ANDROID__) // leave here, as it also defines linux
 #if defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64) || defined(__i386__) || defined(__i386) || defined(__i486__) || defined(__i486) || defined(i386) || defined(__ia64__)           \
    || defined(__x86_64__)
 #if (INTPTR_MAX == INT32_MAX)
-   libraryKey = "android.x86_32"s;
+   libraryKey = "android.x86_32"sv;
 #else
-   libraryKey = "android.x86_64"s;
+   libraryKey = "android.x86_64"sv;
 #endif
 #elif (INTPTR_MAX == INT32_MAX)
-   libraryKey = "android.x86_32"s;
+   libraryKey = "android.x86_32"sv;
 #endif
 #elif (defined(__linux) || defined(__linux__))
 #if defined(__aarch64__)
-   libraryKey = "linux.aarch64"s;
+   libraryKey = "linux.aarch64"sv;
 #else
-   libraryKey = "linux.x64"s;
+   libraryKey = "linux.x64"sv;
 #endif
 #elif defined(__APPLE__)
 #if defined(TARGET_OS_IOS) && TARGET_OS_IOS
@@ -388,9 +389,9 @@ void MsgPluginManager::ScanPluginFolder(std::shared_ptr<MsgModuleLoader> loader,
 #elif defined(TARGET_OS_TV) && TARGET_OS_TV
    // Not yet implemented
 #elif defined(__aarch64__)
-   libraryKey = "macos.arm64"s;
+   libraryKey = "macos.arm64"sv;
 #else
-   libraryKey = "macos.x64"s;
+   libraryKey = "macos.x64"sv;
 #endif
 #endif
    if (libraryKey.empty())
@@ -404,7 +405,7 @@ void MsgPluginManager::ScanPluginFolder(std::shared_ptr<MsgModuleLoader> loader,
       if (entry.is_directory())
       {
          mINI::INIStructure ini;
-         mINI::INIFile file(entry.path() / "plugin.cfg");
+         mINI::INIFile file(entry.path() / "plugin.cfg"sv);
          if (file.read(ini) && ini.has("configuration"s) && ini["configuration"s].has("id"s) && ini.has("libraries"s) && ini["libraries"s].has(libraryKey))
          {
             std::string id = unquote(ini["configuration"s]["id"s]);

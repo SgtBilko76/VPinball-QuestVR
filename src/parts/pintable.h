@@ -577,7 +577,7 @@ public:
       // Table ini file alongside table file, name matching folder name
       const auto folder = m_filename.parent_path();
       auto fn = folder.filename();
-      fn += ".ini";
+      fn += ".ini"sv;
       std::filesystem::path folderIni = folder / fn;
       folderIni = find_case_insensitive_file_path(folderIni);
       if (!folderIni.empty())

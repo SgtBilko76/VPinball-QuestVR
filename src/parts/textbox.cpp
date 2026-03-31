@@ -711,7 +711,7 @@ TTF_Font* Textbox::LoadFont()
       path = tablePath / (fontName + styles[0] + ".ttf");
       PLOGW << "Unable to locate font: path=" << path.string();
 
-      path = g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Assets) / "LiberationSans-Regular.ttf";
+      path = g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Assets) / "LiberationSans-Regular.ttf"sv;
       pFont = TTF_OpenFont(path.string().c_str(), (float)(m_d.m_font.size / 10000.));
       if (pFont) {
          PLOGW << "Default font loaded: path=" << path.string();

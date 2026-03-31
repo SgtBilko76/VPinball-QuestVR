@@ -534,7 +534,7 @@ string PUPPinDisplay::GetGetRoot() const
    if (m_pupManager.GetPath().empty())
       return m_pupManager.GetRootPath().string();
    else
-      return (m_pupManager.GetPath().parent_path() / "").string();
+      return (m_pupManager.GetPath().parent_path() / ""sv).string();
 }
 
 void PUPPinDisplay::SetGetRoot(const string& value)

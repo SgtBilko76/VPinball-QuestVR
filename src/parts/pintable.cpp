@@ -2157,7 +2157,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
 #ifndef __STANDALONE__
    const DWORD attr = GetFileAttributes(filename.string().c_str());
    if ((attr != INVALID_FILE_ATTRIBUTES) && (attr & FILE_ATTRIBUTE_READONLY))
-      m_title += " [READ ONLY]";
+      m_title += " [READ ONLY]"sv;
 #endif
 
    PLOGI << "InitTablePostLoad"; // For profiling
@@ -2184,7 +2184,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
    // are now normal settings stored with others in app/table ini file. It will be only imported if there is no table ini file
    if (const std::filesystem::path filenameAuto = tablePath / tableFile.replace_extension(".pov"); !FileExists(GetSettingsFileName()) && FileExists(filenameAuto))
       ImportBackdropPOV(filenameAuto);
-   else if (const std::filesystem::path filenameAuto2 = tablePath / "autopov.pov"; FileExists(filenameAuto2))
+   else if (const std::filesystem::path filenameAuto2 = tablePath / "autopov.pov"sv; FileExists(filenameAuto2))
       ImportBackdropPOV(filenameAuto2);
 
    // auto-import VBS table script, if it exists...
@@ -2193,7 +2193,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
    else
    {
       auto fn = tablePath.filename();
-      fn += ".vbs";
+      fn += ".vbs"sv;
       std::filesystem::path folderVbs = tablePath / fn;
       folderVbs = find_case_insensitive_file_path(folderVbs);
       if (!folderVbs.empty())
@@ -2204,7 +2204,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
    // auto-import VPP settings, if it exists...
    if (const std::filesystem::path filenameAuto = tablePath / tableFile.replace_extension(".vpp"); FileExists(filenameAuto)) // We check if there is a matching table vpp settings file first
       ImportVPP(filenameAuto);
-   else if (const std::filesystem::path filenameAuto2 = tablePath / "autovpp.vpp"; FileExists(filenameAuto2)) // Otherwise, we seek for autovpp settings
+   else if (const std::filesystem::path filenameAuto2 = tablePath / "autovpp.vpp"sv; FileExists(filenameAuto2)) // Otherwise, we seek for autovpp settings
       ImportVPP(filenameAuto2);
 
    if (m_tableEditor)
@@ -4390,7 +4390,7 @@ Material* PinTable::GetMaterial(const string &name) const
 void PinTable::AddMaterial(Material * const pmat)
 {
    if (pmat->m_name.empty() || pmat->m_name == "dummyMaterial")
-      pmat->m_name = "Material"s;
+      pmat->m_name = "Material"sv;
 
    if (!IsMaterialNameUnique(pmat->m_name) || pmat->m_name == "Material")
    {
@@ -4880,16 +4880,15 @@ STDMETHODIMP PinTable::GetPredefinedStrings(DISPID dispID, CALPOLESTR *pcaString
       rgstr = (WCHAR **)CoTaskMemAlloc((cvar + 1) * sizeof(WCHAR *));
       rgdw = (uint32_t *)CoTaskMemAlloc((cvar + 1) * sizeof(uint32_t));
 
-      WCHAR *wzDst = (WCHAR *)CoTaskMemAlloc(7 * sizeof(WCHAR));
-      // TEXT
-      MultiByteToWideCharNull(CP_ACP, 0, LocalString(IDS_NONE).m_szbuffer, -1, wzDst, 7);
-      rgstr[0] = wzDst;
+      const wstring tmp = LocalStringW(IDS_NONE).m_buffer;
+      rgstr[0] = (WCHAR *)CoTaskMemAlloc((tmp.length()+1) * sizeof(WCHAR));
+      wcscpy_s(rgstr[0], tmp.length()+1, tmp.c_str());
       rgdw[0] = ~0u;
 
       for (size_t ivar = 0; ivar < cvar; ivar++)
       {
          const int cwch = (int)m_vimage[ivar]->m_name.length() + 1;
-         wzDst = (WCHAR *)CoTaskMemAlloc(cwch*sizeof(WCHAR));
+         WCHAR* const wzDst = (WCHAR *)CoTaskMemAlloc(cwch*sizeof(WCHAR));
          if (wzDst == nullptr)
             ShowError("DISPID_Image alloc failed");
          else
@@ -4911,16 +4910,15 @@ STDMETHODIMP PinTable::GetPredefinedStrings(DISPID dispID, CALPOLESTR *pcaString
       rgstr = (WCHAR **)CoTaskMemAlloc((cvar + 1) * sizeof(WCHAR *));
       rgdw = (uint32_t *)CoTaskMemAlloc((cvar + 1) * sizeof(uint32_t));
 
-      WCHAR *wzDst = (WCHAR *)CoTaskMemAlloc(7 * sizeof(WCHAR));
-      // TEXT
-      MultiByteToWideCharNull(CP_ACP, 0, LocalString(IDS_NONE).m_szbuffer, -1, wzDst, 7);
-      rgstr[0] = wzDst;
+      const wstring tmp = LocalStringW(IDS_NONE).m_buffer;
+      rgstr[0] = (WCHAR *)CoTaskMemAlloc((tmp.length()+1) * sizeof(WCHAR));
+      wcscpy_s(rgstr[0], tmp.length()+1, tmp.c_str());
       rgdw[0] = ~0u;
 
       for (size_t ivar = 0; ivar < cvar; ivar++)
       {
          const int cwch = (int)m_materials[ivar]->m_name.length() + 1;
-         wzDst = (WCHAR *)CoTaskMemAlloc(cwch*sizeof(WCHAR));
+         WCHAR* const wzDst = (WCHAR *)CoTaskMemAlloc(cwch*sizeof(WCHAR));
          if (wzDst == nullptr)
             ShowError("IDC_MATERIAL_COMBO alloc failed");
          else

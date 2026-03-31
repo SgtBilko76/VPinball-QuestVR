@@ -132,7 +132,7 @@ wstring f2wz(const float f, const bool can_convert_decimal_point)
 {
    wstring wz = std::to_wstring(f);
    const size_t pos = wz.find_first_of(L'.');
-   if (pos != string::npos)
+   if (pos != wstring::npos)
    {
       if (can_convert_decimal_point && point != '.') // fix locales that use a ',' instead of the C '.' as decimal point
          wz[pos] = point;
@@ -140,7 +140,7 @@ wstring f2wz(const float f, const bool can_convert_decimal_point)
       size_t pos0 = wz.find_last_not_of(L'0');
       if (pos0 == pos)
          pos0++;
-      wz.erase(pos0 + 1, string::npos); // remove trailing zeros, but leave .0 for integers (line above), as then its clearer that a decimal point can be used for a certain setting!
+      wz.erase(pos0 + 1, wstring::npos); // remove trailing zeros, but leave .0 for integers (line above), as then its clearer that a decimal point can be used for a certain setting!
    }
 
    return wz;

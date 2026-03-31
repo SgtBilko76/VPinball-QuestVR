@@ -298,13 +298,13 @@ void EditorUI::RenderUI()
          string text;
          switch (m_predefinedView)
          {
-         case PredefinedView::None: text = "User"s; break;
-         case PredefinedView::Left: text = "Left"s; break;
-         case PredefinedView::Right: text = "Right"s; break;
-         case PredefinedView::Top: text = "Top"s; break;
-         case PredefinedView::Bottom: text = "Bottom"s; break;
-         case PredefinedView::Front: text = "Front"s; break;
-         case PredefinedView::Back: text = "Back"s; break;
+         case PredefinedView::None: text = "User"sv; break;
+         case PredefinedView::Left: text = "Left"sv; break;
+         case PredefinedView::Right: text = "Right"sv; break;
+         case PredefinedView::Top: text = "Top"sv; break;
+         case PredefinedView::Bottom: text = "Bottom"sv; break;
+         case PredefinedView::Front: text = "Front"sv; break;
+         case PredefinedView::Back: text = "Back"sv; break;
          }
          ImGui::TextUnformatted((text + (m_perspectiveCam ? " Perspective" : " Orthographic")).c_str());
          break;

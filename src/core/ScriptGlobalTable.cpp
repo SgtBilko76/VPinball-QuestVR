@@ -328,7 +328,7 @@ STDMETHODIMP ScriptGlobalTable::get_Setting(BSTR Section, BSTR SettingName, BSTR
       {
       case VPX::Properties::PropertyDef::Type::Float: value = f2wz(settings.GetFloat(propId.value()), false); break;
       case VPX::Properties::PropertyDef::Type::Int: value = std::to_wstring(settings.GetInt(propId.value())); break;
-      case VPX::Properties::PropertyDef::Type::Bool: value = settings.GetBool(propId.value()) ? L"1"s : L"0"s; break;
+      case VPX::Properties::PropertyDef::Type::Bool: value = settings.GetBool(propId.value()) ? L"1"sv : L"0"sv; break;
       case VPX::Properties::PropertyDef::Type::Enum: value = std::to_wstring(settings.GetInt(propId.value())); break;
       case VPX::Properties::PropertyDef::Type::String: value = MakeWide(settings.GetString(propId.value())); break;
       default: return E_FAIL;
@@ -367,7 +367,7 @@ STDMETHODIMP ScriptGlobalTable::get_UserDirectory(BSTR *pVal)
    const auto table = g_pplayer ? g_pplayer->m_ptable : g_pvp ? g_pvp->GetActiveTable() : nullptr;
    if (table == nullptr)
       return E_FAIL;
-   const std::filesystem::path path = g_app->m_fileLocator.GetTablePath(table, FileLocator::TableSubFolder::User, true) / "";
+   const std::filesystem::path path = g_app->m_fileLocator.GetTablePath(table, FileLocator::TableSubFolder::User, true) / ""sv;
    if (!DirExists(path))
       return E_FAIL;
    *pVal = MakeWideBSTR(path.native());
@@ -376,7 +376,7 @@ STDMETHODIMP ScriptGlobalTable::get_UserDirectory(BSTR *pVal)
 
 STDMETHODIMP ScriptGlobalTable::get_TablesDirectory(BSTR *pVal)
 {
-   std::filesystem::path path = g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Tables) / "";
+   std::filesystem::path path = g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Tables) / ""sv;
    if (!DirExists(path))
       return E_FAIL;
    *pVal = MakeWideBSTR(path.native());
@@ -404,7 +404,7 @@ STDMETHODIMP ScriptGlobalTable::get_MusicDirectory(VARIANT pSubDir, BSTR *pVal)
 
 STDMETHODIMP ScriptGlobalTable::get_ScriptsDirectory(BSTR *pVal)
 {
-   const std::filesystem::path path = g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Scripts) / "";
+   const std::filesystem::path path = g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Scripts) / ""sv;
    if (!DirExists(path))
       return E_FAIL;
    *pVal = MakeWideBSTR(path.native());
@@ -513,7 +513,7 @@ STDMETHODIMP ScriptGlobalTable::SaveValue(BSTR TableName, BSTR ValueName, VARIAN
    HRESULT hr;
 
 #ifndef __STANDALONE__
-   const wstring wzPath = (g_app->m_fileLocator.GetTablePath(g_pplayer->m_ptable, FileLocator::TableSubFolder::User, true) / "VPReg.stg").wstring();
+   const wstring wzPath = (g_app->m_fileLocator.GetTablePath(g_pplayer->m_ptable, FileLocator::TableSubFolder::User, true) / "VPReg.stg"sv).wstring();
 
    IStorage *pstgRoot;
    if (FAILED(hr = StgOpenStorage(wzPath.c_str(), nullptr, STGM_TRANSACTED | STGM_READWRITE | STGM_SHARE_EXCLUSIVE, nullptr, 0, &pstgRoot)))
@@ -561,7 +561,7 @@ STDMETHODIMP ScriptGlobalTable::SaveValue(BSTR TableName, BSTR ValueName, VARIAN
    pstgRoot->Release();
 #else
    mINI::INIStructure ini;
-   mINI::INIFile file(g_app->m_fileLocator.GetTablePath(g_pplayer->m_ptable, FileLocator::TableSubFolder::User, true) / "VPReg.ini");
+   mINI::INIFile file(g_app->m_fileLocator.GetTablePath(g_pplayer->m_ptable, FileLocator::TableSubFolder::User, true) / "VPReg.ini"sv);
    file.read(ini);
 
    string szTableName = MakeString(TableName);
@@ -589,7 +589,7 @@ STDMETHODIMP ScriptGlobalTable::LoadValue(BSTR TableName, BSTR ValueName, VARIAN
    HRESULT hr;
 
 #ifndef __STANDALONE__
-   const std::filesystem::path path = g_app->m_fileLocator.GetTablePath(g_pplayer->m_ptable, FileLocator::TableSubFolder::User, false) / "VPReg.stg";
+   const std::filesystem::path path = g_app->m_fileLocator.GetTablePath(g_pplayer->m_ptable, FileLocator::TableSubFolder::User, false) / "VPReg.stg"sv;
 
    IStorage *pstgRoot;
    if (FAILED(hr = StgOpenStorage(path.wstring().c_str(), nullptr, STGM_TRANSACTED | STGM_READWRITE | STGM_SHARE_EXCLUSIVE, nullptr, 0, &pstgRoot)))
@@ -639,7 +639,7 @@ STDMETHODIMP ScriptGlobalTable::LoadValue(BSTR TableName, BSTR ValueName, VARIAN
    Settings* const pSettings = &g_pplayer->m_ptable->m_settings;
 
    mINI::INIStructure ini;
-   mINI::INIFile file(g_app->m_fileLocator.GetTablePath(g_pplayer->m_ptable, FileLocator::TableSubFolder::User, false) / "VPReg.ini");
+   mINI::INIFile file(g_app->m_fileLocator.GetTablePath(g_pplayer->m_ptable, FileLocator::TableSubFolder::User, false) / "VPReg.ini"sv);
    file.read(ini);
 
    string szTableName = MakeString(TableName);

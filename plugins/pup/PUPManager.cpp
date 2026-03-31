@@ -111,7 +111,7 @@ void PUPManager::SetGameDir(const string& szRomName)
       VPXTableInfo tableInfo;
       m_vpxApi->GetTableInfo(&tableInfo);
       std::filesystem::path tablePath = tableInfo.path;
-      path = find_case_insensitive_directory_path(tablePath.parent_path() / "pupvideos" / szRomName);
+      path = find_case_insensitive_directory_path(tablePath.parent_path() / "pupvideos"sv / szRomName);
    }
 
    // If we did not find the pup folder along the table, search for it in the global 'pupvideos' path if defined
@@ -148,7 +148,7 @@ void PUPManager::LoadConfig(const string& szRomName)
    LoadFonts();
 
    // Load screens and start them
-   if (std::filesystem::path szScreensPath = find_case_insensitive_file_path(m_szPath / "screens.pup"); !szScreensPath.empty())
+   if (std::filesystem::path szScreensPath = find_case_insensitive_file_path(m_szPath / "screens.pup"sv); !szScreensPath.empty())
    {
       std::ifstream screensFile;
       screensFile.open(szScreensPath, std::ifstream::in);
@@ -208,7 +208,7 @@ void PUPManager::UnloadFonts()
 void PUPManager::LoadFonts()
 {
    UnloadFonts();
-   std::filesystem::path szFontsPath = find_case_insensitive_directory_path(m_szPath / "FONTS");
+   std::filesystem::path szFontsPath = find_case_insensitive_directory_path(m_szPath / "FONTS"sv);
    if (!szFontsPath.empty())
    {
       for (const auto& entry : std::filesystem::directory_iterator(szFontsPath))
@@ -238,7 +238,7 @@ void PUPManager::LoadFonts()
 
 void PUPManager::LoadPlaylists()
 {
-   std::filesystem::path szPlaylistsPath = find_case_insensitive_file_path(GetPath() / "playlists.pup");
+   std::filesystem::path szPlaylistsPath = find_case_insensitive_file_path(GetPath() / "playlists.pup"sv);
    std::ifstream playlistsFile;
    playlistsFile.open(szPlaylistsPath, std::ifstream::in);
    if (playlistsFile.is_open()) {

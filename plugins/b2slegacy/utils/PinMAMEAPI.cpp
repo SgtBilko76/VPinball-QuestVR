@@ -20,15 +20,15 @@ PinMAMEAPI::PinMAMEAPI(MsgPluginAPI* msgApi, uint32_t endpointId, Server* server
       const char* name = serverClassDef->members[i].name.name;
       unsigned int nArgs = serverClassDef->members[i].nArgs;
 
-      if (name == "ChangedLamps"s && nArgs == 0)
+      if (name == "ChangedLamps"sv && nArgs == 0)
          m_changedLampsIndex = i;
-      else if (name == "ChangedSolenoids"s && nArgs == 0)
+      else if (name == "ChangedSolenoids"sv && nArgs == 0)
          m_changedSolenoidsIndex = i;
-      else if (name == "ChangedGIStrings"s && nArgs == 0)
+      else if (name == "ChangedGIStrings"sv && nArgs == 0)
          m_changedGIStringsIndex = i;
-      else if (name == "ChangedLEDs"s && nArgs == 4)
+      else if (name == "ChangedLEDs"sv && nArgs == 4)
          m_changedLEDsIndex = i;
-      else if (name == "Switch"s && nArgs == 2)
+      else if (name == "Switch"sv && nArgs == 2)
          m_setSwitchIndex = i;
    }
    
@@ -94,7 +94,7 @@ void PinMAMEAPI::HandleCall(int memberIndex, ScriptVariant* pArgs, ScriptVariant
 
    m_controllerProxy.ForwardCall(m_server, memberIndex, pArgs, pRet);
 
-   if (methodName == "GameName"s) {
+   if (methodName == "GameName"sv) {
       if (pArgs) {
          string gameName;
          if (pArgs[0].vString.string)
@@ -104,19 +104,19 @@ void PinMAMEAPI::HandleCall(int memberIndex, ScriptVariant* pArgs, ScriptVariant
          m_server->GetB2SSettings()->SetB2SName(""s);
       }
    }
-   else if (methodName == "Run"s)
+   else if (methodName == "Run"sv)
       m_server->Run(0);
-   else if (methodName == "Stop"s)
+   else if (methodName == "Stop"sv)
       m_server->Stop();
-   else if (methodName == "ChangedLamps"s)
+   else if (methodName == "ChangedLamps"sv)
       m_server->GetChangedLamps(pRet);
-   else if (methodName == "ChangedSolenoids"s)
+   else if (methodName == "ChangedSolenoids"sv)
       m_server->GetChangedSolenoids(pRet);
-   else if (methodName == "ChangedGIStrings"s)
+   else if (methodName == "ChangedGIStrings"sv)
       m_server->GetChangedGIStrings(pRet);
-   else if (methodName == "ChangedLEDs"s)
+   else if (methodName == "ChangedLEDs"sv)
       m_server->GetChangedLEDs(pRet);
-   else if (methodName == "GetMech"s) {
+   else if (methodName == "GetMech"sv) {
       if (pArgs && pRet)
          m_server->CheckGetMech(pArgs[0].vInt, pRet->vInt);
    }

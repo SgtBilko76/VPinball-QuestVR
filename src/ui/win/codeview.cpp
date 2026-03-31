@@ -1282,7 +1282,7 @@ string CodeViewer::GetParamsFromEvent(const UINT iEvent)
                for (unsigned int l = 1; l < cnames; ++l)
                {
                   if (l > 1)
-                     szParams += ", ";
+                     szParams += ", "sv;
                   szParams += MakeString(rgstr[l]);
                   SysFreeString(rgstr[l]);
                }
@@ -1441,7 +1441,7 @@ void CodeViewer::FindCodeFromEvent()
 
       string szNewCode = "Sub "s + szItemName + '(' + GetParamsFromEvent((UINT)iEventIndex) + ")\n\t";
       const size_t subtitlelen = szNewCode.length();
-      szNewCode += "\nEnd Sub";
+      szNewCode += "\nEnd Sub"sv;
 
       ::SendMessage(m_hwndScintilla, SCI_REPLACESEL, TRUE, (size_t)szNewCode.c_str());
 

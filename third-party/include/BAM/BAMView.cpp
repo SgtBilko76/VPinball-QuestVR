@@ -417,7 +417,7 @@ void LoadXML()
          g_TableSettings = LoadXML(ts);
          return;
       }
-      if (szName && "Default"s == szName)
+      if (szName && "Default"sv == szName)
       {
          g_DefaultSettings = LoadXML(ts);
       }

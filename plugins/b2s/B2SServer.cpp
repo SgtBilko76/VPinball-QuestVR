@@ -35,7 +35,7 @@ B2SServer::B2SServer(const MsgPluginAPI* const msgApi, unsigned int endpointId, 
    if (b2sFilename.empty())
    {
       std::filesystem::path folderName = tablePath.parent_path().filename();
-      folderName += ".directb2s";
+      folderName += ".directb2s"sv;
       b2sFilename = find_case_insensitive_file_path(tablePath.parent_path() / folderName);
    }
 

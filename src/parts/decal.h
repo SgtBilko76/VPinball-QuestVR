@@ -44,7 +44,7 @@ public:
    STDMETHOD(GetDocumentation)(INT index, BSTR *pBstrName, BSTR *pBstrDocString, DWORD *pdwHelpContext, BSTR *pBstrHelpFile);
    HRESULT FireDispID(const DISPID dispid, DISPPARAMS *const pdispparams) final;
 #endif
-   Decal() { m_wzName = L"Decal"s; }
+   Decal() { m_wzName = L"Decal"sv; }
    virtual ~Decal();
 
    BEGIN_COM_MAP(Decal)

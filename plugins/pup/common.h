@@ -19,6 +19,7 @@
 #include <string>
 using std::string;
 using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 #include <vector>
 using std::vector;

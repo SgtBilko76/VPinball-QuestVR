@@ -11,6 +11,7 @@
 #include <altsound.h>
 
 using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 #ifndef _MSC_VER
  #define strcpy_s(A, B, C) strncpy(A, C, B)
@@ -187,11 +188,11 @@ static void OnControllerGameStart(const unsigned int eventId, void* userData, vo
     std::filesystem::path basePath;
 
     // Priority 1: altsound/<rom> (library adds /altsound/<rom> to basePath)
-    if (auto path1 = find_case_insensitive_file_path(tablePath.parent_path() / "altsound" / msg->gameId); !path1.empty())
+    if (auto path1 = find_case_insensitive_file_path(tablePath.parent_path() / "altsound"sv / msg->gameId); !path1.empty())
         basePath = tablePath.parent_path();
     // Priority 2: pinmame/altsound/<rom>
-    else if (auto path2 = find_case_insensitive_file_path(tablePath.parent_path() / "pinmame" / "altsound" / msg->gameId); !path2.empty())
-        basePath = tablePath.parent_path() / "pinmame";
+    else if (auto path2 = find_case_insensitive_file_path(tablePath.parent_path() / "pinmame"sv / "altsound"sv / msg->gameId); !path2.empty())
+        basePath = tablePath.parent_path() / "pinmame"sv;
     // Priority 3: global setting
     else
     {
@@ -201,7 +202,7 @@ static void OnControllerGameStart(const unsigned int eventId, void* userData, vo
     }
 
     if (!basePath.empty()) {
-        std::filesystem::path altsoundGamePath = basePath / "altsound" / msg->gameId;
+        std::filesystem::path altsoundGamePath = basePath / "altsound"sv / msg->gameId;
         if (std::filesystem::exists(altsoundGamePath)) {
             LOGI(std::format("Found altsound directory for game: {} at {}", msg->gameId, altsoundGamePath.string()));
             StartAltSound(msg->gameId, basePath.string(), msg->hardwareGen);

@@ -547,7 +547,7 @@ Player::Player(PinTable *const table, const PlayMode playMode)
       {
          try
          {
-            std::filesystem::path path = g_app->m_fileLocator.GetTablePath(m_ptable, FileLocator::TableSubFolder::Cache, false) / "used_textures.xml";
+            std::filesystem::path path = g_app->m_fileLocator.GetTablePath(m_ptable, FileLocator::TableSubFolder::Cache, false) / "used_textures.xml"sv;
             if (FileExists(path))
             {
                PLOGI << "Texture cache found at " << path;
@@ -878,7 +878,7 @@ Player::~Player()
          tinyxml2::XMLDocument xmlDoc;
          tinyxml2::XMLElement *root;
          ankerl::unordered_dense::map<string, tinyxml2::XMLElement *> textureAge;
-         const std::filesystem::path path = dir / "used_textures.xml";
+         const std::filesystem::path path = dir / "used_textures.xml"sv;
          if (FileExists(path))
          {
             std::ifstream myFile(path);
@@ -1764,7 +1764,7 @@ private:
       // - bmp is fast to save but huge on disk (multiple times faster than png, but huge)
       // - qoi is both faster to save and small enough on disk (twice faster than bmp)
       // So we use qoi as it offers a good balance and is lossless and supported by all major video tools (ffmpeg, vlc,...)
-      return m_player->m_ptable->m_filename.parent_path() / "Capture"
+      return m_player->m_ptable->m_filename.parent_path() / "Capture"sv
          / std::format("{}_{:05}{}.qoi",
             (id == VPXWindowId::VPXWINDOW_Playfield        ? "Playfield"
                   : id == VPXWindowId::VPXWINDOW_Backglass ? "Backglass"
@@ -2447,18 +2447,18 @@ float Player::ParseLog(LARGE_INTEGER *pli1, LARGE_INTEGER *pli2)
       int index;
       sscanf_s(szLine, "%s",szWord, (unsigned)_countof(szWord));
 
-      if (szWord == "Key"s)
+      if (szWord == "Key"sv)
       {
          sscanf_s(szLine, "%s %s %d",szWord, (unsigned)_countof(szWord), szSubWord, (unsigned)_countof(szSubWord), &index);
          CComVariant rgvar[1] = { CComVariant(index) };
          DISPPARAMS dispparams = { rgvar, nullptr, 1, 0 };
-         g_pplayer->m_ptable->FireDispID(szSubWord == "Down"s ? DISPID_GameEvents_KeyDown : DISPID_GameEvents_KeyUp, &dispparams);
+         g_pplayer->m_ptable->FireDispID(szSubWord == "Down"sv ? DISPID_GameEvents_KeyDown : DISPID_GameEvents_KeyUp, &dispparams);
       }
-      else if (szWord == "Physics"s)
+      else if (szWord == "Physics"sv)
       {
          sscanf_s(szLine, "%s %s %f",szWord, (unsigned)_countof(szWord), szSubWord, (unsigned)_countof(szSubWord), &dtime);
       }
-      else if (szWord == "Frame"s)
+      else if (szWord == "Frame"sv)
       {
          int a,b,c,d;
          sscanf_s(szLine, "%s %s %f %u %u %u %u",szWord, (unsigned)_countof(szWord), szSubWord, (unsigned)_countof(szSubWord), &dtime, &a, &b, &c, &d);
@@ -2467,7 +2467,7 @@ float Player::ParseLog(LARGE_INTEGER *pli1, LARGE_INTEGER *pli2)
          pli2->HighPart = c;
          pli2->LowPart = d;
       }
-      else if (szWord == "Step"s)
+      else if (szWord == "Step"sv)
       {
          int a,b,c,d;
          sscanf_s(szLine, "%s %s %u %u %u %u",szWord, (unsigned)_countof(szWord), szSubWord, (unsigned)_countof(szSubWord), &a, &b, &c, &d);
@@ -2476,7 +2476,7 @@ float Player::ParseLog(LARGE_INTEGER *pli1, LARGE_INTEGER *pli2)
          pli2->HighPart = c;
          pli2->LowPart = d;
       }
-      else if (szWord == "End"s)
+      else if (szWord == "End"sv)
       {
          return dtime;
       }

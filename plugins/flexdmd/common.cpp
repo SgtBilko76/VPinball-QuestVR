@@ -53,7 +53,7 @@ bool try_parse_color(const string& str, ColorRGBA32& value)
    string hexStr(str, start);
 
    if (hexStr.size() == 6)
-      hexStr += "FF";
+      hexStr += "FF"sv;
    else
       if (hexStr.size() != 8)
          return false;
@@ -116,7 +116,7 @@ string find_case_insensitive_file_path(const string& szPath)
       const auto parent = p.parent_path();
       string base;
       if (parent.empty() || parent == p) {
-         base = "."s;
+         base = "."sv;
       } else {
          base = self(self, parent.string());
          if (base.empty())

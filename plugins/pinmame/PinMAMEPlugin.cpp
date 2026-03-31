@@ -449,13 +449,13 @@ MSGPI_EXPORT void MSGPIAPI PinMAMEPluginLoad(const uint32_t sessionId, const Msg
       VPXPluginAPI* vpxApi = nullptr;
       msgApi->BroadcastMsg(endpointId, getVpxApiMsgId, &vpxApi);
       
-      // Priorize a pinmame folder along the table
+      // Prioritize a pinmame folder along the table
       if (vpxApi != nullptr)
       {
          VPXTableInfo tableInfo;
          vpxApi->GetTableInfo(&tableInfo);
          std::filesystem::path tablePath = tableInfo.path;
-         pinmamePath = find_case_insensitive_directory_path(tablePath.parent_path() / "pinmame" / "roms");
+         pinmamePath = find_case_insensitive_directory_path(tablePath.parent_path() / "pinmame"sv / "roms"sv);
          if (!pinmamePath.empty())
             pinmamePath = pinmamePath.parent_path();
       }
@@ -470,18 +470,18 @@ MSGPI_EXPORT void MSGPIAPI PinMAMEPluginLoad(const uint32_t sessionId, const Msg
       {
          VPXInfo vpxInfo;
          vpxApi->GetVpxInfo(&vpxInfo);
-         pinmamePath = find_case_insensitive_directory_path(std::filesystem::path(vpxInfo.prefPath) / "pinmame"s);
+         pinmamePath = find_case_insensitive_directory_path(std::filesystem::path(vpxInfo.prefPath) / "pinmame"sv);
       }
       #elif defined(__APPLE__) || defined(__linux__)
       if (pinmamePath.empty())
-         pinmamePath = std::filesystem::path(getenv("HOME")) / ".pinmame";
+         pinmamePath = std::filesystem::path(getenv("HOME")) / ".pinmame"sv;
       #endif
 
       // FIXME implement a last resort or just ask the user to define its path setup in the settings ?
       if (pinmamePath.empty())
          LOGE("PinMAME path is not defined."s);
       else
-         strncpy_s(const_cast<char*>(config.vpmPath), PINMAME_MAX_PATH, (pinmamePath / "").string().c_str());
+         strncpy_s(const_cast<char*>(config.vpmPath), PINMAME_MAX_PATH, (pinmamePath / ""sv).string().c_str());
 
       Controller* pController = new Controller(msgApi, endpointId, config);
       pController->SetOnDestroyHandler(OnControllerDestroyed);
