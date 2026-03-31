@@ -128,6 +128,24 @@ string f2sz(const float f, const bool can_convert_decimal_point)
 #endif
 }
 
+wstring f2wz(const float f, const bool can_convert_decimal_point)
+{
+   wstring wz = std::to_wstring(f);
+   const size_t pos = wz.find_first_of(L'.');
+   if (pos != string::npos)
+   {
+      if (can_convert_decimal_point && point != '.') // fix locales that use a ',' instead of the C '.' as decimal point
+         wz[pos] = point;
+
+      size_t pos0 = wz.find_last_not_of(L'0');
+      if (pos0 == pos)
+         pos0++;
+      wz.erase(pos0 + 1, string::npos); // remove trailing zeros, but leave .0 for integers (line above), as then its clearer that a decimal point can be used for a certain setting!
+   }
+
+   return wz;
+}
+
 LocalString::LocalString(const int resid)
 {
    m_szbuffer[0] = '\0';
@@ -239,10 +257,10 @@ static bool HelperConvertASCII(const char* const __restrict szcstr, const int le
       if (_mm_movemask_epi8(sz16) != 0) // test highest bit of each byte, so check for >=0x80 -> non-ASCII
          return false;
 #if (WCHAR_T_SIZE == 2) // UTF16
-      _mm_storeu_si128((__m128i*)(result + i    ), _mm_unpacklo_epi8(sz16, zero)); // zero-extend 16 bytes -> 2×8 uint16 and store
+      _mm_storeu_si128((__m128i*)(result + i    ), _mm_unpacklo_epi8(sz16, zero)); // zero-extend 16 bytes -> 2Ã—8 uint16 and store
       _mm_storeu_si128((__m128i*)(result + i + 8), _mm_unpackhi_epi8(sz16, zero));
 #else // UTF32
-      // zero-extend 16 bytes -> 4×4 uint32 and store
+      // zero-extend 16 bytes -> 4Ã—4 uint32 and store
       const __m128i lo16 = _mm_unpacklo_epi8(sz16, zero); // uint8 -> uint16
       const __m128i hi16 = _mm_unpackhi_epi8(sz16, zero);
       _mm_storeu_si128((__m128i*)(result + i     ), _mm_unpacklo_epi16(lo16, zero)); // uint16 -> uint32
@@ -301,6 +319,12 @@ BSTR MakeWideBSTR(const string& sz, const UINT codepage)
       return trimmed;
    }
    return result;
+}
+
+// Just for convenience and native file system path conversion
+BSTR MakeWideBSTR(const wstring& wz)
+{
+   return SysAllocStringLen(wz.c_str(), (UINT)wz.length());
 }
 
 wstring MakeWString(const string& sz, const UINT codepage)

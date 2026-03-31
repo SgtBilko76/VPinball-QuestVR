@@ -1125,10 +1125,7 @@ HRESULT PinTable::SaveCustomInfo(IStorage* pstg, IStream *pstmTags, HCRYPTHASH h
    writer.EndObject();
 
    for (size_t i = 0; i < m_vCustomInfoTag.size(); i++)
-   {
-      const wstring wzName = MakeWString(m_vCustomInfoTag[i]);
-      WriteInfoValue(pstg, wzName, m_vCustomInfoContent[i], hcrypthash);
-   }
+      WriteInfoValue(pstg, MakeWString(m_vCustomInfoTag[i]), m_vCustomInfoContent[i], hcrypthash);
 
    pstg->Commit(STGC_DEFAULT);
 #endif
@@ -2643,7 +2640,7 @@ void PinTable::Load(IObjectReader& reader)
 
 bool PinTable::ExportSound(VPX::Sound *const pps, const std::filesystem::path &filename)
 {
-   if (pps->GetImportPath().extension() == filename.extension())
+   if (StrCompareNoCase(pps->GetImportPath().extension().string(), filename.extension().string()))
    {
       if (pps->SaveToFile(filename))
          return true;

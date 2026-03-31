@@ -907,7 +907,7 @@ STDMETHODIMP Flasher::put_VideoCapUpdate(BSTR cWinTitle)
     }
 
     if (m_isVideoCap == false) {  // VideoCap has not started because no sourcewin found
-        m_videoCapHwnd = ::FindWindow(nullptr, MakeString(cWinTitle).c_str());
+        m_videoCapHwnd = ::FindWindowW(nullptr, cWinTitle);
         if (m_videoCapHwnd == nullptr)
             return S_FALSE;
 

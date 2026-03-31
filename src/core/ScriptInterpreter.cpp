@@ -87,7 +87,7 @@ ScriptInterpreter::~ScriptInterpreter()
          {
             PLOGE << "Script did not terminate within 5s after request. Forcing close of interpreter #" << m_pScript;
             EXCEPINFO eiInterrupt = {};
-            eiInterrupt.bstrDescription = MakeWideBSTR(LocalString(IDS_HANG).m_szbuffer);
+            eiInterrupt.bstrDescription = MakeWideBSTR(LocalStringW(IDS_HANG).m_buffer);
             //eiInterrupt.scode = E_NOTIMPL;
             eiInterrupt.wCode = 2345;
             m_pScript->InterruptScriptThread(SCRIPTTHREADID_BASE /*SCRIPTTHREADID_ALL*/, &eiInterrupt, /*SCRIPTINTERRUPT_DEBUG*/ SCRIPTINTERRUPT_RAISEEXCEPTION);
@@ -151,7 +151,7 @@ void ScriptInterpreter::Stop(PinTable *table, bool interruptDirectly)
       {
          PLOGE << "Script did not terminate within 5s after request. Forcing close of interpreter #" << m_pScript;
          EXCEPINFO eiInterrupt = {};
-         eiInterrupt.bstrDescription = MakeWideBSTR(LocalString(IDS_HANG).m_szbuffer);
+         eiInterrupt.bstrDescription = MakeWideBSTR(LocalStringW(IDS_HANG).m_buffer);
          //eiInterrupt.scode = E_NOTIMPL;
          eiInterrupt.wCode = 2345;
          m_pScript->InterruptScriptThread(SCRIPTTHREADID_BASE /*SCRIPTTHREADID_ALL*/, &eiInterrupt, /*SCRIPTINTERRUPT_DEBUG*/ SCRIPTINTERRUPT_RAISEEXCEPTION);
@@ -633,8 +633,7 @@ STDMETHODIMP ScriptInterpreter::DebuggerModule::Print(VARIANT *pvar)
       return S_OK;
    }
 
-   const string szT = MakeString(V_BSTR(&varT));
-   PLOGI << "Script.Print '" << szT << '\'';
+   PLOGI << "Script.Print '" << MakeString(V_BSTR(&varT)) << '\'';
 
    return S_OK;
 }

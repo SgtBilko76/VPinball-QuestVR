@@ -638,11 +638,13 @@ string convert_decimal_point_and_trim(string sz, const bool use_locale);
 
 float sz2f(string sz, const bool force_convert_decimal_point = false);
 string f2sz(const float f, const bool can_convert_decimal_point = true);
+wstring f2wz(const float f, const bool can_convert_decimal_point = true);
 
 string SizeToReadable(const size_t bytes);
 
 #ifndef MINIMAL_DEF_H
 BSTR MakeWideBSTR(const string& sz, const UINT codepage = CP_ACP);
+BSTR MakeWideBSTR(const wstring& wz);
 #endif
 WCHAR* MakeWide(const string& sz, const UINT codepage = CP_ACP);
 string MakeString(const wstring& wz, const UINT codepage = CP_ACP);

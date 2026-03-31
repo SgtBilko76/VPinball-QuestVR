@@ -323,14 +323,14 @@ STDMETHODIMP ScriptGlobalTable::get_Setting(BSTR Section, BSTR SettingName, BSTR
    const auto propId = Settings::GetRegistry().GetPropertyId(sectionSz, settingSz);
    if (propId.has_value())
    {
-      string value;
+      wstring value;
       switch (Settings::GetRegistry().GetProperty(propId.value())->m_type)
       {
-      case VPX::Properties::PropertyDef::Type::Float: value = f2sz(settings.GetFloat(propId.value()), false); break;
-      case VPX::Properties::PropertyDef::Type::Int: value = std::to_string(settings.GetInt(propId.value())); break;
-      case VPX::Properties::PropertyDef::Type::Bool: value = settings.GetBool(propId.value()) ? "1"s : "0"s; break;
-      case VPX::Properties::PropertyDef::Type::Enum: value = std::to_string(settings.GetInt(propId.value())); break;
-      case VPX::Properties::PropertyDef::Type::String: value = settings.GetString(propId.value()); break;
+      case VPX::Properties::PropertyDef::Type::Float: value = f2wz(settings.GetFloat(propId.value()), false); break;
+      case VPX::Properties::PropertyDef::Type::Int: value = std::to_wstring(settings.GetInt(propId.value())); break;
+      case VPX::Properties::PropertyDef::Type::Bool: value = settings.GetBool(propId.value()) ? L"1"s : L"0"s; break;
+      case VPX::Properties::PropertyDef::Type::Enum: value = std::to_wstring(settings.GetInt(propId.value())); break;
+      case VPX::Properties::PropertyDef::Type::String: value = MakeWide(settings.GetString(propId.value())); break;
       default: return E_FAIL;
       }
       *param = MakeWideBSTR(value);
@@ -370,7 +370,7 @@ STDMETHODIMP ScriptGlobalTable::get_UserDirectory(BSTR *pVal)
    const std::filesystem::path path = g_app->m_fileLocator.GetTablePath(table, FileLocator::TableSubFolder::User, true) / "";
    if (!DirExists(path))
       return E_FAIL;
-   *pVal = MakeWideBSTR(path.string());
+   *pVal = MakeWideBSTR(path.native());
    return S_OK;
 }
 
@@ -379,7 +379,7 @@ STDMETHODIMP ScriptGlobalTable::get_TablesDirectory(BSTR *pVal)
    std::filesystem::path path = g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Tables) / "";
    if (!DirExists(path))
       return E_FAIL;
-   *pVal = MakeWideBSTR(path.string());
+   *pVal = MakeWideBSTR(path.native());
 
    return S_OK;
 }
@@ -394,11 +394,11 @@ STDMETHODIMP ScriptGlobalTable::get_MusicDirectory(VARIANT pSubDir, BSTR *pVal)
       return E_FAIL;
    std::filesystem::path path = g_app->m_fileLocator.GetTablePath(table, FileLocator::TableSubFolder::Music, false);
    if (V_VT(&pSubDir) == VT_BSTR)
-      path = path / MakeString(V_BSTR(&pSubDir));
+      path = path / V_BSTR(&pSubDir);
    if (!DirExists(path))
       return E_FAIL;
    path /= "";
-   *pVal = MakeWideBSTR(path.string());
+   *pVal = MakeWideBSTR(path.native());
    return S_OK;
 }
 
@@ -407,7 +407,7 @@ STDMETHODIMP ScriptGlobalTable::get_ScriptsDirectory(BSTR *pVal)
    const std::filesystem::path path = g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Scripts) / "";
    if (!DirExists(path))
       return E_FAIL;
-   *pVal = MakeWideBSTR(path.string());
+   *pVal = MakeWideBSTR(path.native());
    return S_OK;
 }
 
@@ -651,9 +651,7 @@ STDMETHODIMP ScriptGlobalTable::LoadValue(BSTR TableName, BSTR ValueName, VARIAN
    else
       SetVarBstr(Value, SysAllocString(L""));
 
-   string szValue = MakeString(V_BSTR(Value));
-
-   PLOGD << "TableName=" << szTableName << ", ValueName=" << szValueName << ", Value=" << szValue;
+   PLOGD << "TableName=" << szTableName << ", ValueName=" << szValueName << ", Value=" << MakeString(V_BSTR(Value));
 #endif
    return S_OK;
 }
@@ -873,7 +871,7 @@ STDMETHODIMP ScriptGlobalTable::LoadTexture(BSTR imageName, BSTR fileName)
    if (m_pt->GetImage(szImageName))
       return E_FAIL;
 
-   Texture *image = m_pt->ImportImage(MakeString(fileName), szImageName);
+   Texture *image = m_pt->ImportImage(fileName, szImageName);
    return image == nullptr ? E_FAIL : S_OK;
 }
 
