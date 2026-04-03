@@ -1285,17 +1285,16 @@ void Primitive::UpdateAnimation(const float diff_time_msec)
    {
       const float previousFrame = m_currentFrame;
       m_currentFrame += m_speed * (diff_time_msec * (float)(60. / 1000.));
-      if (m_currentFrame >= (float)m_mesh.m_animationFrames.size())
+      const float maxFrame = (float)(m_mesh.m_animationFrames.size()-1);
+      if (m_currentFrame > maxFrame)
       {
-          if (m_endless)
-          {
-             m_currentFrame = 0.0f;
-          }
-          else
-          {
-             m_currentFrame = (float)(m_mesh.m_animationFrames.size() - 1);
-             m_doAnimation = false;
-          }
+         if (m_endless)
+            m_currentFrame = fminf(m_currentFrame-maxFrame, maxFrame);
+         else
+         {
+            m_currentFrame = maxFrame;
+            m_doAnimation = false;
+         }
       }
       m_vertexBufferRegenerate |= m_currentFrame != previousFrame;
    }

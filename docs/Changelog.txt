@@ -176,6 +176,8 @@ FIXES:
 
 - fix SMAA looking worse compared to 10.7.X, and slightly improve its quality in general
 
+- fix wrong primitive animation when using the endless-loop function (removing the need for NFozzy's workaround via script)
+
 - allow for larger inclination value range
 
 - fix 0-scaled rubber crash (like it can happen if invalid UI-inputs like 'Scale' are mapped to 0)
