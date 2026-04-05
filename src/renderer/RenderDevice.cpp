@@ -319,7 +319,9 @@ void RenderDevice::RenderThread(RenderDevice* rd, bgfx::Init init)
    //   . For Vulkan, we use the vkWaitForPresentKHR extension which allows to wait for a specific presented frame to be 
    //     displayed. We wait for the last presented frame to be displayed before submitting the next one (in turn 
    //     enforcing a maxFrameLatency of 1).
-   //   . Metal & OpenGL do not have support for latency management yet
+   //   . For Metal, we simply acquire a swapchain drawable that will release afterward as this calls is blocking until
+   //     a drawable is available.
+   //   . OpenGL do not have support for latency management yet
    // - OpenXR offers its own frame display time prediction that we use when in VR mode.
 
    init.resolution.numBackBuffers = 2; // Simple flip model with 2 buffers: one locked for the GPU (rendering), one locked for the swapchain (displayed or queued)
