@@ -33,6 +33,7 @@ InputManager::InputManager(Player* player)
    CreateInputActions();
 
    // Touch screen support
+   m_supportsTouch = false;
    int nTouchDevices;
    SDL_TouchID* touchDevices = SDL_GetTouchDevices(&nTouchDevices);
    for (int i = 0; i < nTouchDevices; i++)

@@ -84,7 +84,7 @@ void PerfUI::RenderFPS()
          color = IM_COL32(255, 0, 0, 128); // Red dot when running slower than expected
       else
       #endif
-      if ((m_player->m_logicProfiler.GetSlidingAvg(FrameProfiler::PROFILE_FRAME) - 100) * m_player->GetTargetRefreshRate() > 1000000)
+      if ((m_player->m_logicProfiler.GetSlidingAvg(FrameProfiler::PROFILE_FRAME) - 100.) * m_player->GetTargetRefreshRate() > 1000000.)
          color = IM_COL32(255, 0, 0, 128); // Red dot when missing target refresh rate
       ImGui::GetWindowDrawList()->AddCircleFilled(
          ImGui::GetCursorScreenPos() + ImVec2(ImGui::GetWindowWidth() - 5.f * m_uiScale - 2.f * ImGui::GetStyle().WindowPadding.x, ImGui::GetTextLineHeight() * 0.5f),
@@ -261,7 +261,7 @@ void PerfUI::RenderStats() const
          const bgfx::Stats *stats = bgfx::getStats();
          const float height = blockHeight * 2.f - style.FramePadding.y;
          const uint64_t gpuStart = m_player->m_renderProfiler->GetPrevStart(FrameProfiler::PROFILE_RENDER_FLIP);
-         const uint64_t gpuEnd = gpuStart + (stats->gpuTimeEnd - stats->gpuTimeBegin) * 1000000 / stats->gpuTimerFreq;
+         const uint64_t gpuEnd = gpuStart + (stats->gpuTimeEnd - stats->gpuTimeBegin) * 1000000ULL / stats->gpuTimerFreq;
          {
             const float start = static_cast<float>(gpuStart - minTS) / elapse;
             const float end = static_cast<float>(min(gpuEnd, maxTS) - minTS) / elapse;
