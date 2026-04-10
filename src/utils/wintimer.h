@@ -252,20 +252,23 @@ public:
       assert(m_threadLock == std::this_thread::get_id());
       EnterProfileSection(PROFILE_SCRIPT);
       m_scriptEventDispID = id;
+      m_timerNameWritten = false;
       // For the time being, just store a list of the timer called during the script profile section
       if (!timer_name.empty())
       {
          m_profileTimerTimeStamp = m_profileTimeStamp;
          const size_t len = timer_name.length() + 1;
-         if (m_profileTimersPos + len < MAX_TIMER_LOG - 8)
+         if (m_profileTimersPos + len + 4 <= MAX_TIMER_LOG)
          {
-            strncpy_s(&m_profileTimers[m_profileTimersPos], len, timer_name.c_str());
+            memcpy(&m_profileTimers[m_profileTimersPos], timer_name.c_str(), len);
             m_profileTimersPos += len;
+            m_timerNameWritten = true;
          }
-         else if (m_profileTimersPos < MAX_TIMER_LOG - 8)
+         else if (m_profileTimersPos + 8 <= MAX_TIMER_LOG)
          {
-            strncpy_s(&m_profileTimers[m_profileTimersPos], 4, "...");
+            memcpy(&m_profileTimers[m_profileTimersPos], "...", 4);
             m_profileTimersPos += 4;
+            m_timerNameWritten = true;
          }
       }
    }
@@ -279,7 +282,7 @@ public:
       et.totalLength += (unsigned int)(m_profileTimeStamp - profileTimeStamp);
       if (m_profileSection != PROFILE_SCRIPT)
          et.callCount++;
-      if (!timer_name.empty() && (m_profileTimersPos + 4 < MAX_TIMER_LOG))
+      if (m_timerNameWritten && (m_profileTimersPos + 4 <= MAX_TIMER_LOG))
       {
          *((uint32_t*)(&m_profileTimers[m_profileTimersPos])) = (uint32_t)(m_profileTimeStamp - m_profileTimerTimeStamp);
          m_profileTimersPos += 4;
@@ -517,6 +520,7 @@ private:
    char m_profileTimers[MAX_TIMER_LOG];
    size_t m_profileTimersPos = 0;
    uint64_t m_profileTimerTimeStamp;
+   bool m_timerNameWritten = false;
 
    // Worst frames data
    unsigned int m_leastWorstFrameLength;
