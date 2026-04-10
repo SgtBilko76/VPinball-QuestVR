@@ -161,7 +161,7 @@ void GraphicSettingsPage::BuildPage()
          default: assert(false); return 0;
          }
       }, // Live
-      [this](Settings& settings)
+      [this](const Settings& settings)
       {
          switch (settings.GetPlayer_SyncMode())
          {

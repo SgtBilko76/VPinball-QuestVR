@@ -57,15 +57,15 @@ public:
 
    // Properties with custom storage
    explicit InGameUIItem(const VPX::Properties::FloatPropertyDef& prop, float displayScale, const string& format, const std::function<float()>& getValue,
-      const std::function<float(Settings&)>& getStoredValue, const std::function<void(float, float)>& onChange, const std::function<void(Settings&)>& onResetSave,
+      const std::function<float(const Settings&)>& getStoredValue, const std::function<void(float, float)>& onChange, const std::function<void(Settings&)>& onResetSave,
       const std::function<void(float, Settings&, bool)>& onSave);
-   explicit InGameUIItem(const VPX::Properties::IntPropertyDef& prop, const string& format, const std::function<int()>& getValue, const std::function<int(Settings&)>& getStoredValue,
+   explicit InGameUIItem(const VPX::Properties::IntPropertyDef& prop, const string& format, const std::function<int()>& getValue, const std::function<int(const Settings&)>& getStoredValue,
       const std::function<void(int, int)>& onChange, const std::function<void(Settings&)>& onResetSave, const std::function<void(int, Settings&, bool)>& onSave);
-   explicit InGameUIItem(const VPX::Properties::EnumPropertyDef& prop, const std::function<int()>& getValue, const std::function<int(Settings&)>& getStoredValue,
+   explicit InGameUIItem(const VPX::Properties::EnumPropertyDef& prop, const std::function<int()>& getValue, const std::function<int(const Settings&)>& getStoredValue,
       const std::function<void(int, int)>& onChange, const std::function<void(Settings&)>& onResetSave, const std::function<void(int, Settings&, bool)>& onSave);
-   explicit InGameUIItem(const VPX::Properties::BoolPropertyDef& prop, const std::function<bool()>& getValue, const std::function<bool(Settings&)>& getStoredValue,
+   explicit InGameUIItem(const VPX::Properties::BoolPropertyDef& prop, const std::function<bool()>& getValue, const std::function<bool(const Settings&)>& getStoredValue,
       const std::function<void(bool)>& onChange, const std::function<void(Settings&)>& onResetSave, const std::function<void(bool, Settings&, bool)>& onSave);
-   explicit InGameUIItem(const VPX::Properties::StringPropertyDef& prop, const std::function<string()>& getValue, const std::function<string(Settings&)>& getStoredValue,
+   explicit InGameUIItem(const VPX::Properties::StringPropertyDef& prop, const std::function<string()>& getValue, const std::function<string(const Settings&)>& getStoredValue,
       const std::function<void(const string&, const string&)>& onChange, const std::function<void(Settings&)>& onResetSave,
       const std::function<void(const string&, Settings&, bool)>& onSave);
 
@@ -124,22 +124,22 @@ private:
    string m_initialMappingString;
 
    const std::function<bool()> m_getBoolValue;
-   const std::function<bool(Settings&)> m_getStoredBoolValue;
+   const std::function<bool(const Settings&)> m_getStoredBoolValue;
    const std::function<void(bool)> m_onChangeBool;
    const std::function<void(bool, Settings&, bool)> m_onSaveBool;
 
    const std::function<int()> m_getIntValue;
-   const std::function<int(Settings&)> m_getStoredIntValue;
+   const std::function<int(const Settings&)> m_getStoredIntValue;
    const std::function<void(int, int)> m_onChangeInt;
    const std::function<void(int, Settings&, bool)> m_onSaveInt;
 
    const std::function<float()> m_getFloatValue;
-   const std::function<float(Settings&)> m_getStoredFloatValue;
+   const std::function<float(const Settings&)> m_getStoredFloatValue;
    const std::function<void(float, float)> m_onChangeFloat;
    const std::function<void(float, Settings&, bool)> m_onSaveFloat;
 
    const std::function<string()> m_getStringValue;
-   const std::function<string(Settings&)> m_getStoredStringValue;
+   const std::function<string(const Settings&)> m_getStoredStringValue;
    const std::function<void(const string&, const string&)> m_onChangeString;
    const std::function<void(const string&, Settings&, bool)> m_onSaveString;
 

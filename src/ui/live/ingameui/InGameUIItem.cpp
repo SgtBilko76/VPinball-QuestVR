@@ -54,7 +54,7 @@ InGameUIItem::InGameUIItem(string label, string tooltip, string path)
 }
 
 InGameUIItem::InGameUIItem(const FloatPropertyDef& prop, float displayScale, const string& format, const std::function<float()>& getValue,
-   const std::function<float(Settings&)>& getStoredValue, const std::function<void(float, float)>& onChange, const std::function<void(Settings&)>& onResetSave,
+   const std::function<float(const Settings&)>& getStoredValue, const std::function<void(float, float)>& onChange, const std::function<void(Settings&)>& onResetSave,
    const std::function<void(float, Settings&, bool)>& onSave)
    : m_type(Type::Property)
    , m_label(prop.m_label)
@@ -81,7 +81,7 @@ InGameUIItem::InGameUIItem(
 {
 }
 
-InGameUIItem::InGameUIItem(const IntPropertyDef& prop, const string& format, const std::function<int()>& getValue, const std::function<int(Settings&)>& getStoredValue,
+InGameUIItem::InGameUIItem(const IntPropertyDef& prop, const string& format, const std::function<int()>& getValue, const std::function<int(const Settings&)>& getStoredValue,
    const std::function<void(int, int)>& onChange, const std::function<void(Settings&)>& onResetSave, const std::function<void(int, Settings&, bool)>& onSave)
    : m_type(Type::Property)
    , m_label(prop.m_label)
@@ -106,7 +106,7 @@ InGameUIItem::InGameUIItem(const PropertyRegistry::PropId propId, const string& 
 {
 }
 
-InGameUIItem::InGameUIItem(const EnumPropertyDef& prop, const std::function<int()>& getValue, const std::function<int(Settings&)>& getStoredValue,
+InGameUIItem::InGameUIItem(const EnumPropertyDef& prop, const std::function<int()>& getValue, const std::function<int(const Settings&)>& getStoredValue,
    const std::function<void(int, int)>& onChange, const std::function<void(Settings&)>& onResetSave, const std::function<void(int, Settings&, bool)>& onSave)
    : m_type(Type::Property)
    , m_label(prop.m_label)
@@ -130,7 +130,7 @@ InGameUIItem::InGameUIItem(const PropertyRegistry::PropId propId, const std::fun
 {
 }
 
-InGameUIItem::InGameUIItem(const BoolPropertyDef& prop, const std::function<bool()>& getValue, const std::function<bool(Settings&)>& getStoredValue,
+InGameUIItem::InGameUIItem(const BoolPropertyDef& prop, const std::function<bool()>& getValue, const std::function<bool(const Settings&)>& getStoredValue,
    const std::function<void(bool)>& onChange, const std::function<void(Settings&)>& onResetSave, const std::function<void(bool, Settings&, bool)>& onSave)
    : m_type(Type::Property)
    , m_label(prop.m_label)
@@ -154,7 +154,7 @@ InGameUIItem::InGameUIItem(const PropertyRegistry::PropId propId, const std::fun
 {
 }
 
-InGameUIItem::InGameUIItem(const StringPropertyDef& prop, const std::function<string()>& getValue, const std::function<string(Settings&)>& getStoredValue,
+InGameUIItem::InGameUIItem(const StringPropertyDef& prop, const std::function<string()>& getValue, const std::function<string(const Settings&)>& getStoredValue,
    const std::function<void(const string&, const string&)>& onChange, const std::function<void(Settings&)>& onResetSave, const std::function<void(const string&, Settings&, bool)>& onSave)
    : m_type(Type::Property)
    , m_label(prop.m_label)
@@ -195,7 +195,7 @@ InGameUIItem::InGameUIItem(string label, string tooltip, std::function<void(int,
 
 bool InGameUIItem::IsModified() const
 {
-   Settings& settings = g_pplayer ? g_pplayer->m_ptable->m_settings : g_app->m_settings;
+   const Settings& settings = g_pplayer ? g_pplayer->m_ptable->m_settings : g_app->m_settings;
    switch (m_type)
    {
    case Type::Property:
@@ -207,8 +207,8 @@ bool InGameUIItem::IsModified() const
       case PropertyDef::Type::Float:
          if (const size_t dotPos = m_format.find('.'); dotPos != string::npos)
          {
-            const float nDec = m_format[dotPos + 1] - '0';
-            const float threshold = 0.5f * powf(10.f, -nDec);
+            const int nDec = m_format[dotPos + 1] - '0';
+            const float threshold = (float)(0.5 * std::pow(10.f, -nDec));
             return fabs(GetFloatValue() - dynamic_cast<FloatPropertyDef*>(m_property.get())->GetValid(m_getStoredFloatValue(settings))) * m_floatValueDisplayScale > threshold;
          }
          return GetFloatValue() != dynamic_cast<FloatPropertyDef*>(m_property.get())->GetValid(m_getStoredFloatValue(settings));

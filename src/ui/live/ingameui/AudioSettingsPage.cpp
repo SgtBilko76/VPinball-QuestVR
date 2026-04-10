@@ -13,7 +13,7 @@ AudioSettingsPage::AudioSettingsPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::BoolPropertyDef(""s, ""s, "Lock Volumes"s, "Adjust backglass and playfield volume simultaneaously"s, false, true), //
       [this]() { return m_lockVolume; }, //
-      [this](Settings&) { return m_lockVolume; }, //
+      [this](const Settings&) { return m_lockVolume; }, //
       [this](bool v) { m_lockVolume = v; }, //
       [](Settings&) { /* UI state, not persisted */ }, //
       [](bool, Settings&, bool) { /* UI state, not persisted */ }));

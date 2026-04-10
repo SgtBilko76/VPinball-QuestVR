@@ -99,7 +99,7 @@ void SensorSetupPage::BuildPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::EnumPropertyDef(""s, ""s, sensorTypeNames.size() > 1 ? "Hardware Sensor"s : (sensorTypeNames[0] + " Sensor"), ""s, false, 0, liveAxis, axisNames),
       [liveAxis]() { return liveAxis; }, // Live
-      [liveAxis, storedAxis](Settings& settings) { return storedAxis >= 0 ? storedAxis : liveAxis; }, // Stored
+      [liveAxis, storedAxis](const Settings& settings) { return storedAxis >= 0 ? storedAxis : liveAxis; }, // Stored
       [this, defaultSensorType](int, int v)
       {
          const uint16_t deviceId = m_sensors[v - 1] >> 16;
@@ -128,7 +128,7 @@ void SensorSetupPage::BuildPage()
       AddItem(std::make_unique<InGameUIItem>(
          VPX::Properties::EnumPropertyDef(""s, ""s, "Sensor Type"s, ""s, false, 0, sensorType, sensorTypeNames), //
          [sensorType]() { return sensorType; }, // Live
-         [storedSensorType](Settings&) { return storedSensorType; }, // Stored
+         [storedSensorType](const Settings&) { return storedSensorType; }, // Stored
          [this, sensorTypeNames](int, int v)
          {
             const uint16_t deviceId = m_item.m_physicsSensor->GetMapping().GetDeviceId();
@@ -152,7 +152,7 @@ void SensorSetupPage::BuildPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::BoolPropertyDef(""s, ""s, "Reversed axis"s, ""s, false, false), //
       [liveScale]() { return liveScale < 0.f; }, // Live
-      [storedScale](Settings&) { return storedScale < 0.f; }, // Stored
+      [storedScale](const Settings&) { return storedScale < 0.f; }, // Stored
       [this, liveScale](bool v)
       {
          float s = fabs(liveScale);
@@ -168,7 +168,7 @@ void SensorSetupPage::BuildPage()
       VPX::Properties::FloatPropertyDef(""s, ""s, "Dead Zone"s, ""s, false, 0.f, 0.3f, 0.f, 0.f), 100.f,
       "%4.1f %%", //
       [liveDeadZone]() { return liveDeadZone; }, // Live
-      [storedDeadZone](Settings&) { return storedDeadZone; }, // Stored
+      [storedDeadZone](const Settings&) { return storedDeadZone; }, // Stored
       [this](float, float v)
       {
          m_item.m_physicsSensor->GetMapping().SetDeadZone(v);
@@ -181,7 +181,7 @@ void SensorSetupPage::BuildPage()
       VPX::Properties::FloatPropertyDef(""s, ""s, "Gain"s, ""s, false, 0.f, 5.f, 0.f, 1.f), 100.f,
       "%4.1f %%", //
       [liveScale]() { return fabs(liveScale); }, // Live
-      [storedScale](Settings&) { return fabs(storedScale); }, // Stored
+      [storedScale](const Settings&) { return fabs(storedScale); }, // Stored
       [this, liveScale](float, float v)
       {
          const bool reversed = liveScale < 0.f;
@@ -197,7 +197,7 @@ void SensorSetupPage::BuildPage()
       VPX::Properties::FloatPropertyDef(""s, ""s, "Limit"s, ""s, false, 0.f, 10.f, 0.f, 1.f), 1.f,
       "%4.2f", //
       [liveLimit]() { return liveLimit; }, // Live
-      [storedLimit](Settings&) { return storedLimit; }, // Stored
+      [storedLimit](const Settings&) { return storedLimit; }, // Stored
       [this](float, float v)
       {
          m_item.m_physicsSensor->GetMapping().SetLimit(v);

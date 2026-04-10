@@ -321,7 +321,7 @@ void DisplaySettingsPage::BuildWindowPage()
       AddItem(std::make_unique<InGameUIItem>(
          VPX::Properties::EnumPropertyDef(""s, ""s, "Video Mode"s, "Video mode"s, false, 0, defaultMode, modeNames), //
          [selectedMode]() { return selectedMode; }, // Live
-         [selectedMode](Settings& settings) { return selectedMode; }, // Stored
+         [selectedMode](const Settings& settings) { return selectedMode; }, // Stored
          [this, wndDisplay](int, int v)
          {
             m_delayApplyNotifId = m_player->m_liveUI->PushNotification("This change will be applied after restarting the game"s, 5000, m_delayApplyNotifId);
@@ -350,7 +350,7 @@ void DisplaySettingsPage::BuildWindowPage()
       AddItem(std::make_unique<InGameUIItem>(
          VPX::Properties::EnumPropertyDef(""s, ""s, "Lock aspect ratio"s, "Limit window size to a predefined aspect ratio"s, false, 0, m_arLock, arNames), //
          [this]() { return m_arLock; }, // Live
-         [this](Settings& settings) { return m_arLock; }, // Stored
+         [this](const Settings& settings) { return m_arLock; }, // Stored
          [this](int, int v)
          {
             m_arLock = v;
@@ -571,7 +571,7 @@ void DisplaySettingsPage::BuildEmbeddedPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::EnumPropertyDef(""s, ""s, "Lock aspect ratio"s, "Limit window size to a predefined aspect ratio"s, false, 0, m_arLock, arNames), //
       [this]() { return m_arLock; }, // Live
-      [this](Settings& settings) { return m_arLock; }, // Stored
+      [this](const Settings& settings) { return m_arLock; }, // Stored
       [this](int, int v)
       {
          m_arLock = v;

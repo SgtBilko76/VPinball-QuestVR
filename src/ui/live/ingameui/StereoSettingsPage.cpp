@@ -524,7 +524,7 @@ void StereoSettingsPage::RenderAnaglyphInformations() const
    }
 
    const float textWidth = ImGui::CalcTextSize("Right Perception").x;
-   const float colorWidth = 60.f;
+   constexpr float colorWidth = 60.f;
 
    const float innerPosx = posx + style.ItemSpacing.x + textWidth + style.ItemSpacing.x + colorWidth + style.ItemSpacing.x;
    const float innerPosy = posy + style.ItemSpacing.y;
@@ -551,7 +551,7 @@ void StereoSettingsPage::RenderAnaglyphInformations() const
       overallRetinalRivalry += retinalRivalry;
 
       //const float rejection = 1.f - 0.5f * retinalRivalry; // We could model part of the information rejection that happens at high retinal rivalry levels
-      const float rejection = 1.f;
+      constexpr float rejection = 1.f;
       const vec3 perceivedColor = Saturate(rejection * (leftPerceivedColor + rightPerceivedColor)); // linearRGB
 
       const vec3 inColLAB = VPX::Colors::XYZToLAB(VPX::Colors::LinearRGBtoXYZ(inputLinearRGB));

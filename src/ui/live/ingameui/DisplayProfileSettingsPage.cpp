@@ -25,7 +25,7 @@ void DisplayProfileSettingsPage::BuildPage()
             "DMD: Legacy VPX"s, "DMD: Neon Plasma"s, "DMD: Red LED"s, "DMD: Green LED"s, "DMD: Yellow LED"s, "DMD: Generic Plasma"s, "DMD: Generic LED"s, //
             "Alpha: Neon Plasma"s, "Alpha: Blue VFD"s, "Alpha: Green VFD"s, "Alpha: Red LED"s, "Alpha: Green LED"s, "Alpha: Yellow LED"s, "Alpha: Generic Plasma"s, "Alpha: Generic LED"s }),
       [this]() { return m_selectedProfile; }, // Live
-      [this](Settings&) { return m_selectedProfile; }, // Stored
+      [this](const Settings&) { return m_selectedProfile; }, // Stored
       [this](int, int v)
       {
          m_selectedProfile = v;
@@ -42,7 +42,7 @@ void DisplayProfileSettingsPage::BuildPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::FloatPropertyDef(""s, ""s, "Preview Brightness"s, "Adjust the brightness level of the preview."s, false, 0.1f, 5.f, 0.1f, 1.f), 1.f, "%4.1f"s, //
       [this]() { return m_previewBrightness; }, // Live
-      [this](Settings&) { return m_previewBrightness; }, // Stored
+      [this](const Settings&) { return m_previewBrightness; }, // Stored
       [this](float, float v) { m_previewBrightness = v; },
       [](Settings&) { /* UI state, not persisted */ }, //
       [](float, Settings&, bool) { /* UI state, not persisted */ }));
@@ -95,7 +95,7 @@ void DisplayProfileSettingsPage::BuildDMDPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::IntPropertyDef(""s, ""s, "Dot Tint Green"s, ""s, false, 0, 255, 128), "%3d / 255"s, //
       [this, profile]() { return m_srgbLit.g; }, //
-      [this, profile](Settings& settings) { return (settings.GetDMD_ProfileDotTint(profile) >> 8) & 0xFF; }, //
+      [this, profile](const Settings& settings) { return (settings.GetDMD_ProfileDotTint(profile) >> 8) & 0xFF; }, //
       [this, profile](int, int v)
       {
          m_srgbLit.g = v;
@@ -222,7 +222,7 @@ void DisplayProfileSettingsPage::BuildAlphaPage()
    AddItem(std::make_unique<InGameUIItem>(
       VPX::Properties::IntPropertyDef(""s, ""s, "Unlit Segment Color Red"s, ""s, false, 0, 255, 128), "%3d / 255"s, //
       [this, profile]() { return m_srgbUnlit.r; }, //
-      [this, profile](Settings& settings) { return settings.GetAlpha_ProfileUnlit(profile) & 0xFF; }, //
+      [this, profile](const Settings& settings) { return settings.GetAlpha_ProfileUnlit(profile) & 0xFF; }, //
       [this, profile](int, int v)
       {
          m_srgbUnlit.r = v;
