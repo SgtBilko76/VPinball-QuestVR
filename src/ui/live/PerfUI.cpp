@@ -414,10 +414,10 @@ void PerfUI::RenderPlots()
          ImPlot::SetupAxisLimits(ImAxis_X1, 0, m_plotFPS.m_timeSpan, ImGuiCond_Always);
       else
          ImPlot::SetupAxisLimits(ImAxis_X1, static_cast<double>(t) - m_plotFPS.m_timeSpan, static_cast<double>(t), ImGuiCond_Always);
-      ImPlot::PlotLine("ms Frame", &m_plotFPSSmoothed.m_data[0].x, &m_plotFPSSmoothed.m_data[0].y, m_plotFPSSmoothed.m_data.size(), 0, m_plotFPSSmoothed.m_offset, 2 * sizeof(float));
-      ImPlot::PushStyleColor(ImPlotCol_Fill, ImVec4(1, 0, 0, 0.25f));
-      ImPlot::PlotLine("Smoothed ms Frame", &m_plotFPS.m_data[0].x, &m_plotFPS.m_data[0].y, m_plotFPS.m_data.size(), 0, m_plotFPS.m_offset, 2 * sizeof(float));
-      ImPlot::PopStyleColor();
+      ImPlot::PlotLine("ms Frame", &m_plotFPSSmoothed.m_data[0].x, &m_plotFPSSmoothed.m_data[0].y, m_plotFPSSmoothed.m_data.size(),
+         { ImPlotProp_Offset, m_plotFPSSmoothed.m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
+      ImPlot::PlotLine("Smoothed ms Frame", &m_plotFPS.m_data[0].x, &m_plotFPS.m_data[0].y, m_plotFPS.m_data.size(),
+         { ImPlotProp_FillColor, ImVec4(1, 0, 0, 0.25f), ImPlotProp_Offset, m_plotFPS.m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
       ImPlot::EndPlot();
    }
 
@@ -434,10 +434,10 @@ void PerfUI::RenderPlots()
          ImPlot::SetupAxisLimits(ImAxis_X1, 0, m_plotPhysx.m_timeSpan, ImGuiCond_Always);
       else
          ImPlot::SetupAxisLimits(ImAxis_X1, static_cast<double>(t) - m_plotPhysx.m_timeSpan, static_cast<double>(t), ImGuiCond_Always);
-      ImPlot::PlotLine("ms Physics", &m_plotPhysxSmoothed.m_data[0].x, &m_plotPhysxSmoothed.m_data[0].y, m_plotPhysxSmoothed.m_data.size(), 0, m_plotPhysxSmoothed.m_offset, 2 * sizeof(float));
-      ImPlot::PushStyleColor(ImPlotCol_Fill, ImVec4(1, 0, 0, 0.25f));
-      ImPlot::PlotLine("Smoothed ms Physics", &m_plotPhysx.m_data[0].x, &m_plotPhysx.m_data[0].y, m_plotPhysx.m_data.size(), 0, m_plotPhysx.m_offset, 2 * sizeof(float));
-      ImPlot::PopStyleColor();
+      ImPlot::PlotLine("ms Physics", &m_plotPhysxSmoothed.m_data[0].x, &m_plotPhysxSmoothed.m_data[0].y, m_plotPhysxSmoothed.m_data.size(),
+         { ImPlotProp_Offset, m_plotPhysxSmoothed.m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
+      ImPlot::PlotLine("Smoothed ms Physics", &m_plotPhysx.m_data[0].x, &m_plotPhysx.m_data[0].y, m_plotPhysx.m_data.size(),
+         { ImPlotProp_FillColor, ImVec4(1, 0, 0, 0.25f), ImPlotProp_Offset, m_plotPhysx.m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
       ImPlot::EndPlot();
    }
 
@@ -454,10 +454,10 @@ void PerfUI::RenderPlots()
          ImPlot::SetupAxisLimits(ImAxis_X1, 0, m_plotScript.m_timeSpan, ImGuiCond_Always);
       else
          ImPlot::SetupAxisLimits(ImAxis_X1, static_cast<double>(t) - m_plotScript.m_timeSpan, static_cast<double>(t), ImGuiCond_Always);
-      ImPlot::PlotLine("ms Script", &m_plotScriptSmoothed.m_data[0].x, &m_plotScriptSmoothed.m_data[0].y, m_plotScriptSmoothed.m_data.size(), 0, m_plotScriptSmoothed.m_offset, 2 * sizeof(float));
-      ImPlot::PushStyleColor(ImPlotCol_Fill, ImVec4(1, 0, 0, 0.25f));
-      ImPlot::PlotLine("Smoothed ms Script", &m_plotScript.m_data[0].x, &m_plotScript.m_data[0].y, m_plotScript.m_data.size(), 0, m_plotScript.m_offset, 2 * sizeof(float));
-      ImPlot::PopStyleColor();
+      ImPlot::PlotLine("ms Script", &m_plotScriptSmoothed.m_data[0].x, &m_plotScriptSmoothed.m_data[0].y, m_plotScriptSmoothed.m_data.size(),
+         { ImPlotProp_Offset, m_plotScriptSmoothed.m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
+      ImPlot::PlotLine("Smoothed ms Script", &m_plotScript.m_data[0].x, &m_plotScript.m_data[0].y, m_plotScript.m_data.size(),
+         { ImPlotProp_FillColor, ImVec4(1, 0, 0, 0.25f), ImPlotProp_Offset, m_plotScript.m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
       ImPlot::EndPlot();
    }
 

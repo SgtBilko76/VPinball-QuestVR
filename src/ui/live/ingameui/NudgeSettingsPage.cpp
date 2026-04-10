@@ -216,16 +216,13 @@ void NudgeSettingsPage::Render(float elapsed)
       ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
       for (int i = 0; i < 2; i++)
          if (m_player->m_pininput.GetNudgeXSensor(i)->IsMapped() && m_nudgeXRawPlot[i].HasData())
-            ImPlot::PlotLine(std::format("Sensor X{} - {}", i + 1, m_player->m_pininput.GetNudgeXSensor(i)->GetMappingLabel()).c_str(), 
+            ImPlot::PlotLine(std::format("Sensor X{} - {}", i + 1, m_player->m_pininput.GetNudgeXSensor(i)->GetMappingLabel()).c_str(),
                &m_nudgeXRawPlot[i].m_data[0].x, //
                &m_nudgeXRawPlot[i].m_data[0].y, //
-               m_nudgeXRawPlot[i].m_data.size(),  //
-               ImPlotLineFlags_None, //
-               m_nudgeXRawPlot[i].m_offset, 2 * sizeof(float));
+               m_nudgeXRawPlot[i].m_data.size(), { ImPlotProp_Offset, m_nudgeXRawPlot[i].m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
       ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
-      ImPlot::PushStyleColor(ImPlotCol_Fill, ImVec4(1, 0, 0, 0.25f));
-      ImPlot::PlotLine("Nudge X", &m_nudgeXPlot.m_data[0].x, &m_nudgeXPlot.m_data[0].y, m_nudgeXPlot.m_data.size(), 0, m_nudgeXPlot.m_offset, 2 * sizeof(float));
-      ImPlot::PopStyleColor();
+      ImPlot::PlotLine("Nudge X", &m_nudgeXPlot.m_data[0].x, &m_nudgeXPlot.m_data[0].y, m_nudgeXPlot.m_data.size(),
+         { ImPlotProp_FillColor, ImVec4(1, 0, 0, 0.25f), ImPlotProp_Offset, m_nudgeXPlot.m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
       ImPlot::EndPlot();
    }
    ImGui::PopFont();
@@ -246,16 +243,13 @@ void NudgeSettingsPage::Render(float elapsed)
       ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
       for (int i = 0; i < 2; i++)
          if (m_player->m_pininput.GetNudgeYSensor(i)->IsMapped() && m_nudgeYRawPlot[i].HasData())
-            ImPlot::PlotLine(std::format("Sensor Y{} - {}", i + 1, m_player->m_pininput.GetNudgeYSensor(i)->GetMappingLabel()).c_str(), 
+            ImPlot::PlotLine(std::format("Sensor Y{} - {}", i + 1, m_player->m_pininput.GetNudgeYSensor(i)->GetMappingLabel()).c_str(),
                &m_nudgeYRawPlot[i].m_data[0].x, //
                &m_nudgeYRawPlot[i].m_data[0].y, //
-               m_nudgeYRawPlot[i].m_data.size(), //
-               ImPlotLineFlags_None, //
-               m_nudgeYRawPlot[i].m_offset, 2 * sizeof(float));
+               m_nudgeYRawPlot[i].m_data.size(), { ImPlotProp_Offset, m_nudgeYRawPlot[i].m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
       ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
-      ImPlot::PushStyleColor(ImPlotCol_Fill, ImVec4(1, 0, 0, 0.25f));
-      ImPlot::PlotLine("Nudge Y", &m_nudgeYPlot.m_data[0].x, &m_nudgeYPlot.m_data[0].y, m_nudgeYPlot.m_data.size(), 0, m_nudgeYPlot.m_offset, 2 * sizeof(float));
-      ImPlot::PopStyleColor();
+      ImPlot::PlotLine("Nudge Y", &m_nudgeYPlot.m_data[0].x, &m_nudgeYPlot.m_data[0].y, m_nudgeYPlot.m_data.size(),
+         { ImPlotProp_FillColor, ImVec4(1, 0, 0, 0.25f), ImPlotProp_Offset, m_nudgeYPlot.m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
       ImPlot::EndPlot();
    }
    ImGui::PopFont();

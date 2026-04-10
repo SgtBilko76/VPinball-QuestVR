@@ -87,12 +87,12 @@ void PlungerSettingsPage::Render(float elapsed)
       if (m_player->m_pininput.HasMechPlungerSpeed())
       {
          ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
-         ImPlot::PushStyleColor(ImPlotCol_Fill, ImVec4(1, 0, 0, 0.25f));
-         ImPlot::PlotLine("Speed", &m_velocityPlot.m_data[0].x, &m_velocityPlot.m_data[0].y, m_velocityPlot.m_data.size(), ImPlotLineFlags_None, m_velocityPlot.m_offset, 2 * sizeof(float));
-         ImPlot::PopStyleColor();
+         ImPlot::PlotLine("Speed", &m_velocityPlot.m_data[0].x, &m_velocityPlot.m_data[0].y, m_velocityPlot.m_data.size(),
+            { ImPlotProp_FillColor, ImVec4(1, 0, 0, 0.25f), ImPlotProp_Offset, m_velocityPlot.m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
       }
       ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
-      ImPlot::PlotLine("Position", &m_positionPlot.m_data[0].x, &m_positionPlot.m_data[0].y, m_positionPlot.m_data.size(), ImPlotLineFlags_None, m_positionPlot.m_offset, 2 * sizeof(float));
+      ImPlot::PlotLine("Position", &m_positionPlot.m_data[0].x, &m_positionPlot.m_data[0].y, m_positionPlot.m_data.size(),
+         { ImPlotProp_Offset, m_positionPlot.m_offset, ImPlotProp_Stride, 2 * (int)sizeof(float) });
       ImPlot::EndPlot();
    }
 
