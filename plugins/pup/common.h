@@ -77,7 +77,7 @@ PSC_USE_ERROR();
 
 template <typename T> constexpr T clamp(const T x, const T mn, const T mx) { return x < mn ? mn : x > mx ? mx : x; }
 template <typename T> constexpr T lerp(const T x1, const T x2, const float alpha) { return (1.f - alpha) * x1 + alpha * x2; }
-template <typename T> constexpr __forceinline T saturate(const T x) { return std::max(std::min(x, T { 1 }), T { 0 }); }
+template <typename T> constexpr T saturate(const T x) { return std::max(std::min(x, T { 1 }), T { 0 }); }
 
 // Rendering provided through plugin messages
 extern VPXTexture CreateTexture(SDL_Surface* surf);
