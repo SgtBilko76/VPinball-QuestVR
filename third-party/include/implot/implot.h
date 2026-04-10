@@ -537,20 +537,20 @@ struct ImPlotSpec {
     template <typename ...Args>
     ImPlotSpec(Args... args) {
         static_assert((sizeof ...(Args)) % 2 == 0, "Odd number of arguments! You must provide (ImPlotProp, value) pairs!");
-        SetProp(args...);
+        SetPropImPlot(args...);
     }
 
-    // Set properties from (ImPlotProp,value) pairs in any order, e.g. SetProp(ImPlotProp_LineColor, my_color, ImPlotProp_Marker, 4.0f)
+    // Set properties from (ImPlotProp,value) pairs in any order, e.g. SetPropImPlot(ImPlotProp_LineColor, my_color, ImPlotProp_Marker, 4.0f)
     template <typename Arg, typename ...Args>
-    void SetProp(ImPlotProp prop, Arg arg, Args... args) {
+    void SetPropImPlot(ImPlotProp prop, Arg arg, Args... args) {
         static_assert((sizeof ...(Args)) % 2 == 0, "Odd number of arguments! You must provide (ImPlotProp,value) pairs!");
-        SetProp(prop, arg);
-        SetProp(args...);
+        SetPropImPlot(prop, arg);
+        SetPropImPlot(args...);
     }
 
     // Set a property from a scalar value.
     template <typename T>
-    void SetProp(ImPlotProp prop, T v) {
+    void SetPropImPlot(ImPlotProp prop, T v) {
         switch (prop) {
         case ImPlotProp_LineColor       : LineColor       = ImGui::ColorConvertU32ToFloat4((ImU32)v); return;
         case ImPlotProp_LineWeight      : LineWeight      = (float)v;                                 return;
@@ -570,7 +570,7 @@ struct ImPlotSpec {
     }
 
     // Set a property from a pointer value.
-    void SetProp(ImPlotProp prop, ImU32* v) {
+    void SetPropImPlot(ImPlotProp prop, ImU32* v) {
         switch (prop) {
         case ImPlotProp_LineColors       : LineColors       = v;  return;
         case ImPlotProp_FillColors       : FillColors       = v;  return;
@@ -582,7 +582,7 @@ struct ImPlotSpec {
     }
 
     // Set a property from a float pointer value.
-    void SetProp(ImPlotProp prop, float* v) {
+    void SetPropImPlot(ImPlotProp prop, float* v) {
         switch (prop) {
         case ImPlotProp_MarkerSizes : MarkerSizes = v; return;
         default: break;
@@ -591,7 +591,7 @@ struct ImPlotSpec {
     }
 
     // Set a property from an ImVec4 value.
-    void SetProp(ImPlotProp prop, const ImVec4& v) {
+    void SetPropImPlot(ImPlotProp prop, const ImVec4& v) {
         switch (prop) {
         case ImPlotProp_LineColor       : LineColor       = v; return;
         case ImPlotProp_FillColor       : FillColor       = v; return;
