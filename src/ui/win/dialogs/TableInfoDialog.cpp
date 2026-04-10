@@ -141,12 +141,8 @@ INT_PTR TableInfoDialog::DialogProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
                   if (plistview->uNewState & LVIS_SELECTED)
                   {
                      const int sel = plistview->iItem;
-
-                     const char* name = m_customListView.GetItemText(sel, 0, MAXSTRING).c_str();
-                     m_customNameEdit.SetWindowText(name);
-
-                     const char* value = m_customListView.GetItemText(sel, 1, MAXSTRING).c_str();
-                     m_customValueEdit.SetWindowText(value);
+                     m_customNameEdit.SetWindowText(m_customListView.GetItemText(sel, 0, MAXSTRING).c_str()); // name
+                     m_customValueEdit.SetWindowText(m_customListView.GetItemText(sel, 1, MAXSTRING).c_str()); // value
                   }
                }
                break;
