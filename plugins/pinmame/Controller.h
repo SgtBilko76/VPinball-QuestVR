@@ -86,7 +86,7 @@ public:
    bool GetShowWinDMD() const { LOGE("ShowWinDMD is not implemented"s); return false; }
    void SetShowWinDMD(bool v) const { LOGE("ShowWinDMD is not implemented"s); }
 
-   // All these properties/methods are part of the VPinMame IDL but doesn't seem to be used anywhere (or are deprecated)
+   // All these properties/methods are part of the VPinMAME IDL but doesn't seem to be used anywhere (or are deprecated)
    //STDMETHOD(get_DmdWidth)(/*[out, retval]*/ int *pVal);
    //STDMETHOD(get_DmdHeight)(/*[out, retval]*/ int *pVal);
    //STDMETHOD(get_DmdPixel)(/*[in]*/ int x, /*[in]*/ int y, /*[out, retval]*/ int *pVal);
@@ -163,7 +163,7 @@ private:
    vector<PinmameGIState> m_giStates;
    vector<PinmameSolenoidState> m_solenoidStates;
    string m_splashInfoLine; // Info line shown during startup
-   bool m_hidden = true; // Show/Hide PinMame window
+   bool m_hidden = true; // Show/Hide PinMAME window
 
    const MsgPluginAPI* const m_msgApi;
    const unsigned int m_endpointId;

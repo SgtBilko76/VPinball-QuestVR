@@ -228,10 +228,10 @@ void ScoreView::Parse(const std::filesystem::path& path)
          CHECK_FIELD((indent == 2) && (visual != nullptr)); // Display pad inside rect
          const auto rect = parseArray(value);
          CHECK_FIELD(rect.size() == 4);
-         visual->glassPad.x = clamp(rect[0] / layout.height, 0.f, 1.f);
-         visual->glassPad.y = clamp(rect[1] / layout.width, 0.f, 1.f);
-         visual->glassPad.z = clamp(rect[2] / layout.height, 0.f, 1.f);
-         visual->glassPad.w = clamp(rect[3] / layout.width, 0.f, 1.f);
+         visual->glassPad.x = saturate(rect[0] / layout.height);
+         visual->glassPad.y = saturate(rect[1] / layout.width);
+         visual->glassPad.z = saturate(rect[2] / layout.height);
+         visual->glassPad.w = saturate(rect[3] / layout.width);
          // Not yet supported
          CHECK_FIELD((visual->glassPad.x == 0.f) && (visual->glassPad.y == 0.f) && (visual->glassPad.z == 0.f) && (visual->glassPad.w == 0.f));
       }

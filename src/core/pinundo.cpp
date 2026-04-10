@@ -120,7 +120,7 @@ void PinUndo::Undo(bool discard)
          pstm->Read(&pie, sizeof(IEditable *), &read);
          pie->ClearForOverwrite();
 
-         // Note that we do not process the loaded PartGroup parenting. This is not an issue as we do not support unoding reparenting (yet)
+         // Note that we do not process the loaded PartGroup parenting. This is not an issue as we do not support undoing reparenting (yet)
          BiffReader reader(pstm, CURRENT_FILE_FORMAT_VERSION, 0, 0);
          pie->Load(reader);
          if (g_pplayer)

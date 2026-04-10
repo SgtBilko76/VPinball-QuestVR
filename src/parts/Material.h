@@ -121,13 +121,13 @@ public:
          uint64_t ull;
       } h;
       h.uc[0] = ((unsigned int)m_type << 6) | ((unsigned int)m_bOpacityActive << 8) | (const unsigned int)(((size_t)this / sizeof(Material)) & 63); //!! meh
-      h.uc[1] = (unsigned char)(clamp(m_fWrapLighting, 0.f, 1.f)*255.0f);
-      h.uc[2] = (unsigned char)(clamp(m_fRoughness, 0.f, 1.f)*255.0f);
-      h.uc[3] = (((unsigned char)(clamp(m_fEdge, 0.f, 1.f)*255.0f)) >> 4) | (m_bOpacityActive ? ((((unsigned char)(clamp(m_fEdgeAlpha, 0.f, 1.f)*255.0f)) >> 4) << 4) : 0);
+      h.uc[1] = (unsigned char)(saturate(m_fWrapLighting)*255.0f);
+      h.uc[2] = (unsigned char)(saturate(m_fRoughness)*255.0f);
+      h.uc[3] = (((unsigned char)(saturate(m_fEdge)*255.0f)) >> 4) | (m_bOpacityActive ? ((((unsigned char)(clamp(m_fEdgeAlpha, 0.f, 1.f)*255.0f)) >> 4) << 4) : 0);
       h.uc[4] = ((m_cBase & 255) >> 5) | ((((m_cBase >> 8) & 255) >> 5) << 3) | ((((m_cBase >> 16) & 255) >> 6) << 6);
       h.uc[5] = m_type == MaterialType::BASIC ? ((m_cGlossy & 255) >> 5) | ((((m_cGlossy >> 8) & 255) >> 5) << 3) | ((((m_cGlossy >> 16) & 255) >> 6) << 6) : 0;
       h.uc[6] = ((m_cClearcoat & 255) >> 5) | ((((m_cClearcoat >> 8) & 255) >> 5) << 3) | ((((m_cClearcoat >> 16) & 255) >> 6) << 6);
-      h.uc[7] = m_bOpacityActive ? (unsigned char)(clamp(m_fOpacity, 0.f, 1.f)*255.0f) : 0;
+      h.uc[7] = m_bOpacityActive ? (unsigned char)(saturate(m_fOpacity)*255.0f) : 0;
       return h.ull;
 
       /*return ((uint64_t)(h.uc[0]&  1)<< 0) | ((uint64_t)(h.uc[1]&  1)<< 1) | ((uint64_t)(h.uc[2]&  1)<< 2) | ((uint64_t)(h.uc[3]&  1)<< 3) | ((uint64_t)(h.uc[4]&  1)<< 4) | ((uint64_t)(h.uc[5]&  1)<< 5) | ((uint64_t)(h.uc[6]&  1)<< 6) | ((uint64_t)(h.uc[7]&  1)<< 7) |

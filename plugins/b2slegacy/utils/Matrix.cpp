@@ -63,16 +63,6 @@ Matrix::Matrix()
    m_transform = AffineTransformMakeIdentity();
 }
 
-Matrix::Matrix(const Matrix& matrix)
-{
-   m_transform = matrix.m_transform;
-}
-
-Matrix::Matrix(float m11, float m12, float m21, float m22, float dx, float dy)
-{
-   m_transform = {m11, m12, m21, m22, dx, dy};
-}
-
 void Matrix::Translate(float offsetX, float offsetY)
 {
    AffineTransform affine = AffineTransformMakeTranslation(offsetX, offsetY);

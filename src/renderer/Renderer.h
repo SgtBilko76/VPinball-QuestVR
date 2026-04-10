@@ -86,7 +86,7 @@ public:
    void DrawSprite(const float posx, const float posy, const float width, const float height, const COLORREF color, const std::shared_ptr<const Sampler>& tex, const float intensity, const bool backdrop = false);
    void DrawWireframe(IEditable* renderable, const vec4& fillColor, const vec4& edgeColor, bool withDepthMask);
 
-   void ReinitRenderable(IRenderable* part) { m_renderableToInit.push_back(part); }
+   void ReinitRenderable(IRenderable* part) { if (part) m_renderableToInit.push_back(part); }
 
    RenderProbe::ReflectionMode GetMaxReflectionMode() const {
       // For dynamic mode, static reflections are not available so adapt the mode

@@ -49,6 +49,7 @@ namespace ScoreView
 #endif
 
 template <typename T> constexpr __forceinline T clamp(const T x, const T mn, const T mx) { return std::max(std::min(x, mx), mn); }
+template <typename T> constexpr __forceinline T saturate(const T x) { return std::max(std::min(x, T { 1 }), T { 0 }); }
 
 string TrimLeading(const string& str, const string& whitespace);
 string TrimTrailing(const string& str, const string& whitespace);

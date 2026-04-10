@@ -214,25 +214,19 @@ void Dream7Display::InitMatrix(float shear, float scaleFactor, bool mirrored)
 {
    delete m_pMatrix;
    m_pMatrix = new Matrix();
-   if (shear < 0.0f)
-       shear = 0.0f;
-   if (shear > 2.0f)
-      shear = 2.0f;
-   if (scaleFactor < 0.01f)
-      scaleFactor = 0.01f;
-   if (scaleFactor > 10.0f)
-      scaleFactor = 10.0f;
+   shear = clamp(shear, 0.0f, 2.0f);
+   scaleFactor = clamp(scaleFactor, 0.01f, 10.0f);
    Matrix styleMatrix;
    if (mirrored) {
-      Matrix InvertMatrix(1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f);
-      styleMatrix.Multiply(InvertMatrix);
+      static constexpr Matrix MirrorMatrix { 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f };
+      styleMatrix = MirrorMatrix;
    }
    styleMatrix.Shear(-shear, 0.0f);
    styleMatrix.Rotate(m_angle);
    styleMatrix.Scale(scaleFactor, scaleFactor);
    styleMatrix.Translate(10.0f, 10.0f);
    if (IsHandleCreated()) {
-      SDL_FRect bounds = GetBounds(&styleMatrix);
+      const SDL_FRect bounds = GetBounds(&styleMatrix);
       if (m_scaleMode != ScaleMode_Manual) {
          float scaleX = (float)(GetWidth() + 3 - m_offsetWidth) / bounds.w;
          float scaleY = (float)(GetHeight() - 1) / bounds.h;

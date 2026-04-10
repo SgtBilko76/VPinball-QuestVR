@@ -682,8 +682,8 @@ void RenderDevice::RenderThread(RenderDevice* rd, bgfx::Init init)
             bgfx::waitForSwapchain();
             g_pplayer->m_renderProfiler->ExitProfileSection();
             const uint64_t now = usec();
-            rd->m_renderLatency = (static_cast<float>(now - lastSubmitTimestamp) / 1000000.0f) // Time spent since pushing data to the GPU until consumed by swapchain
-               + (static_cast<float>(init.resolution.maxFrameLatency - 1) / rd->m_outputWnd[0]->GetRefreshRate()); // Time that will be spent in the GPU queue before display (if any)
+            rd->m_renderLatency = static_cast<float>((double)(now - lastSubmitTimestamp) / 1000000.0) // Time spent since pushing data to the GPU until consumed by swapchain
+               + static_cast<float>(init.resolution.maxFrameLatency - 1) / rd->m_outputWnd[0]->GetRefreshRate(); // Time that will be spent in the GPU queue before display (if any)
             // If we have waited for the swapchain, we can adjust the estimated present time to be just before the end of the wait
             if (g_pplayer->m_renderProfiler->Get(FrameProfiler::PROFILE_RENDER_WAIT_SC) > 500)
                rd->m_presentTimestampReference = now - 100;
@@ -1842,7 +1842,7 @@ float RenderDevice::GetPredictedDisplayDelay() const
    if (g_pplayer->m_vrDevice)
    {
       // Use OpenXR display time prediction
-      const float nowS = now / 1000000.f;
+      const float nowS = (float)((double)now / 1000000.);
       const float displayTimestamp = g_pplayer->m_vrDevice->GetPredictedDisplayTimestamp();
       return nowS < displayTimestamp ? displayTimestamp - nowS : 0.f;
    }
@@ -1858,7 +1858,7 @@ float RenderDevice::GetPredictedDisplayDelay() const
       const int nFrameLatency = g_pplayer->GetVideoSyncMode() == VideoSyncMode::VSM_FRAME_PACING ? 1 : g_pplayer->m_ptable->m_settings.GetPlayer_MaxPrerenderedFrames();
       const uint64_t delayToNextPresent = targetFrameLength - ((now - m_presentTimestampReference) % targetFrameLength);
       const uint64_t displayFrameLength = static_cast<uint64_t>(1000000. / (double)m_outputWnd[0]->GetRefreshRate());
-      const float delayToNextFrame = static_cast<float>(nFrameLatency * displayFrameLength + delayToNextPresent) / 1000000.f;
+      const float delayToNextFrame = (float)(static_cast<double>(nFrameLatency * displayFrameLength + delayToNextPresent) / 1000000.);
       //PLOGD << std::format("Display Delay: {:5.3f}", delayToNextFrame * 1000.f);
       return delayToNextFrame;
    }

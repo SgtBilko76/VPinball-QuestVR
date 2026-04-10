@@ -463,7 +463,7 @@ void PUPLabel::SetSpecial(const string& szSpecial)
          else if (key == "alpha")
          {
             // See pDMDLabelSetAlpha — 0-255  255=full, 0=blank
-            m_alpha = clamp(value.as<int>(), 0, 255) / 255.0f;
+            m_alpha = saturate((float)value.as<int>() / 255.0f);
          }
          else if (key == "gradstate")
          {
@@ -1149,7 +1149,7 @@ bool PUPLabel::Animation::Update(const SDL_Rect& screenRect, const SDL_FRect& la
    if (m_motionLen)
    {
       // TODO implement tweening
-      float pos = clamp(static_cast<float>(elapsed) / static_cast<float>(m_motionLen), 0.f, 1.f);
+      float pos = saturate(static_cast<float>(elapsed) / static_cast<float>(m_motionLen));
       const float xBase = labelRect.x;
       const float xLeft = static_cast<float>(screenRect.x) - labelRect.w;
       const float xRight = static_cast<float>(screenRect.x) + static_cast<float>(screenRect.w);
@@ -1160,10 +1160,10 @@ bool PUPLabel::Animation::Update(const SDL_Rect& screenRect, const SDL_FRect& la
       // other values = percentage position (see pDMDLabelMoveTO)
       const float screenW = static_cast<float>(screenRect.w);
       const float screenH = static_cast<float>(screenRect.h);
-      const float xs = m_xps == 0 ? xBase : m_xps == 1 ? xRight : m_xps == -1 ? xLeft : static_cast<float>(screenRect.x) + screenW * m_xps / 100.f;
-      const float xe = m_xpe == 0 ? xBase : m_xpe == 1 ? xRight : m_xpe == -1 ? xLeft : static_cast<float>(screenRect.x) + screenW * m_xpe / 100.f;
-      const float ys = m_yps == 0 ? yBase : m_yps == 1 ? yBottom : m_yps == -1 ? yTop : static_cast<float>(screenRect.y) + screenH * m_yps / 100.f;
-      const float ye = m_ype == 0 ? yBase : m_ype == 1 ? yBottom : m_ype == -1 ? yTop : static_cast<float>(screenRect.y) + screenH * m_ype / 100.f;
+      const float xs = m_xps == 0 ? xBase : m_xps == 1 ? xRight : m_xps == -1 ? xLeft : static_cast<float>(screenRect.x) + screenW * (float)m_xps / 100.f;
+      const float xe = m_xpe == 0 ? xBase : m_xpe == 1 ? xRight : m_xpe == -1 ? xLeft : static_cast<float>(screenRect.x) + screenW * (float)m_xpe / 100.f;
+      const float ys = m_yps == 0 ? yBase : m_yps == 1 ? yBottom : m_yps == -1 ? yTop : static_cast<float>(screenRect.y) + screenH * (float)m_yps / 100.f;
+      const float ye = m_ype == 0 ? yBase : m_ype == 1 ? yBottom : m_ype == -1 ? yTop : static_cast<float>(screenRect.y) + screenH * (float)m_ype / 100.f;
       m_color = pos < 1.0f ? m_motionColor : m_foregroundColor;
       m_xOffset = lerp(xs, xe, pos) - xBase;
       m_yOffset = lerp(ys, ye, pos) - yBase;
@@ -1172,7 +1172,7 @@ bool PUPLabel::Animation::Update(const SDL_Rect& screenRect, const SDL_FRect& la
       {
          const int fadeStart = static_cast<int>(m_lengthMs) - m_alphaFade;
          if (static_cast<int>(elapsed) > fadeStart)
-            m_alpha = 1.0f - clamp(static_cast<float>(elapsed - fadeStart) / static_cast<float>(m_alphaFade), 0.f, 1.f);
+            m_alpha = 1.0f - saturate(static_cast<float>(elapsed - fadeStart) / static_cast<float>(m_alphaFade));
       }
    }
 
@@ -1193,7 +1193,7 @@ bool PUPLabel::Animation::Update(const SDL_Rect& screenRect, const SDL_FRect& la
       else
       {
          // See pDMDLabelFadeOut / pDMDLabelFadeIn / pDMDScreenFadeOut / pDMDScreenFadeIn
-         float pos = clamp(static_cast<float>(elapsed) / static_cast<float>(m_lengthMs), 0.f, 1.f);
+         float pos = saturate(static_cast<float>(elapsed) / static_cast<float>(m_lengthMs));
          m_alpha = as + pos * (ae - as);
       }
       m_color = m_foregroundColor;
@@ -1213,7 +1213,7 @@ bool PUPLabel::Animation::Update(const SDL_Rect& screenRect, const SDL_FRect& la
       else
       {
          // See pDMDZoomBig — zoom from hstart to hend over len ms
-         float pos = clamp(static_cast<float>(elapsed) / static_cast<float>(m_lengthMs), 0.f, 1.f);
+         float pos = saturate(static_cast<float>(elapsed) / static_cast<float>(m_lengthMs));
          m_zoom = m_zoomStart + pos * (m_zoomEnd - m_zoomStart);
       }
       m_color = m_foregroundColor;
@@ -1232,7 +1232,7 @@ bool PUPLabel::Animation::Update(const SDL_Rect& screenRect, const SDL_FRect& la
    // See pDMDLabelPulseNumber — interpolate number and update label caption
    if (m_numStart != INT_MIN)
    {
-      float pos = clamp(static_cast<float>(elapsed) / static_cast<float>(m_lengthMs), 0.f, 1.f);
+      float pos = saturate(static_cast<float>(elapsed) / static_cast<float>(m_lengthMs));
       int num = (pos >= 1.f) ? m_numEnd : m_numStart + static_cast<int>(pos * static_cast<float>(m_numEnd - m_numStart));
       string numStr;
       if (m_numFormat == 1)

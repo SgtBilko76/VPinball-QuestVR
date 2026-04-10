@@ -23,7 +23,6 @@
 #include "parts/ramp.h"
 #include "parts/flasher.h"
 #include "parts/rubber.h"
-#include "parts/PartGroup.h"
 
 DrawingOrderDialog::DrawingOrderDialog(bool select)
    : CDialog(IDD_DRAWING_ORDER)

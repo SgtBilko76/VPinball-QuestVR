@@ -1071,7 +1071,7 @@ void VRDevice::RenderFrame(RenderDevice* rd, const std::function<void(RenderTarg
    RenderLayerInfo renderLayerInfo;
    renderLayerInfo.predictedDisplayTime = frameState.predictedDisplayTime;
 
-   m_predictedDisplayTimestamp = static_cast<float>(usec()) / 1000000.f;
+   m_predictedDisplayTimestamp = static_cast<float>((double)usec() / 1000000.);
    #if BX_PLATFORM_WINDOWS
    if (m_xrConvertTimeToWin32PerformanceCounterKHR)
    {
@@ -1091,9 +1091,9 @@ void VRDevice::RenderFrame(RenderDevice* rd, const std::function<void(RenderTarg
       timespec now;
       clock_gettime(CLOCK_MONOTONIC, &now);
       time_t sec_diff = displayTime.tv_sec - now.tv_sec;
-      long nsec_diff = displayTime.tv_nsec - now.tv_nsec;
+      long long nsec_diff = displayTime.tv_nsec - now.tv_nsec;
       int64_t total_nsec = sec_diff * 1000000000LL + nsec_diff;
-      m_predictedDisplayTimestamp += static_cast<float>(total_nsec) / 1000000000.0f;
+      m_predictedDisplayTimestamp += (float)(static_cast<double>(total_nsec) / 1000000000.0);
    }
    #endif
 

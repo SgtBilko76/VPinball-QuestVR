@@ -74,7 +74,8 @@
 #endif
 
 #include <vector>
-#include <string>
+using std::vector;
+
 #include <format>
 #include <algorithm>
 #ifndef __STANDALONE__
@@ -83,11 +84,11 @@
 #include <cderr.h>
 #endif
 
+#include <string>
 using namespace std::string_literals;
 using namespace std::string_view_literals;
 using std::string;
 using std::wstring;
-using std::vector;
 
 
 #ifndef __STANDALONE__

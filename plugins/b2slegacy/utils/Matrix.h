@@ -16,8 +16,8 @@ using std::vector;
 namespace B2SLegacy {
 
 struct AffineTransform {
-  float a, b, c, d;
-  float tx, ty;
+   float a, b, c, d;
+   float tx, ty;
 };
 
 AffineTransform AffineTransformMakeTranslation(float tx, float ty);
@@ -28,21 +28,21 @@ AffineTransform AffineTransformMakeMultiply(const AffineTransform& a, const Affi
 class Matrix final
 {
 public:
-    Matrix();
-    Matrix(const Matrix& matrix);
-    Matrix(float m11, float m12, float m21, float m22, float dx, float dy);
+   Matrix();
+   constexpr Matrix(const Matrix& matrix) { m_transform = matrix.m_transform; }
+   constexpr Matrix(float m11, float m12, float m21, float m22, float dx, float dy) { m_transform = { m11, m12, m21, m22, dx, dy }; }
 
-    void Rotate(float angle);
-    void Multiply(const Matrix& other);
-    void Translate(float x, float y);
-    void Shear(float shearX, float shearY);
-    void Scale(float scaleX, float scaleY);
-    void TransformPoint(float& x, float& y) const;
-    void TransformPoints(vector<SDL_FPoint>& points) const;
-    void Reset();
-    Matrix* Clone() const;
+   void Rotate(float angle);
+   void Multiply(const Matrix& other);
+   void Translate(float x, float y);
+   void Shear(float shearX, float shearY);
+   void Scale(float scaleX, float scaleY);
+   void TransformPoint(float& x, float& y) const;
+   void TransformPoints(vector<SDL_FPoint>& points) const;
+   void Reset();
+   Matrix* Clone() const;
 
-    AffineTransform m_transform;
+   AffineTransform m_transform;
 };
 
 }

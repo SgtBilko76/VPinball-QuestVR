@@ -92,7 +92,7 @@ public:
    float GetValid(float v) const { return (v < m_min || v > m_max) ? m_def : GetSteppedClamped(v); }
 
 protected:
-   virtual bool equals(const PropertyDef& other) const override
+   bool equals(const PropertyDef& other) const override
    {
       const FloatPropertyDef* o = dynamic_cast<const FloatPropertyDef*>(&other);
       return o && PropertyDef::equals(other) && (m_min == o->m_min) && (m_max == o->m_max) && (m_step == o->m_step) && (m_def == o->m_def);
@@ -136,7 +136,7 @@ public:
    int GetValid(int v) const { return (v < m_min || v > m_max) ? m_def : v; }
 
 protected:
-   virtual bool equals(const PropertyDef& other) const override
+   bool equals(const PropertyDef& other) const override
    {
       const IntPropertyDef* o = dynamic_cast<const IntPropertyDef*>(&other);
       return o && PropertyDef::equals(other) && (m_min == o->m_min) && (m_max == o->m_max) && (m_def == o->m_def);
@@ -190,7 +190,7 @@ public:
    const string& GetEnum(int index) const { return m_values[GetValid(index)]; }
 
 protected:
-   virtual bool equals(const PropertyDef& other) const override
+   bool equals(const PropertyDef& other) const override
    {
       const EnumPropertyDef* o = dynamic_cast<const EnumPropertyDef*>(&other);
       return o && PropertyDef::equals(other) && (m_min == o->m_min) && (m_values == o->m_values) && (m_def == o->m_def);
@@ -216,7 +216,7 @@ public:
    const bool m_def;
 
 protected:
-   virtual bool equals(const PropertyDef& other) const override
+   bool equals(const PropertyDef& other) const override
    {
       const BoolPropertyDef* o = dynamic_cast<const BoolPropertyDef*>(&other);
       return o && PropertyDef::equals(other) && (m_def == o->m_def);
@@ -242,7 +242,7 @@ public:
    const string m_def;
 
 protected:
-   virtual bool equals(const PropertyDef& other) const override
+   bool equals(const PropertyDef& other) const override
    {
       const StringPropertyDef* o = dynamic_cast<const StringPropertyDef*>(&other);
       return o && PropertyDef::equals(other) && (m_def == o->m_def);

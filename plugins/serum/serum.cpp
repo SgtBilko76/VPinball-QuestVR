@@ -29,8 +29,8 @@ LPI_IMPLEMENT_CPP // Implement shared log support
 //
 // This plugin only rely on the generic message plugin API, the generic controller
 // plugin API and the following messages:
-// - PinMame/OnGameStart: msgData is PinMame game identifier (rom name)
-// - PinMame/OnGameEnd
+// - PinMAME/OnGameStart: msgData is PinMAME game identifier (rom name)
+// - PinMAME/OnGameEnd
 
 static const MsgPluginAPI* msgApi = nullptr;
 static VPXPluginAPI* vpxApi = nullptr;

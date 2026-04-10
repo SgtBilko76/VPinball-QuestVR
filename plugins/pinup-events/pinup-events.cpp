@@ -23,7 +23,7 @@
 // directory. Since these dll are closed source, they are not distributed
 // with the plugin and must be obtained from PinUp distribution separately.
 //
-// For some strange reason, PinUp does not do its matching on the PinMame DMD but on a 
+// For some strange reason, PinUp does not do its matching on the PinMAME DMD but on a 
 // stretched to fit 128x32 frame, shaded using 0xFF4500 color (C# Colors.OrangeRed), 
 // with non linear shading for 2 bitplane frames.
 
