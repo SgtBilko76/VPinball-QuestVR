@@ -553,7 +553,7 @@ void PinTable::SetDirtyDraw()
 
 PinTable* PinTable::CopyForPlay()
 {
-   const PinTable *src = this;
+   PinTable * const src = this;
    CComObject<PinTable> *live_table;
    CComObject<PinTable>::CreateInstance(&live_table);
    live_table->AddRef();
@@ -669,7 +669,7 @@ PinTable* PinTable::CopyForPlay()
       dst->m_vfont.push_back(font);
 
    PLOGI << "Duplicating parts for live instance"; // For profiling
-   for (IEditable* editable : src->m_vedit)
+   for (IEditable* const editable : src->m_vedit)
    {
       IEditable* edit_dst = nullptr;
       switch (editable->GetItemType())
@@ -1362,13 +1362,13 @@ void PinTable::Save(IObjectWriter& writer, const bool saveForUndo)
          mats[i].cClearcoat = m->m_cClearcoat;
          mats[i].fWrapLighting = m->m_fWrapLighting;
          mats[i].fRoughness = m->m_fRoughness;
-         mats[i].fGlossyImageLerp = 255 - quantizeUnsigned<8>(clamp(m->m_fGlossyImageLerp, 0.f, 1.f)); // '255 -' to be compatible with previous table versions
+         mats[i].fGlossyImageLerp = 255 - quantizeUnsigned<8>(saturate(m->m_fGlossyImageLerp)); // '255 -' to be compatible with previous table versions
          mats[i].fThickness = quantizeUnsigned<8>(clamp(m->m_fThickness, 0.05f, 1.f)); // clamp with 0.05f to be compatible with previous table versions
          mats[i].fEdge = m->m_fEdge;
          mats[i].fOpacity = m->m_fOpacity;
          mats[i].bIsMetal = m->m_type == Material::MaterialType::METAL;
          mats[i].bOpacityActive_fEdgeAlpha = m->m_bOpacityActive ? 1 : 0;
-         mats[i].bOpacityActive_fEdgeAlpha |= quantizeUnsigned<7>(clamp(m->m_fEdgeAlpha, 0.f, 1.f)) << 1;
+         mats[i].bOpacityActive_fEdgeAlpha |= quantizeUnsigned<7>(saturate(m->m_fEdgeAlpha)) << 1;
          strncpy_s(mats[i].szName, std::size(mats[i].szName), m->m_name.c_str());
          for (size_t c = strnlen_s(mats[i].szName, std::size(mats[i].szName)); c < std::size(mats[i].szName); ++c) // to avoid garbage after 0
              mats[i].szName[c] = '\0';
@@ -5020,7 +5020,7 @@ STDMETHODIMP PinTable::GetPredefinedStrings(DISPID dispID, CALPOLESTR *pcaString
             (ramps && m_vedit[ivar]->GetItemType() == eItemRamp) ||
             //!! **************** warning **********************
             // added to render to surface of DMD style lights and emreels
-            // but no checks are being performed at moment:
+            // but no checks are being performed at the moment:
             (flashers && m_vedit[ivar]->GetItemType() == eItemFlasher))
          {
             const wstring& sname = m_vedit[ivar]->GetIScriptable()->m_wzName;
@@ -5191,10 +5191,9 @@ float PinTable::GetSurfaceHeight(const string& name, float x, float y) const
    const wstring wname = MakeWString(name);
    for (const IEditable *const item : m_vedit)
    {
-      if ((item->GetItemType() == eItemSurface) && (wname == item->GetIScriptable()->m_wzName))
-         return static_cast<const Surface *>(item)->m_d.m_heighttop;
-      else if ((item->GetItemType() == eItemRamp) && (wname == item->GetIScriptable()->m_wzName))
-         return static_cast<const Ramp *>(item)->GetSurfaceHeight(x, y);
+      const ItemTypeEnum type = item->GetItemType();
+      if ((type == eItemSurface || type == eItemRamp) && (wname == item->GetIScriptable()->m_wzName))
+         return type == eItemSurface ? static_cast<const Surface *>(item)->m_d.m_heighttop : static_cast<const Ramp *>(item)->GetSurfaceHeight(x, y);
    }
 
    PLOGE << "Failed to find part '" << name << "' to set other part height";
@@ -5208,10 +5207,9 @@ Material* PinTable::GetSurfaceMaterial(const wstring& name) const
 
    for (const IEditable *const item : m_vedit)
    {
-      if ((item->GetItemType() == eItemSurface) && (name == item->GetIScriptable()->m_wzName))
-         return GetMaterial(static_cast<const Surface *>(item)->m_d.m_szTopMaterial);
-      else if ((item->GetItemType() == eItemRamp) && (name == item->GetIScriptable()->m_wzName))
-         return GetMaterial(static_cast<const Ramp *>(item)->m_d.m_szMaterial);
+      const ItemTypeEnum type = item->GetItemType();
+      if ((type == eItemSurface || type == eItemRamp) && (name == item->GetIScriptable()->m_wzName))
+         return GetMaterial(type == eItemSurface ? static_cast<const Surface *>(item)->m_d.m_szTopMaterial : static_cast<const Ramp *>(item)->m_d.m_szMaterial);
    }
 
    PLOGE << "Failed to find part '" << MakeString(name) << "' to set other part material";
@@ -5225,10 +5223,9 @@ Texture* PinTable::GetSurfaceImage(const wstring& name) const
 
    for (const IEditable *const item : m_vedit)
    {
-      if ((item->GetItemType() == eItemSurface) && (name == item->GetIScriptable()->m_wzName))
-         return GetImage(static_cast<const Surface *>(item)->m_d.m_szImage);
-      else if ((item->GetItemType() == eItemRamp) && (name == item->GetIScriptable()->m_wzName))
-         return GetImage(static_cast<const Ramp *>(item)->m_d.m_szImage);
+      const ItemTypeEnum type = item->GetItemType();
+      if ((type == eItemSurface || type == eItemRamp) && (name == item->GetIScriptable()->m_wzName))
+         return GetImage(type == eItemSurface ? static_cast<const Surface *>(item)->m_d.m_szImage : static_cast<const Ramp *>(item)->m_d.m_szImage);
    }
 
    PLOGE << "Failed to find part '" << MakeString(name) << "' to set other part image";
@@ -5295,7 +5292,6 @@ void PinTable::SetTableWidth(const float value)
 STDMETHODIMP PinTable::get_Width(float *pVal)
 {
    *pVal = GetTableWidth();
-
    return S_OK;
 }
 
@@ -5306,7 +5302,6 @@ STDMETHODIMP PinTable::put_Width(float newVal)
    STOPUNDO
 
    m_tableEditor->SetMyScrollInfo();
-
    return S_OK;
 }
 
@@ -5333,7 +5328,6 @@ float PinTable::GetPlayfieldOverridenSlope() const
 STDMETHODIMP PinTable::get_Height(float *pVal)
 {
    *pVal = GetHeight();
-
    return S_OK;
 }
 
@@ -5344,7 +5338,6 @@ STDMETHODIMP PinTable::put_Height(float newVal)
    STOPUNDO
 
    m_tableEditor->SetMyScrollInfo();
-
    return S_OK;
 }
 
@@ -5538,7 +5531,6 @@ void PinTable::SetPlayfieldReflectionStrength(const int value)
 STDMETHODIMP PinTable::get_PlayfieldReflectionStrength(int *pVal)
 {
    *pVal = GetPlayfieldReflectionStrength();
-
    return S_OK;
 }
 
@@ -5635,7 +5627,6 @@ void PinTable::SetTableSoundVolume(const int value)
 STDMETHODIMP PinTable::get_TableSoundVolume(int *pVal)
 {
    *pVal = GetTableSoundVolume();
-
    return S_OK;
 }
 
@@ -5819,8 +5810,8 @@ STDMETHODIMP PinTable::put_ColorGradeImage(BSTR newVal)
    const Texture * const tex = GetImage(szImage);
    if (tex && (tex->m_width != 256 || tex->m_height != 16))
    {
-       ShowError("Wrong image size, needs to be 256x16 resolution");
-       return E_FAIL;
+      ShowError("Wrong image size, needs to be 256x16 resolution");
+      return E_FAIL;
    }
 
    STARTUNDO
@@ -5877,7 +5868,7 @@ STDMETHODIMP PinTable::get_Friction(float *pVal)
 
 void PinTable::SetFriction(const float value)
 {
-   m_friction = clamp(value, 0.0f, 1.0f);
+   m_friction = saturate(value);
 }
 
 STDMETHODIMP PinTable::put_Friction(float newVal)
@@ -6054,8 +6045,8 @@ STDMETHODIMP PinTable::put_EnvironmentImage(BSTR newVal)
    const Texture * const tex = GetImage(szImage);
    if (tex && (tex->m_width != tex->m_height*2))
    {
-       ShowError("Wrong image size, needs to be 2x width in comparison to height");
-       return E_FAIL;
+      ShowError("Wrong image size, needs to be 2x width in comparison to height");
+      return E_FAIL;
    }
 
    STARTUNDO
@@ -6314,8 +6305,8 @@ STDMETHODIMP PinTable::ExportPhysics()
    const size_t index = filename.find_last_of(PATH_SEPARATOR_CHAR);
    if (index != string::npos)
    {
-       const string newInitDir(filename.substr(0, index));
-       g_app->m_settings.SetRecentDir_PhysicsDir(newInitDir, false);
+      const string newInitDir(filename.substr(0, index));
+      g_app->m_settings.SetRecentDir_PhysicsDir(newInitDir, false);
    }
 
    tinyxml2::XMLDocument xmlDoc;
@@ -6495,8 +6486,8 @@ STDMETHODIMP PinTable::put_BallFrontDecal(BSTR newVal)
    const Texture * const tex = GetImage(szImage);
    if (tex && tex->IsHDR())
    {
-       ShowError("Cannot use a HDR image (.exr/.hdr) here");
-       return E_FAIL;
+      ShowError("Cannot use a HDR image (.exr/.hdr) here");
+      return E_FAIL;
    }
 
    STARTUNDO
