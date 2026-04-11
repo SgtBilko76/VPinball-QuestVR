@@ -426,8 +426,24 @@ void RenderDevice::RenderThread(RenderDevice* rd, bgfx::Init init)
    PLOGI << "BGFX initialized using " << bgfx::getRendererName(bgfx::getRendererType()) << " backend (" << init.resolution.width << 'x' << init.resolution.height << " "
          << bimg::getName(bimg::TextureFormat::Enum(init.resolution.formatColor)) << ')';
 
-   rd->m_GPU_name = bgfx::getCaps()->gpuName;
-   rd->m_driver_name = bgfx::getRendererName(bgfx::getRendererType()) + " backend on "s + bgfx::getCaps()->vendorId + '/' + bgfx::getCaps()->deviceId;
+   const uint16_t vendorId = bgfx::getCaps()->vendorId;
+   string vendorString;
+   switch (vendorId)
+   {
+      case BGFX_PCI_ID_SOFTWARE_RASTERIZER: vendorString = "Software Raster"; break;
+      case BGFX_PCI_ID_NVIDIA: vendorString = "NVIDIA"; break;
+      case BGFX_PCI_ID_AMD:
+      case 0x1022: vendorString = "AMD"; break;
+      case BGFX_PCI_ID_INTEL: vendorString = "Intel"; break;
+      case BGFX_PCI_ID_ARM: vendorString = "arm"; break;
+      case 0x5143: vendorString = "Qualcomm"; break;
+      case 0x1010: vendorString = "ImgTec (PowerVR)"; break;
+      case BGFX_PCI_ID_APPLE: vendorString = "Apple"; break;
+      case BGFX_PCI_ID_MICROSOFT: vendorString = "Microsoft"; break;
+      default: vendorString = "Unknown"; break;
+   }
+   rd->m_GPU_name = vendorString + '/' + std::to_string(bgfx::getCaps()->deviceId);
+   rd->m_driver_name = bgfx::getRendererName(bgfx::getRendererType()) + " backend"s;
 
    if (g_pplayer->IsVR())
    {
@@ -1189,8 +1205,8 @@ RenderDevice::RenderDevice(
    #endif
    #endif
 
-   const GLubyte* renderer = glGetString(GL_RENDERER);
-   const GLubyte* vendor = glGetString(GL_VENDOR);
+   const char* renderer = (char*)glGetString(GL_RENDERER);
+   const char* vendor = (char*)glGetString(GL_VENDOR);
    if (renderer)
       m_GPU_name = renderer;
    if (vendor)
