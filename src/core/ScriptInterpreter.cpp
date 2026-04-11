@@ -124,8 +124,8 @@ void ScriptInterpreter::Start(PinTable* table)
    for (int i = 0; i < table->m_vcollection.size(); i++)
       AddItem(&table->m_vcollection[i], false);
    for (auto editable : table->GetParts())
-      if (editable->IGetScriptable())
-         AddItem(editable->IGetScriptable(), false);
+      if (editable->GetIScriptable())
+         AddItem(editable->GetIScriptable(), false);
 }
 
 void ScriptInterpreter::Stop(PinTable *table, bool interruptDirectly)
