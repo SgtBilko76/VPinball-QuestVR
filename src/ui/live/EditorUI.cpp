@@ -836,10 +836,9 @@ void EditorUI::DeleteSelection()
       m_renderer->m_renderDevice->AddEndOfFrameCmd([edit]()
          {
             if (edit->GetIHitable())
-            {
-               edit->GetIRenderable()->RenderRelease();
                edit->GetIHitable()->TimerRelease();
-            }
+            if (edit->GetIRenderable())
+               edit->GetIRenderable()->RenderRelease();
             edit->Release();
          });
    }
