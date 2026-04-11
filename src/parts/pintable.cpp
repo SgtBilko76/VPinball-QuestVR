@@ -215,9 +215,8 @@ if (it == m_textureMap.end()) \
 { \
 const wstring es = MakeWString(pEditSurface); \
 bool found = false; \
-for (size_t ie = 0; ie < m_vedit.size(); ie++) \
+for (const auto item : m_vedit) \
 { \
-    const IEditable* const item = m_vedit[ie]; \
     if (item->GetItemType() == eItemSurface || item->GetItemType() == eItemRamp) \
     { \
         if (es == item->GetIScriptable()->m_wzName) \
@@ -244,9 +243,8 @@ void PinTable::RemoveInvalidReferences()
    for (size_t i = 0; i < m_materials.size(); i++)
        m_materialMap[m_materials[i]->m_name] = m_materials[i];
 
-   for (size_t i = 0; i < m_vedit.size(); i++)
+   for (auto pEdit : m_vedit)
    {
-        IEditable* const pEdit = m_vedit[i];
         if (pEdit == nullptr)
             continue;
 
@@ -773,12 +771,9 @@ void PinTable::SetupLookUpTables(bool isPlaying)
          m_textureMap[m_vimage[i]->m_name] = m_vimage[i];
       for (size_t i = 0; i < m_materials.size(); i++)
          m_materialMap[m_materials[i]->m_name] = m_materials[i];
-      for (size_t i = 0; i < m_vedit.size(); i++)
-      {
-         IEditable *const pe = m_vedit[i];
+      for (auto pe : m_vedit)
          if (pe->GetItemType() == ItemTypeEnum::eItemLight)
             m_lightMap[pe->GetName()] = (Light *)pe;
-      }
       for (size_t i = 0; i < m_vrenderprobe.size(); i++)
          m_renderprobeMap[m_vrenderprobe[i]->GetName()] = m_vrenderprobe[i];
    }
@@ -1989,10 +1984,10 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                m_materials[i]->m_fThickness = 0.05f;
 
          if (loadfileversion < 1072) // playfield meshes were always forced as collidable until 10.7.1
-            for (size_t i = 0; i < m_vedit.size(); ++i)
-               if (m_vedit[i]->GetItemType() == ItemTypeEnum::eItemPrimitive && (((Primitive *)m_vedit[i])->IsPlayfield()))
+            for (auto pEdit : m_vedit)
+               if (pEdit->GetItemType() == ItemTypeEnum::eItemPrimitive && (((Primitive *)pEdit)->IsPlayfield()))
                {
-                  Primitive* const prim = (Primitive *)m_vedit[i];
+                  Primitive* const prim = (Primitive *)pEdit;
                   prim->put_IsToy(FTOVB(false));
                   prim->put_Collidable(FTOVB(true));
                }
@@ -2917,8 +2912,9 @@ string PinTable::GetElementName(IEditable *pedit)
 
 IEditable *PinTable::GetElementByName(const char * const name) const
 {
-   for (const auto& pedit : m_vedit)
-      if (name == GetElementName(pedit))
+   const wstring wname = MakeWString(name);
+   for (const auto pedit : m_vedit)
+      if (wname == pedit->GetIScriptable()->m_wzName)
          return pedit;
    return nullptr;
 }
@@ -3106,7 +3102,7 @@ Vertex2D PinTable::EvaluateGlassHeight() const
 
    IEditable *upperEditableX = nullptr;
    IEditable *upperEditableY = nullptr;
-   for (IEditable *edit : m_vedit)
+   for (const auto edit : m_vedit)
    {
       if (edit->GetPartGroup() != nullptr && edit->GetPartGroup()->GetReferenceSpace() != PartGroupData::SpaceReference::SR_PLAYFIELD)
          continue;
@@ -3365,12 +3361,10 @@ void PinTable::ExportTableMesh()
    ObjLoader loader;
    loader.ExportStart(filename);
    ExportMesh(loader);
-   for (size_t i = 0; i < m_vedit.size(); i++)
-   {
-      IEditable * const ptr = m_vedit[i];
-      if (ptr->m_uiVisible && ptr->m_desktopBackdrop == m_vpinball->m_desktopBackdropView)
-         ptr->ExportMesh(loader);
-   }
+   for (const auto pedit : m_vedit)
+      if (pedit->m_uiVisible && pedit->m_desktopBackdrop == m_vpinball->m_desktopBackdropView)
+         pedit->ExportMesh(loader);
+
    loader.ExportEnd();
    m_vpinball->MessageBox("Export finished!", "Info", MB_OK | MB_ICONEXCLAMATION);
 #endif
@@ -3661,7 +3655,7 @@ void PinTable::ExportBackdropPOV() const
 
 void PinTable::SelectItem(IScriptable *piscript)
 {
-   for (const auto &pedit : m_vedit)
+   for (const auto pedit : m_vedit)
    {
       if (piscript == pedit->GetIScriptable())
       {
@@ -4266,12 +4260,9 @@ Light *PinTable::GetLight(const string &szName) const
          return nullptr;
    }
 
-   for (size_t i = 0; i < m_vedit.size(); i++)
-   {
-      IEditable *const pe = m_vedit[i];
-      if (pe->GetItemType() == ItemTypeEnum::eItemLight && StrCompareNoCase(pe->GetName(), szName))
-         return (Light *)pe;
-   }
+   for (const auto pedit : m_vedit)
+      if (pedit->GetItemType() == ItemTypeEnum::eItemLight && StrCompareNoCase(pedit->GetName(), szName))
+         return (Light *)pedit;
 
    return nullptr;
 }
@@ -4425,10 +4416,9 @@ int PinTable::AddListMaterial(HWND hwndListView, Material * const pmat)
    }
    else
    {
-      for (size_t i = 0; i < m_vedit.size(); i++)
+      for (const auto pEdit : m_vedit)
       {
          bool inUse = false;
-         IEditable * const pEdit = m_vedit[i];
          if (pEdit == nullptr)
             continue;
 
@@ -4991,13 +4981,13 @@ STDMETHODIMP PinTable::GetPredefinedStrings(DISPID dispID, CALPOLESTR *pcaString
       constexpr bool ramps = true;
       constexpr bool flashers = true;
 
-      for (size_t ivar = 0; ivar < m_vedit.size(); ivar++)
-         if (m_vedit[ivar]->GetItemType() == eItemSurface ||
-            (ramps && m_vedit[ivar]->GetItemType() == eItemRamp) ||
+      for (const auto edit : m_vedit)
+         if (edit->GetItemType() == eItemSurface ||
+            (ramps && edit->GetItemType() == eItemRamp) ||
             //!! **************** warning **********************
             // added to render to surface of DMD style lights and emreels
             // but no checks are being performed at moment:
-            (flashers && m_vedit[ivar]->GetItemType() == eItemFlasher))
+            (flashers && edit->GetItemType() == eItemFlasher))
             cvar++;
 
       rgstr = (WCHAR **)CoTaskMemAlloc((cvar + 1) * sizeof(WCHAR *));
@@ -5189,7 +5179,7 @@ float PinTable::GetSurfaceHeight(const string& name, float x, float y) const
       return 0.f;
 
    const wstring wname = MakeWString(name);
-   for (const IEditable *const item : m_vedit)
+   for (const auto item : m_vedit)
    {
       const ItemTypeEnum type = item->GetItemType();
       if ((type == eItemSurface || type == eItemRamp) && (wname == item->GetIScriptable()->m_wzName))
@@ -5205,7 +5195,7 @@ Material* PinTable::GetSurfaceMaterial(const wstring& name) const
    if (name.empty())
       return GetMaterial(m_playfieldMaterial);
 
-   for (const IEditable *const item : m_vedit)
+   for (const auto item : m_vedit)
    {
       const ItemTypeEnum type = item->GetItemType();
       if ((type == eItemSurface || type == eItemRamp) && (name == item->GetIScriptable()->m_wzName))
@@ -5221,7 +5211,7 @@ Texture* PinTable::GetSurfaceImage(const wstring& name) const
    if (name.empty())
       return GetImage(m_image);
 
-   for (const IEditable *const item : m_vedit)
+   for (const auto item : m_vedit)
    {
       const ItemTypeEnum type = item->GetItemType();
       if ((type == eItemSurface || type == eItemRamp) && (name == item->GetIScriptable()->m_wzName))
@@ -6710,21 +6700,19 @@ void PinTable::ShowWhereImagesUsed(vector<WhereUsedInfo> &vWhereUsed)
 #define INSERT_WHERE_USED(x) \
 { \
    whereUsed.searchObjectName = searchObjectName; \
-   whereUsed.whereUsedObjectname = m_vedit[i]->GetName(); \
+   whereUsed.whereUsedObjectname = pEdit->GetName(); \
    whereUsed.whereUsedPropertyName = (x); \
    vWhereUsed.push_back(whereUsed); \
 }
 
 void PinTable::ShowWhereImageUsed(vector<WhereUsedInfo> &vWhereUsed, Texture *const ppi)
 {
-   for (size_t i = 0; i < m_vedit.size(); i++)
+   for (const auto pEdit : m_vedit)
    {
-      WhereUsedInfo whereUsed;
-      const IEditable *const pEdit = m_vedit[i];
       if (pEdit == nullptr)
-      {
          continue;
-      }
+
+      WhereUsedInfo whereUsed;
       const string& searchObjectName = ppi->m_name; //searchObjectName will be an image or material that we want to find table objects that are using it.
 
       switch (pEdit->GetItemType())
@@ -6832,14 +6820,12 @@ void PinTable::ShowWhereMaterialsUsed(vector<WhereUsedInfo> &vWhereUsed)
 
 void PinTable::ShowWhereMaterialUsed(vector<WhereUsedInfo> &vWhereUsed, Material *const ppi)
 {
-   for (size_t i = 0; i < m_vedit.size(); i++)
+   for (const auto pEdit : m_vedit)
    {
-      WhereUsedInfo whereUsed;
-      const IEditable *const pEdit = m_vedit[i];
       if (pEdit == nullptr)
-      {
          continue;
-      }
+
+      WhereUsedInfo whereUsed;
       const string& searchObjectName = ppi->m_name; //searchObjectName will be an image or material that we want to find table objects that are using it.
 
       switch (pEdit->GetItemType())

@@ -661,7 +661,7 @@ void PropertyDialog::UpdateTabs(VectorProtected<ISelect> &pvsel)
     }
     else
     {
-        m_nameEdit.SetWindowText(PinTable::GetElementName(psel->GetIEditable()).c_str());
+        m_nameEdit.SetWindowText(psel->GetIEditable()->GetName().c_str());
         m_nameEdit.SetReadOnly(0);
     }
 
