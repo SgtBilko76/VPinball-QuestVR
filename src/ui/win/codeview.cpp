@@ -466,7 +466,7 @@ HRESULT CodeViewer::AddItem(IScriptable * const piscript, const bool global)
    CodeViewDispatch * const pcvd = new CodeViewDispatch();
 
    pcvd->m_wName = piscript->get_Name();
-   pcvd->m_pdisp = piscript->GetDispatch();
+   pcvd->m_pdisp = piscript->GetIDispatch();
    pcvd->m_pdisp->QueryInterface(IID_IUnknown, (void **)&pcvd->m_punk);
    pcvd->m_punk->Release();
    pcvd->m_global = global;
@@ -484,7 +484,7 @@ HRESULT CodeViewer::AddItem(IScriptable * const piscript, const bool global)
 
 #ifdef __STANDALONE__
    ITypeInfo* ti;
-   if (SUCCEEDED(piscript->GetDispatch()->GetTypeInfo(NULL, NULL, &ti))) {
+   if (SUCCEEDED(piscript->GetIDispatch()->GetTypeInfo(NULL, NULL, &ti))) {
       BSTR bstrTypeName;
       if (SUCCEEDED(ti->GetDocumentation(MEMBERID_NIL, &bstrTypeName, NULL, NULL, NULL))) {
          PLOGD << "type=" << MakeString(bstrTypeName) << ", name=" << szT;
@@ -1244,7 +1244,7 @@ string CodeViewer::GetParamsFromEvent(const UINT iEvent)
 #ifndef __STANDALONE__
    const size_t index = ::SendMessage(m_hwndItemList, CB_GETCURSEL, 0, 0);
    IScriptable * const pscript = (IScriptable *)::SendMessage(m_hwndItemList, CB_GETITEMDATA, index, 0);
-   IDispatch * const pdisp = pscript->GetDispatch();
+   IDispatch * const pdisp = pscript->GetIDispatch();
    IProvideClassInfo* pClassInfo;
    pdisp->QueryInterface(IID_IProvideClassInfo, (void **)&pClassInfo);
 

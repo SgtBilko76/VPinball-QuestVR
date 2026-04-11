@@ -7,7 +7,7 @@ vector<wstring> IScriptable::GetMethodNames()
 {
    vector<wstring> methods;
 #ifndef __STANDALONE__
-   IDispatch *pdisp = GetDispatch();
+   IDispatch *pdisp = GetIDispatch();
    if (!pdisp)
       return methods;
 
@@ -51,7 +51,7 @@ vector<wstring> IScriptable::GetEventNames()
 {
    vector<wstring> events;
 #ifndef __STANDALONE__
-   IDispatch * pdisp = GetDispatch();
+   IDispatch * pdisp = GetIDispatch();
 
    // Enum Events From Dispatch
    IProvideClassInfo *pClassInfo;

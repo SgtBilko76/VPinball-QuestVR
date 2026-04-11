@@ -124,8 +124,8 @@ void ScriptInterpreter::Start(PinTable* table)
    for (int i = 0; i < table->m_vcollection.size(); i++)
       AddItem(&table->m_vcollection[i], false);
    for (auto editable : table->GetParts())
-      if (editable->GetScriptable())
-         AddItem(editable->GetScriptable(), false);
+      if (editable->IGetScriptable())
+         AddItem(editable->IGetScriptable(), false);
 }
 
 void ScriptInterpreter::Stop(PinTable *table, bool interruptDirectly)
@@ -165,8 +165,8 @@ void ScriptInterpreter::Stop(PinTable *table, bool interruptDirectly)
    for (int i = 0; i < table->m_vcollection.size(); i++)
       RemoveItem(&table->m_vcollection[i]);
    for (auto editable : table->GetParts())
-      if (editable->GetScriptable())
-         RemoveItem(editable->GetScriptable());
+      if (editable->GetIScriptable())
+         RemoveItem(editable->GetIScriptable());
 }
 
 void ScriptInterpreter::AddItem(const wstring& name, IDispatch *dispatch, const bool global)
@@ -197,7 +197,7 @@ void ScriptInterpreter::AddItem(const wstring& name, IDispatch *dispatch, const 
 
 void ScriptInterpreter::RemoveItem(IScriptable *const piscript)
 {
-   piscript->GetDispatch()->Release();
+   piscript->GetIDispatch()->Release();
    auto it = m_vcvd.find(piscript->get_Name());
    if (it != m_vcvd.end())
       m_vcvd.erase(it);

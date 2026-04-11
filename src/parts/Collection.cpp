@@ -15,7 +15,7 @@ void Collection::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteWideString(FID(NAME), m_wzName);
    for (int i = 0; i < m_visel.size(); ++i)
    {
-      const IScriptable * const piscript = m_visel[i].GetIEditable()->GetScriptable();
+      const IScriptable * const piscript = m_visel[i].GetIEditable()->GetIScriptable();
       writer.WriteWideString(FID(ITEM), piscript->m_wzName);
    }
    writer.WriteBool(FID(EVNT), m_fireEvents);
@@ -52,7 +52,7 @@ HRESULT Collection::InitPostLoad(const PinTable *const pt)
    {
       for (IEditable* editable : pt->GetParts())
       {
-         if (IScriptable *const piscript = editable->GetScriptable(); piscript) // skip decals
+         if (IScriptable *const piscript = editable->GetIScriptable(); piscript) // skip decals
          {
             if (piscript->m_wzName == tmp_isel_name)
             {
@@ -81,7 +81,7 @@ STDMETHODIMP Collection::get_Item(LONG index, IDispatch __RPC_FAR * __RPC_FAR *p
    if (index < 0 || index >= m_visel.size())
       return TYPE_E_OUTOFBOUNDS;
 
-   IDispatch * const pdisp = m_visel[index].GetDispatch();
+   IDispatch * const pdisp = m_visel[index].GetIDispatch();
    return pdisp->QueryInterface(IID_IDispatch, (void **)ppidisp);
 }
 
@@ -128,7 +128,7 @@ STDMETHODIMP OMCollectionEnum::Next(ULONG celt, VARIANT __RPC_FAR *rgVar, ULONG 
 
    for (int i = m_index; i < last; ++i)
    {
-      IDispatch * const pdisp = m_pcol->m_visel[i].GetDispatch();
+      IDispatch * const pdisp = m_pcol->m_visel[i].GetIDispatch();
       pdisp->QueryInterface(IID_IDispatch, (void **)&pdisp);
 
       V_VT(&rgVar[i - m_index]) = VT_DISPATCH;

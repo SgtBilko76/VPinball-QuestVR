@@ -214,7 +214,7 @@ void IEditable::Undelete()
 
 string IEditable::GetName() const
 {
-   const IScriptable *const pscript = const_cast<IEditable*>(this)->GetScriptable();
+   const IScriptable *const pscript = const_cast<IEditable*>(this)->GetIScriptable();
    if (pscript)
       return MakeString(pscript->get_Name());
    return string();
@@ -222,7 +222,7 @@ string IEditable::GetName() const
 
 const wstring& IEditable::GetWName() const
 {
-   const IScriptable *const pscript = const_cast<IEditable*>(this)->GetScriptable();
+   const IScriptable *const pscript = const_cast<IEditable*>(this)->GetIScriptable();
    if (pscript)
       return pscript->get_Name();
    static const wstring emptyString;
@@ -231,7 +231,7 @@ const wstring& IEditable::GetWName() const
 
 void IEditable::SetName(const wstring& name)
 {
-   IScriptable *const scriptable = GetScriptable();
+   IScriptable *const scriptable = GetIScriptable();
    if (name.empty() || scriptable == nullptr)
       return;
 

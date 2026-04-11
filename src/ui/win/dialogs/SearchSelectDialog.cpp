@@ -119,7 +119,7 @@ void SearchSelectDialog::Update()
    }
    for (IEditable *const piedit : m_curTable->m_table->GetParts())
    {
-      if (IScriptable *const piscript = piedit->GetScriptable(); piscript)
+      if (IScriptable *const piscript = piedit->GetIScriptable(); piscript)
       {
          LVITEM lv;
          lv.mask = LVIF_TEXT | LVIF_PARAM;
@@ -197,7 +197,7 @@ void SearchSelectDialog::SelectElement()
               IScriptable * const pscript = (IScriptable*)lv.lParam;
               for (const auto &pedit : m_curTable->m_table->GetParts())
               {
-                 if (pscript == pedit->GetScriptable())
+                 if (pscript == pedit->GetIScriptable())
                  {
                     if (ISelect *const pisel = pedit->GetISelect(); pisel)
                        m_curTable->m_table->AddMultiSel(pisel, true, true, false);

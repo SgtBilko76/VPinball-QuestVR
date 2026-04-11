@@ -75,8 +75,8 @@ public:
    virtual HRESULT GetTypeName(BSTR *pVal) const;
    wstring GetTypeNameForType(const ItemTypeEnum type) const;
 
-   virtual IDispatch *GetDispatch() = 0;
-   virtual const IDispatch *GetDispatch() const = 0;
+   virtual IDispatch *GetIDispatch() = 0;
+   virtual const IDispatch *GetIDispatch() const = 0;
    virtual ItemTypeEnum GetItemType() const = 0;
 
    virtual void Delete() = 0;

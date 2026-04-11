@@ -1000,7 +1000,7 @@ STDMETHODIMP ScriptGlobalTable::GetElements(LPSAFEARRAY *pVal)
    {
       IEditable *const pie = m_pt->GetParts()[i];
 
-      CComVariant v = pie->GetISelect()->GetDispatch();
+      CComVariant v = pie->GetISelect()->GetIDispatch();
       v.Detach(&objs[(LONG)i]);
    }
 
@@ -1015,9 +1015,9 @@ STDMETHODIMP ScriptGlobalTable::GetElementByName(BSTR name, IDispatch* *pVal)
 
    for (IEditable *const pie : m_pt->GetParts())
    {
-      if (name == pie->GetScriptable()->m_wzName)
+      if (name == pie->GetIScriptable()->m_wzName)
       {
-         IDispatch * const id = pie->GetISelect()->GetDispatch();
+         IDispatch * const id = pie->GetISelect()->GetIDispatch();
          id->AddRef();
          *pVal = id;
 

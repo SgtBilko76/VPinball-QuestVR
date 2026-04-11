@@ -179,8 +179,8 @@ private:
 
       HRESULT GetTypeName(BSTR *pVal) const override { return m_plight->GetTypeName(pVal); }
 
-      IDispatch *GetDispatch() override { return m_plight->GetDispatch(); }
-      const IDispatch *GetDispatch() const override { return m_plight->GetDispatch(); }
+      IDispatch *GetIDispatch() override { return m_plight->GetIDispatch(); }
+      const IDispatch *GetIDispatch() const override { return m_plight->GetIDispatch(); }
 
       void Delete() override { m_plight->Delete(); }
       void Uncreate() override { m_plight->Uncreate(); }

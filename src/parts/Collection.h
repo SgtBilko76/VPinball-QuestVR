@@ -20,8 +20,8 @@ public:
    Collection();
 
    // IScriptable
-   IDispatch *GetDispatch() final { return (IDispatch *)this; }
-   const IDispatch *GetDispatch() const final { return (const IDispatch *)this; }
+   IDispatch *GetIDispatch() final { return (IDispatch *)this; }
+   const IDispatch *GetIDispatch() const final { return (const IDispatch *)this; }
 
    void Save(IObjectWriter& writer, const bool saveForUndo);
    void Load(IObjectReader &reader);

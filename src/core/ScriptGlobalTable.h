@@ -140,8 +140,8 @@ public:
    void Init(PinTable *pt);
    ~ScriptGlobalTable();
 
-   IDispatch *GetDispatch() final { return (IDispatch *)this; }
-   const IDispatch *GetDispatch() const final { return (const IDispatch *)this; }
+   IDispatch *GetIDispatch() final { return (IDispatch *)this; }
+   const IDispatch *GetIDispatch() const final { return (const IDispatch *)this; }
 
    BEGIN_COM_MAP(ScriptGlobalTable)
    COM_INTERFACE_ENTRY(ITableGlobal)

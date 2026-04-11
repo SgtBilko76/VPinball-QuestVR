@@ -15,8 +15,8 @@ class IFireEvents
 
 public:
    virtual void FireGroupEvent(const int dispid) = 0;
-   virtual IDispatch *GetDispatch() = 0;
-   virtual const IDispatch *GetDispatch() const = 0;
+   virtual IDispatch *GetIDispatch() = 0;
+   virtual const IDispatch *GetIDispatch() const = 0;
 
    float   m_currentHitThreshold; // while playing and the ball hits the mesh the hit threshold is updated here
 };
@@ -61,8 +61,8 @@ public:
 	STDMETHOD(put_TimerEnabled)(/*[in]*/ VARIANT_BOOL newVal) {BOOL tmp = m_d.m_tdr.m_TimerEnabled ? 1 : 0; const HRESULT res = IEditable::put_TimerEnabled(newVal, &tmp); m_d.m_tdr.m_TimerEnabled = (tmp != 0); return res;} \
 	STDMETHOD(get_UserValue)(VARIANT *pVal) {return IEditable::get_UserValue(pVal);} \
 	STDMETHOD(put_UserValue)(VARIANT *newVal) {return IEditable::put_UserValue(newVal);} \
-	virtual IScriptable *GetScriptable() {return (IScriptable *)this;} \
-	virtual const IScriptable *GetScriptable() const {return (const IScriptable *)this;} \
+	virtual IScriptable *GetIScriptable() {return (IScriptable *)this;} \
+	virtual const IScriptable *GetIScriptable() const {return (const IScriptable *)this;} \
 	virtual void FireGroupEvent(const int dispid) {FireVoidGroupEvent(dispid);}
 
 // used above, do not invoke directly
@@ -99,8 +99,8 @@ public:
 	virtual void Load(IObjectReader &reader); \
 	virtual void Save(IObjectWriter &writer, const bool saveForUndo); \
 	virtual ItemTypeEnum GetItemType() const { return ItemType; } \
-	virtual IDispatch *GetDispatch() {return static_cast<IDispatch *>(this);} \
-	virtual const IDispatch *GetDispatch() const {return static_cast<const IDispatch *>(this);} \
+	virtual IDispatch *GetIDispatch() {return static_cast<IDispatch *>(this);} \
+	virtual const IDispatch *GetIDispatch() const {return static_cast<const IDispatch *>(this);} \
 	virtual IEditable *GetIEditable() {return static_cast<IEditable*>(this);} \
 	virtual const IEditable *GetIEditable() const {return static_cast<const IEditable*>(this);} \
 	virtual ISelect *GetISelect() {return static_cast<ISelect*>(this);} \
@@ -219,8 +219,8 @@ public:
    virtual IRenderable *GetIRenderable() = 0;
    virtual const IRenderable *GetIRenderable() const = 0;
 
-   virtual IScriptable *GetScriptable() = 0;
-   virtual const IScriptable *GetScriptable() const = 0;
+   virtual IScriptable *GetIScriptable() = 0;
+   virtual const IScriptable *GetIScriptable() const = 0;
 
    virtual IFireEvents *GetIFireEvents() = 0;
 

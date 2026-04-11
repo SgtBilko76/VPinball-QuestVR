@@ -387,8 +387,8 @@ public:
    void Translate(const Vertex2D &pvOffset) final;
 
    // IFireEvents
-   IDispatch *GetDispatch() final { return (IDispatch *)this; }
-   const IDispatch *GetDispatch() const final { return (const IDispatch *)this; }
+   IDispatch *GetIDispatch() final { return (IDispatch *)this; }
+   const IDispatch *GetIDispatch() const final { return (const IDispatch *)this; }
 
    // IEditable (mostly bogus for now)
    IFireEvents *GetIFireEvents() final { return (IFireEvents *)this; }
@@ -404,8 +404,8 @@ public:
    const ISelect *GetISelect() const final { return (const ISelect *)this; }
    void SetDefaults(const bool fromMouseClick) final { }
    void WriteRegDefaults() final { }
-   IScriptable *GetScriptable() final { return (IScriptable *)this; }
-   const IScriptable *GetScriptable() const final { return (const IScriptable *)this; }
+   IScriptable *GetIScriptable() final { return (IScriptable *)this; }
+   const IScriptable *GetIScriptable() const final { return (const IScriptable *)this; }
    void BeginUndo() final;
    void EndUndo() final;
    void Undo();

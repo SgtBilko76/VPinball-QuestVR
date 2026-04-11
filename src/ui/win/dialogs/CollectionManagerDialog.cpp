@@ -326,7 +326,7 @@ BOOL CollectionDialog::OnInitDialog()
     for (int i = 0; i < pcol->m_visel.size(); i++)
     {
         IEditable * const piedit = pcol->m_visel[i].GetIEditable();
-        IScriptable * const piscript = piedit->GetScriptable();
+        IScriptable * const piscript = piedit->GetIScriptable();
         if (piscript)
         {
             string name = MakeString(piscript->m_wzName);
@@ -341,7 +341,7 @@ BOOL CollectionDialog::OnInitDialog()
     ::SendMessage(hwndOut, WM_SETREDRAW, FALSE, 0); // to speed up adding the entries :/
     for (IEditable *const piedit : ppt->m_table->GetParts())
     {
-        IScriptable * const piscript = piedit->GetScriptable();
+        IScriptable * const piscript = piedit->GetIScriptable();
         ISelect * const pisel = piedit->GetISelect();
 
         // Only process objects not in this collection
@@ -467,7 +467,7 @@ void CollectionDialog::OnOK()
        IScriptable * const piscript = (IScriptable *)::SendMessage(hwndIn, LB_GETITEMDATA, i, 0);
        for (const auto &pedit : pCurCollection.ppt->m_table->GetParts())
        {
-          if (piscript == pedit->GetScriptable())
+          if (piscript == pedit->GetIScriptable())
           {
              if (ISelect *const pisel = pedit->GetISelect(); pisel) // Not sure how we could possibly get an iscript here that was never an iselect
              {

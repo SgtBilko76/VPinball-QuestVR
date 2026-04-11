@@ -497,7 +497,7 @@ void WinEditor::SetPropSel(VectorProtected<ISelect> &pvsel)
 
 void WinEditor::RenameEditable(IEditable *editable, const string &name)
 {
-   const string oldName = MakeString(editable->GetScriptable()->m_wzName);
+   const string oldName = MakeString(editable->GetIScriptable()->m_wzName);
    editable->SetName(MakeWString(name));
 
 #ifndef __STANDALONE__
