@@ -457,11 +457,11 @@ Player::Player(PinTable *const table, const PlayMode playMode)
       if (m_implicitVRBackglass)
       {
          m_implicitVRBackglass->SetName(m_ptable->GetUniqueName(L"vr_backglass"s));
-         const float flasherWidth = 100.f; // We should gather this from the object instead of guessing the default size
-         const float flasherHeight = 100.f;
-         const float backglassScale = 1.2f;
+         constexpr float flasherWidth = 100.f; // We should gather this from the object instead of guessing the default size
+         constexpr float flasherHeight = 100.f;
+         constexpr float backglassScale = 1.2f;
          const float backglassWidth = backglassScale * (m_ptable->m_right - m_ptable->m_left);
-         const float backglassHeight = backglassWidth * 3.f / 4.f;
+         const float backglassHeight = backglassWidth * (float)(3. / 4.);
          m_implicitVRBackglass->Scale(backglassWidth / flasherWidth, backglassHeight / flasherHeight, Vertex2D {}, true);
          m_implicitVRBackglass->m_d.m_rotX = -90.f;
          m_implicitVRBackglass->m_d.m_height = backglassHeight * 0.5f + m_ptable->m_glassTopHeight;
@@ -690,15 +690,14 @@ Player::Player(PinTable *const table, const PlayMode playMode)
    for (RenderProbe *probe : m_ptable->m_vrenderprobe)
       probe->RenderSetup(m_renderer);
    for (auto editable : m_ptable->GetParts())
-      if (editable->GetIHitable())
-         m_vhitables.push_back(editable);
-   for (IEditable *hitable : m_vhitables)
    {
-      hitable->TimerSetup(m_vht);
-      if (hitable->GetIRenderable())
-         hitable->GetIRenderable()->RenderSetup(m_renderer->m_renderDevice);
-      if (hitable->GetItemType() == ItemTypeEnum::eItemBall)
-         m_vball.push_back(static_cast<Ball *>(hitable));
+      if (editable->GetItemType() == ItemTypeEnum::eItemBall)
+         m_vball.push_back(static_cast<Ball *>(editable));
+
+      editable->TimerSetup(m_vht);
+
+      if (auto ph = editable->GetIRenderable(); ph)
+         ph->RenderSetup(m_renderer->m_renderDevice);
    }
 
    if (!IsEditorMode())
@@ -714,18 +713,15 @@ Player::Player(PinTable *const table, const PlayMode playMode)
       m_scriptInterpreter->Start(m_ptable);
       m_scriptInterpreter->Evaluate(m_pluginAPI.ApplyScriptCOMObjectOverrides(table->m_script_text), false);
 
-      // Fire Init event for table object and all 'hitable' parts, also fire Animate event of parts having it since initial setup is considered as the initial animation event
+      // Fire Init event for table object itself and all table parts, also fire Animate event of parts having it, since initial setup is considered as the initial animation event
       m_ptable->FireVoidEvent(DISPID_GameEvents_Init);
-      for (IEditable *const ph : m_vhitables)
+      for (auto editable : m_ptable->GetParts())
       {
-         if (ph->GetIHitable()->GetEventProxyBase())
-         {
-            ph->GetIHitable()->GetEventProxyBase()->FireVoidEvent(DISPID_GameEvents_Init);
-            const ItemTypeEnum type = ph->GetItemType();
-            if (type == ItemTypeEnum::eItemBumper || type == ItemTypeEnum::eItemDispReel || type == ItemTypeEnum::eItemFlipper || type == ItemTypeEnum::eItemGate
-               || type == ItemTypeEnum::eItemHitTarget || type == ItemTypeEnum::eItemLight || type == ItemTypeEnum::eItemSpinner || type == ItemTypeEnum::eItemTrigger)
-               ph->GetIHitable()->GetEventProxyBase()->FireVoidEvent(DISPID_AnimateEvents_Animate);
-         }
+         editable->GetEventProxyBase()->FireVoidEvent(DISPID_GameEvents_Init);
+         const ItemTypeEnum type = editable->GetItemType();
+         if (type == ItemTypeEnum::eItemBumper || type == ItemTypeEnum::eItemDispReel || type == ItemTypeEnum::eItemFlipper || type == ItemTypeEnum::eItemGate
+          || type == ItemTypeEnum::eItemHitTarget || type == ItemTypeEnum::eItemLight || type == ItemTypeEnum::eItemSpinner || type == ItemTypeEnum::eItemTrigger)
+             editable->GetEventProxyBase()->FireVoidEvent(DISPID_AnimateEvents_Animate);
       }
       m_ptable->FireOptionEvent(PinTable::OptionEventType::Initialized);
       m_ptable->FireVoidEvent(DISPID_GameEvents_Paused);
@@ -990,11 +986,12 @@ Player::~Player()
 
    for (auto probe : m_ptable->m_vrenderprobe)
       probe->RenderRelease();
-   for (auto renderable : m_vhitables)
-      if (renderable->GetIRenderable())
-         renderable->GetIRenderable()->RenderRelease();
-   for (auto hitable : m_vhitables)
-      hitable->TimerRelease();
+   for (auto editable : m_ptable->GetParts())
+   {
+      if (auto ph = editable->GetIRenderable(); ph)
+         ph->RenderRelease();
+      editable->TimerRelease();
+   }
    assert(m_vballDelete.empty());
    m_vball.clear();
 
@@ -1245,11 +1242,8 @@ Ball *Player::CreateBall(const float x, const float y, const float z, const floa
    pBall->m_hitBall.m_d.m_pos.z = z + radius;
    pBall->m_hitBall.m_d.m_mass = mass;
    pBall->m_hitBall.m_d.m_radius = radius;
-   pBall->m_hitBall.m_d.m_vel.x = vx;
-   pBall->m_hitBall.m_d.m_vel.y = vy;
-   pBall->m_hitBall.m_d.m_vel.z = vz;
+   pBall->m_hitBall.m_d.m_vel = { vx, vy, vz };
    pBall->m_d.m_useTableRenderSettings = true;
-   m_vhitables.push_back(pBall);
    pBall->TimerSetup(m_vht);
    pBall->RenderSetup(m_renderer->m_renderDevice);
    pBall->PhysicSetup(m_physics, false);
@@ -1397,7 +1391,7 @@ string Player::GetPerfInfo()
    info << "State changes: " << m_renderer->m_renderDevice->Perf_GetNumStateChanges() << '\n';
    info << "Texture changes: " << m_renderer->m_renderDevice->Perf_GetNumTextureChanges() << " (" << m_renderer->m_renderDevice->Perf_GetNumTextureUploads() << " Uploads)\n";
    info << "Shader/Parameter changes: " << m_renderer->m_renderDevice->Perf_GetNumTechniqueChanges() << " / " << m_renderer->m_renderDevice->Perf_GetNumParameterChanges() << '\n';
-   info << "Objects: " << static_cast<unsigned int>(m_vhitables.size()) << '\n';
+   info << "Objects: " << static_cast<unsigned int>(m_ptable->GetParts().size()) << '\n';
    info << '\n';
 
    // Physics additional information
@@ -1595,14 +1589,14 @@ public:
             m_captureRequestMask &= 1;
       #endif
    }
-   
+
    void Update()
    {
       std::lock_guard lock(m_captureMutex);
 
       m_player->m_physics->UpdatePhysics(max(m_captureTime, m_player->m_physics->GetCurrentTime()));
       m_player->FireTimers(-2);
-      
+
       // Fast forward to capture start time (startup +30s)
       while (m_player->m_physics->GetCurrentTime() < m_player->m_physics->GetStartTime() + 30u * 1000000)
       {
@@ -1610,9 +1604,10 @@ public:
          m_player->m_overall_frames++;
          const float diff_time_msec = (float)(m_player->m_time_msec - m_player->m_last_frame_time_msec);
          m_player->m_last_frame_time_msec = m_player->m_time_msec;
-         for (IEditable *editable : m_player->m_ptable->GetParts())
-            if (IRenderable *const ph = editable->GetIRenderable(); ph)
-               ph->UpdateAnimation(diff_time_msec);
+         if (diff_time_msec > 0.f)
+            for (IEditable *editable : m_player->m_ptable->GetParts())
+               if (auto ph = editable->GetIRenderable(); ph)
+                  ph->UpdateAnimation(diff_time_msec);
          m_player->FireTimers(-1);
          m_player->FireTimers(-2);
          m_player->m_physics->UpdatePhysics(m_captureTime);
@@ -1620,13 +1615,13 @@ public:
          m_captureStartupEndTime = usec();
          m_captureStartupEndPhysicsTime = m_player->m_physics->GetCurrentTime();
       }
-      
+
       // Run 1s of normal emulation to stabilize
       if (m_player->m_physics->GetCurrentTime() < m_captureStartupEndPhysicsTime + 1000000)
       {
          m_captureTime = m_captureStartupEndPhysicsTime + usec() - m_captureStartupEndTime;
       }
-      
+
       // Stepped emulation & rendering at the capture frequency
       else if (!m_captureRequested && m_player->GetCloseState() == Player::CS_PLAYING)
       {
@@ -1647,7 +1642,7 @@ public:
          }
       }
    }
-   
+
 private:
    void OnCapture(bool success)
    {
@@ -1674,7 +1669,7 @@ private:
          {
             Light* const light = static_cast<Light*>(edit);
             const float state = (light->m_d.m_intensity * light->m_d.m_intensity_scale) == 0.f ? 0.f :
-               clamp(light->m_currentIntensity / (light->m_d.m_intensity * light->m_d.m_intensity_scale), 0.f, 1.f);
+               saturate(light->m_currentIntensity / (light->m_d.m_intensity * light->m_d.m_intensity_scale));
             m_lightStates[m_captureFrameNumber - 1].push_back(state);
             if (static_cast<int>(state * 9.f) == 0)
                ss << ' ';
@@ -1682,7 +1677,7 @@ private:
                ss << static_cast<int>(state * 9.f);
          }
       }
-      
+
       // Evaluate best loop against previous frames
       if (int minLoopLength = max(5, m_player->m_nFrameToCapture / 4); m_captureFrameNumber > minLoopLength)
       {
@@ -1717,7 +1712,7 @@ private:
       m_captureTime += 1000000 / m_player->m_frameCaptureFPS;
       if (m_captureFrameNumber <= m_player->m_nFrameToCapture)
          return;
-      
+
       // Capture is finished, process result and exit
       m_player->SetCloseState(Player::CloseState::CS_CLOSE_APP);
       if (!m_player->m_cutCaptureToLoop)
@@ -1779,14 +1774,14 @@ private:
    int m_captureRequestMask;
    int m_captureFrameNumber = 1;
    bool m_captureRequested = false;
-   
+
    uint64_t m_captureTime = usec();
    uint64_t m_captureStartupEndTime = usec();
    uint64_t m_captureStartupEndPhysicsTime = usec();
-   
+
    int m_nLights;
    vector<vector<float>> m_lightStates;
-   
+
    int m_bestLoopStart = -1;
    int m_bestLoopEnd = -1;
    double m_bestLoopDistance = FLT_MAX;
@@ -2091,7 +2086,7 @@ void Player::PrepareFrame()
       m_last_frame_time_msec = m_time_msec;
       if (diff_time_msec > 0.f)
          for (IEditable* editable : m_ptable->GetParts())
-            if (IRenderable *const ph = editable->GetIRenderable(); ph)
+            if (auto ph = editable->GetIRenderable(); ph)
                ph->UpdateAnimation(diff_time_msec);
    }
 
@@ -2182,7 +2177,6 @@ void Player::FinishFrame()
    // Remove ball from table (but they may outlive as they may be in use for rendering) for balls that may have been destroyed from scripts
    for (Ball *const pBall : m_vballDelete)
    {
-      RemoveFromVectorSingle(m_vhitables, static_cast<IEditable *>(pBall));
       if (m_scriptInterpreter)
          m_scriptInterpreter->RemoveItem(pBall);
       m_ptable->RemovePart(pBall);

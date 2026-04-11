@@ -69,16 +69,14 @@ PhysicsEngine::PhysicsEngine(PinTable *const table)
    m_pendingHitObjects = &m_hitoctree.BeginReset();
    m_pendingHitObjects->clear();
    for (IEditable *const pe : table->GetParts())
-   {
-      Hitable * const ph = pe->GetIHitable();
-      if (ph)
+      if (IHitable *const ph = pe->GetIHitable(); ph)
       {
          #ifdef DEBUGPHYSICS
          g_pplayer->m_progressDialog.SetProgress("Initializing Object-Physics " + pe->GetName() + "...");
          #endif
          ph->PhysicSetup(this, false);
       }
-   }
+
    AddCabinetBoundingHitShapes(table);
    for (HitObject *const pho : *m_pendingHitObjects)
    {
@@ -136,8 +134,8 @@ void PhysicsEngine::ReleaseVHO(const vector<HitObject *> &vho, bool isUI)
       if (FindIndexOf(editables, vho[i]->m_editable) == -1)
       {
          editables.push_back(vho[i]->m_editable);
-         if (vho[i]->m_editable->GetIHitable())
-            vho[i]->m_editable->GetIHitable()->PhysicRelease(this, isUI);
+         if (auto ph = vho[i]->m_editable->GetIHitable(); ph)
+            ph->PhysicRelease(this, isUI);
       }
       if (vho[i]->GetType() != eBall) // As balls own their HitBall hit object
          delete vho[i];
@@ -205,8 +203,8 @@ void PhysicsEngine::CollectColliders(IEditable *editable, vector<HitObject *> *h
 {
    assert(m_pendingHitObjects == nullptr);
    m_pendingHitObjects = hitObjects;
-   if (editable->GetIHitable())
-      editable->GetIHitable()->PhysicSetup(this, isUI);
+   if (auto ph = editable->GetIHitable(); ph)
+      ph->PhysicSetup(this, isUI);
    m_pendingHitObjects = nullptr;
 }
 

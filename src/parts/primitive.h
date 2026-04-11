@@ -72,7 +72,7 @@ class Primitive :
 
    public ISelect,
    public IEditable,
-   public Hitable,
+   public IHitable,
    public IRenderable,
    public IScriptable,
    public IFireEvents,
@@ -246,7 +246,7 @@ public:
 
    DECLARE_REGISTRY_RESOURCEID(IDR_PRIMITIVE)
 
-   bool PhysicUpdate(class PhysicsEngine *physics, const bool isUI) override;
+   bool PhysicUpdate(class PhysicsEngine *physics, const bool isUI) final;
 
    void MoveOffset(const float dx, const float dy) final;
    void SetObjectPos() final;

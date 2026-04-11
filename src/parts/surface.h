@@ -40,7 +40,7 @@ class Surface :
    public IProvideClassInfo2Impl<&CLSID_Wall, &DIID_IWallEvents, &LIBID_VPinballLib>,
    public ISelect,
    public IEditable,
-   public Hitable,
+   public IHitable,
    public IRenderable,
    public IHaveDragPoints,
    public IScriptable,

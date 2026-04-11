@@ -31,7 +31,7 @@ class Decal :
    public IProvideClassInfo2Impl<&CLSID_Decal, &DIID_IDecalEvents, &LIBID_VPinballLib>,
    public ISelect,
    public IEditable,
-   public Hitable,
+   //public Hitable, // FIXME implement UI picking
    public IRenderable,
    public IScriptable,
    public IFireEvents,
@@ -42,7 +42,7 @@ public:
    STDMETHOD(GetIDsOfNames)(REFIID /*riid*/, LPOLESTR* rgszNames, UINT cNames, LCID lcid,DISPID* rgDispId);
    STDMETHOD(Invoke)(DISPID dispIdMember, REFIID /*riid*/, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr);
    STDMETHOD(GetDocumentation)(INT index, BSTR *pBstrName, BSTR *pBstrDocString, DWORD *pdwHelpContext, BSTR *pBstrHelpFile);
-   HRESULT FireDispID(const DISPID dispid, DISPPARAMS *const pdispparams) final;
+   HRESULT FireDispID(const DISPID dispid, DISPPARAMS * const pdispparams) final;
 #endif
    Decal() { m_wzName = L"Decal"sv; }
    virtual ~Decal();
@@ -56,7 +56,7 @@ public:
       COM_INTERFACE_ENTRY(IProvideClassInfo2)
    END_COM_MAP()
 
-   STANDARD_EDITABLE_DECLARES(Decal, eItemDecal, DECAL, VIEW_PLAYFIELD | VIEW_BACKGLASS)
+   STANDARD_EDITABLE_DECLARES_NO_HITABLE(Decal, eItemDecal, DECAL, VIEW_PLAYFIELD | VIEW_BACKGLASS)
 
    BEGIN_CONNECTION_POINT_MAP(Decal)
       CONNECTION_POINT_ENTRY(DIID_IDecalEvents)
@@ -73,8 +73,6 @@ public:
    string GetFontName() const;
 
    void WriteRegDefaults() final;
-
-   ItemTypeEnum HitableGetItemType() const final { return eItemDecal; }
 
    void EnsureSize();
 

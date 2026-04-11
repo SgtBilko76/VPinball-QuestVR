@@ -300,6 +300,8 @@ private:
 public:
    PinTable *CopyForPlay();
 
+   EventProxyBase *GetEventProxyBase() final { return (EventProxyBase *)this; }
+
    void RemoveInvalidReferences();
 
    HRESULT GetTypeName(BSTR *pVal) const final;
@@ -399,8 +401,8 @@ public:
    void ClearForOverwrite() final;
    void Load(IObjectReader &reader) final;
    void Save(IObjectWriter& writer, const bool saveForUndo) final;
-   Hitable *GetIHitable() final { return nullptr; }
-   const Hitable *GetIHitable() const final { return nullptr; }
+   IHitable *GetIHitable() final { return nullptr; }
+   const IHitable *GetIHitable() const final { return nullptr; }
    IRenderable *GetIRenderable() final { return nullptr; }
    const IRenderable *GetIRenderable() const final { return nullptr; }
    ISelect *GetISelect() final { return (ISelect *)this; }

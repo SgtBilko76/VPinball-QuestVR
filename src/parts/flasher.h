@@ -65,7 +65,7 @@ class Flasher :
    public IProvideClassInfo2Impl<&CLSID_Flasher, &DIID_IFlasherEvents, &LIBID_VPinballLib>,
    public ISelect,
    public IEditable,
-   public Hitable,
+   public IHitable, // only used for UI picking
    public IRenderable,
    public IHaveDragPoints,
    public IScriptable,

@@ -33,7 +33,7 @@ class Kicker :
    public IProvideClassInfo2Impl<&CLSID_Kicker, &DIID_IKickerEvents, &LIBID_VPinballLib>,
    public ISelect,
    public IEditable,
-   public Hitable,
+   public IHitable,
    public IRenderable,
    public IScriptable,
    public IFireEvents,

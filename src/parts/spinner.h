@@ -32,7 +32,7 @@ class Spinner :
    public IProvideClassInfo2Impl<&CLSID_Spinner, &DIID_ISpinnerEvents, &LIBID_VPinballLib>,
    public ISelect,
    public IEditable,
-   public Hitable,
+   public IHitable,
    public IRenderable,
    public IScriptable,
    public IFireEvents,

@@ -795,11 +795,14 @@ void EditorUI::RenderUI()
 
    if (m_selection != previousSelection)
    {
-      if ((previousSelection.type == Selection::S_EDITABLE) //
-         && FindIndexOf(m_table->GetParts(), previousSelection.uiPart->GetEditable()) != -1 // Not deleted
-         && (previousSelection.uiPart->GetEditable()->GetIHitable() != nullptr)
-         && (previousSelection.uiPart->GetEditable()->GetItemType() != eItemBall))
-         m_player->m_physics->SetStatic(previousSelection.uiPart->GetEditable());
+      if (previousSelection.type == Selection::S_EDITABLE)
+      {
+         auto edit = previousSelection.uiPart->GetEditable();
+         if (FindIndexOf(m_table->GetParts(), edit) != -1 // Not deleted
+            && (edit->GetIHitable() != nullptr)
+            && (edit->GetItemType() != eItemBall))
+            m_player->m_physics->SetStatic(edit);
+      }
       if ((m_selection.type == Selection::S_EDITABLE) && (m_selection.uiPart->GetEditable()->GetIHitable() != nullptr) && (m_selection.uiPart->GetEditable()->GetItemType() != eItemBall))
          m_player->m_physics->SetDynamic(m_selection.uiPart->GetEditable());
    }
@@ -826,19 +829,17 @@ void EditorUI::DeleteSelection()
 {
    if (m_selection.type == Selection::S_EDITABLE && m_selection.uiPart->GetEditable()->GetItemType() != eItemBall && m_selection.uiPart->GetEditable()->GetPartGroup() != nullptr)
    {
-      IEditable* edit = m_selection.uiPart->GetEditable();
+      IEditable* const edit = m_selection.uiPart->GetEditable();
       RemoveFromVectorSingle(m_editables, m_selection.uiPart);
       m_selection = Selection();
       if (edit->GetIHitable())
          m_player->m_physics->Remove(edit);
-      RemoveFromVectorSingle(g_pplayer->m_vhitables, edit);
       m_table->RemovePart(edit);
       m_renderer->m_renderDevice->AddEndOfFrameCmd([edit]()
          {
-            if (edit->GetIHitable())
-               edit->TimerRelease();
             if (edit->GetIRenderable())
                edit->GetIRenderable()->RenderRelease();
+            edit->TimerRelease();
             edit->Release();
          });
    }

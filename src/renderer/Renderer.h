@@ -84,7 +84,7 @@ public:
    void DrawStatics();
    void DrawDynamics(bool onlyBalls);
    void DrawSprite(const float posx, const float posy, const float width, const float height, const COLORREF color, const std::shared_ptr<const Sampler>& tex, const float intensity, const bool backdrop = false);
-   void DrawWireframe(IEditable* renderable, const vec4& fillColor, const vec4& edgeColor, bool withDepthMask);
+   void DrawWireframe(IEditable* const renderable, const vec4& fillColor, const vec4& edgeColor, bool withDepthMask);
 
    void ReinitRenderable(IRenderable* part) { if (part) m_renderableToInit.push_back(part); }
 
@@ -206,7 +206,7 @@ public:
    VPXRenderContext2D& GetAncillaryRenderContext(VPXWindowId window, float width, float height, bool is2D, bool isOutputLinear, float depthbias);
 
 private:
-   void RenderItem(IEditable* renderable, bool isNoBackdrop);
+   void RenderItem(IEditable* const renderable, bool isNoBackdrop);
    void RenderStaticPrepass();
    void RenderDynamics();
    void DrawBackground();

@@ -201,23 +201,6 @@ void Textbox::PutCenter(const Vertex2D& pv)
 }
 
 
-#pragma region Physics
-
-void Textbox::PhysicSetup(PhysicsEngine* physics, const bool isUI)
-{
-   if (isUI)
-   {
-      // FIXME implement UI picking
-   }
-}
-
-void Textbox::PhysicRelease(PhysicsEngine* physics, const bool isUI)
-{
-}
-
-#pragma endregion
-
-
 #pragma region Rendering
 
 void Textbox::RenderSetup(RenderDevice *device)

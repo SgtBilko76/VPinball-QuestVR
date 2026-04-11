@@ -91,23 +91,6 @@ void Timer::RenderBlueprint(Sur *psur, const bool solid)
 {
 }
 
-
-#pragma region Physics
-
-void Timer::PhysicSetup(PhysicsEngine* physics, const bool isUI)
-{
-   if (isUI)
-   {
-      // FIXME implement UI picking
-   }
-}
-
-void Timer::PhysicRelease(PhysicsEngine* physics, const bool isUI)
-{
-}
-
-#pragma endregion
-
 STDMETHODIMP Timer::InterfaceSupportsErrorInfo(REFIID riid)
 {
    static const IID* arr[] =

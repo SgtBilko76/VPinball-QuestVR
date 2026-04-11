@@ -71,7 +71,7 @@ class Light :
    public IProvideClassInfo2Impl<&CLSID_Light, &DIID_ILightEvents, &LIBID_VPinballLib>,
    public ISelect,
    public IEditable,
-   public Hitable,
+   public IHitable, // only used for UI picking
    public IRenderable,
    public IHaveDragPoints,
    public IScriptable,

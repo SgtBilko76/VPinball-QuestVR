@@ -351,21 +351,6 @@ void Decal::EnsureSize()
 }
 
 
-#pragma region Physics
-
-void Decal::PhysicSetup(PhysicsEngine* physics, const bool isUI)
-{
-   if (isUI)
-   {
-      // FIXME implement UI picking
-   }
-}
-
-void Decal::PhysicRelease(PhysicsEngine* physics, const bool isUI) { }
-
-#pragma endregion
-
-
 #pragma region Rendering
 
 void Decal::RenderSetup(RenderDevice *device)

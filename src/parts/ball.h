@@ -106,7 +106,7 @@ class Ball :
 
    public ISelect,
    public IEditable,
-   public Hitable,
+   public IHitable,
    public IRenderable,
    public IScriptable,
    public IFireEvents,
@@ -117,7 +117,7 @@ public:
    STDMETHOD(GetIDsOfNames)(REFIID /*riid*/, LPOLESTR* rgszNames, UINT cNames, LCID lcid,DISPID* rgDispId);
    STDMETHOD(Invoke)(DISPID dispIdMember, REFIID /*riid*/, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr);
    STDMETHOD(GetDocumentation)(INT index, BSTR *pBstrName, BSTR *pBstrDocString, DWORD *pdwHelpContext, BSTR *pBstrHelpFile);
-   HRESULT FireDispID(const DISPID dispid, DISPPARAMS *const pdispparams) final;
+   HRESULT FireDispID(const DISPID dispid, DISPPARAMS * const pdispparams) final;
 #endif
    Ball();
    ~Ball() override;
@@ -144,7 +144,7 @@ public:
 
    DECLARE_REGISTRY_RESOURCEID(IDR_BALL)
 
-   bool PhysicUpdate(class PhysicsEngine *physics, const bool isUI) override;
+   bool PhysicUpdate(class PhysicsEngine *physics, const bool isUI) final;
 
    // ISelect implementation
    void MoveOffset(const float dx, const float dy) final;

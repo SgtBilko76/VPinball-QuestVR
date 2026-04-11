@@ -3,8 +3,8 @@
 #pragma once
 
 class HitTimer;
-class Hitable;
 class Collection;
+class IHitable;
 class IRenderable;
 class IScriptable;
 
@@ -46,13 +46,34 @@ public:
 #define STANDARD_EDITABLE_DECLARES(T, ItemType, ResName, AllowedViews) \
 	_STANDARD_EDITABLE_CONSTANTS(ItemType, ResName, AllowedViews) \
 	_STANDARD_DISPATCH_INDEPENDENT_EDITABLE_DECLARES(T, ItemType) \
+	_STANDARD_DISPATCH_INDEPENDENT_EDITABLE_HITABLE_DECLARES(T, ItemType) \
 	_STANDARD_DISPATCH_INDEPENDENT_EDITABLE_RENDERABLE_DECLARES(T, ItemType) \
 	_STANDARD_DISPATCH_EDITABLE_DECLARES(ItemType)
 
 #define STANDARD_EDITABLE_DECLARES_NO_RENDERABLE(T, ItemType, ResName, AllowedViews) \
 	_STANDARD_EDITABLE_CONSTANTS(ItemType, ResName, AllowedViews) \
 	_STANDARD_DISPATCH_INDEPENDENT_EDITABLE_DECLARES(T, ItemType) \
-	_STANDARD_DISPATCH_EDITABLE_DECLARES(ItemType)
+	_STANDARD_DISPATCH_INDEPENDENT_EDITABLE_HITABLE_DECLARES(T, ItemType) \
+	_STANDARD_DISPATCH_EDITABLE_DECLARES(ItemType) \
+	IRenderable *GetIRenderable() final { return nullptr; } \
+	const IRenderable *GetIRenderable() const final { return nullptr; }
+
+#define STANDARD_EDITABLE_DECLARES_NO_HITABLE(T, ItemType, ResName, AllowedViews) \
+	_STANDARD_EDITABLE_CONSTANTS(ItemType, ResName, AllowedViews) \
+	_STANDARD_DISPATCH_INDEPENDENT_EDITABLE_DECLARES(T, ItemType) \
+	_STANDARD_DISPATCH_INDEPENDENT_EDITABLE_RENDERABLE_DECLARES(T, ItemType) \
+	_STANDARD_DISPATCH_EDITABLE_DECLARES(ItemType) \
+	IHitable *GetIHitable() final { return nullptr; } \
+	const IHitable *GetIHitable() const final { return nullptr; }
+
+#define STANDARD_EDITABLE_DECLARES_NO_RENDERABLE_NO_HITABLE(T, ItemType, ResName, AllowedViews) \
+	_STANDARD_EDITABLE_CONSTANTS(ItemType, ResName, AllowedViews) \
+	_STANDARD_DISPATCH_INDEPENDENT_EDITABLE_DECLARES(T, ItemType) \
+	_STANDARD_DISPATCH_EDITABLE_DECLARES(ItemType) \
+	IRenderable* GetIRenderable() final { return nullptr; } \
+	const IRenderable* GetIRenderable() const final { return nullptr; } \
+	IHitable *GetIHitable() final { return nullptr; } \
+	const IHitable *GetIHitable() const final { return nullptr; }
 
 // used above, do not invoke directly
 #define _STANDARD_DISPATCH_EDITABLE_DECLARES(itemType) \
@@ -108,16 +129,18 @@ public:
 	const IEditable *GetIEditable() const final {return static_cast<const IEditable*>(this);} \
 	ISelect *GetISelect() final {return static_cast<ISelect*>(this);} \
 	const ISelect *GetISelect() const final {return static_cast<const ISelect*>(this);} \
-	Hitable *GetIHitable() final {return static_cast<Hitable *>(this);} \
-	const Hitable *GetIHitable() const final {return static_cast<const Hitable *>(this);} \
 	STDMETHOD(GetDisplayString)(DISPID dispID, BSTR * pbstr) { return ResultFromScode(E_NOTIMPL); } \
 	STDMETHOD(MapPropertyToPage)(DISPID dispID, CLSID * pclsid) { return ResultFromScode(E_NOTIMPL); } \
 	STDMETHOD(GetPredefinedStrings)(DISPID dispID, CALPOLESTR *pcaStringsOut, CADWORD *pcaCookiesOut) {return GetPTable()->GetPredefinedStrings(dispID, pcaStringsOut, pcaCookiesOut, this);} \
 	STDMETHOD(GetPredefinedValue)(DISPID dispID, DWORD dwCookie, VARIANT *pVarOut) {return GetPTable()->GetPredefinedValue(dispID, dwCookie, pVarOut, this);} \
-	void SetDefaults(const bool fromMouseClick) final; \
-	/* Hitable implementation */ \
-	void PhysicSetup(PhysicsEngine* physics, const bool isUI) final; \
-	void PhysicRelease(PhysicsEngine* physics, const bool isUI) final;
+	void SetDefaults(const bool fromMouseClick) final;
+
+// used above, do not invoke directly
+#define _STANDARD_DISPATCH_INDEPENDENT_EDITABLE_HITABLE_DECLARES(T, ItemType) \
+   IHitable *GetIHitable() final { return static_cast<IHitable *>(this); } \
+   const IHitable *GetIHitable() const final { return static_cast<const IHitable *>(this); } \
+   void PhysicSetup(PhysicsEngine *physics, const bool isUI) final; \
+   void PhysicRelease(PhysicsEngine* physics, const bool isUI) final;
 
 // used above, do not invoke directly
 #define _STANDARD_DISPATCH_INDEPENDENT_EDITABLE_RENDERABLE_DECLARES(T, ItemType) \
@@ -204,8 +227,8 @@ public:
    virtual ISelect *GetISelect() = 0;
    virtual const ISelect *GetISelect() const = 0;
 
-   virtual Hitable *GetIHitable() = 0;
-   virtual const Hitable *GetIHitable() const = 0;
+   virtual IHitable *GetIHitable() = 0;
+   virtual const IHitable *GetIHitable() const = 0;
 
    virtual IRenderable *GetIRenderable() = 0;
    virtual const IRenderable *GetIRenderable() const = 0;
@@ -230,6 +253,8 @@ public:
    virtual void ExportMesh(class ObjLoader &loader) { }
 
    virtual IEditable *CopyForPlay() const = 0;
+
+   virtual EventProxyBase *GetEventProxyBase() = 0;
 
    // Shared implementation
 protected:
@@ -295,13 +320,9 @@ public:
          if (pcol->m_stopSingleEvents)
             m_singleEvents = false;
       }
-      IFireEvents *const fe = GetIFireEvents();
-      if (fe)
-      {
-         m_phittimer = std::make_unique<HitTimer>(GetName(), m_timerInterval, fe);
-         if (m_timerEnabled)
-            pvht.push_back(m_phittimer.get());
-      }
+      m_phittimer = std::make_unique<HitTimer>(GetName(), m_timerInterval, GetIFireEvents());
+      if (m_timerEnabled)
+         pvht.push_back(m_phittimer.get());
    }
    void TimerRelease() { m_phittimer = nullptr; }
 

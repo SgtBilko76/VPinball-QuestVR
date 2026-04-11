@@ -28,8 +28,8 @@ class Timer :
    public ISelect,
    public IEditable,
    public IScriptable,
-   public IFireEvents,
-   public Hitable
+   //public IHitable, // FIXME implement UI picking
+   public IFireEvents
 {
 public:
 #ifdef __STANDALONE__
@@ -63,13 +63,10 @@ public:
    void PutCenter(const Vertex2D& pv) final;
 
    void RenderBlueprint(Sur *psur, const bool solid) final;
-   ItemTypeEnum HitableGetItemType() const final { return eItemTimer; }
 
    void WriteRegDefaults() final;
 
-   STANDARD_EDITABLE_DECLARES_NO_RENDERABLE(Timer, eItemTimer, TIMER, VIEW_PLAYFIELD | VIEW_BACKGLASS)
-   IRenderable *GetIRenderable() final { return nullptr; }
-   const IRenderable *GetIRenderable() const final { return nullptr; }
+   STANDARD_EDITABLE_DECLARES_NO_RENDERABLE_NO_HITABLE(Timer, eItemTimer, TIMER, VIEW_PLAYFIELD | VIEW_BACKGLASS)
 
    //DECLARE_NOT_AGGREGATABLE(Timer)
    // Remove the comment from the line above if you don't want your object to

@@ -87,19 +87,6 @@ void PartGroup::RenderBlueprint(Sur *psur, const bool solid)
 #pragma endregion
 
 
-#pragma region Physics
-
-void PartGroup::PhysicSetup(PhysicsEngine* physics, const bool isUI)
-{
-}
-
-void PartGroup::PhysicRelease(PhysicsEngine* physics, const bool isUI)
-{
-}
-
-#pragma endregion
-
-
 #pragma region Rendering
 
 unsigned int PartGroup::GetPlayerModeVisibilityMask() const

@@ -39,8 +39,8 @@ class Textbox :
    public IEditable,
    public IScriptable,
    public IFireEvents,
-   public IRenderable,
-   public Hitable
+   //public IHitable, // FIXME implement UI picking
+   public IRenderable
 {
 public:
 #ifdef __STANDALONE__
@@ -68,14 +68,13 @@ public:
       CONNECTION_POINT_ENTRY(DIID_ITextboxEvents)
    END_CONNECTION_POINT_MAP()
 
-   STANDARD_EDITABLE_DECLARES(Textbox, eItemTextbox, TEXTBOX, VIEW_BACKGLASS)
+   STANDARD_EDITABLE_DECLARES_NO_HITABLE(Textbox, eItemTextbox, TEXTBOX, VIEW_BACKGLASS)
 
    void MoveOffset(const float dx, const float dy) final;
    void SetObjectPos() final;
    // Multi-object manipulation
    Vertex2D GetCenter() const final { return m_d.m_v1; }
    void PutCenter(const Vertex2D& pv) final;
-   ItemTypeEnum HitableGetItemType() const final { return eItemTextbox; }
 
    void WriteRegDefaults() final;
 

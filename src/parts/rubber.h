@@ -32,7 +32,7 @@ class Rubber :
    public IProvideClassInfo2Impl<&CLSID_Rubber, &DIID_IRubberEvents, &LIBID_VPinballLib>,
    public ISelect,
    public IEditable,
-   public Hitable,
+   public IHitable,
    public IRenderable,
    public IScriptable,
    public IHaveDragPoints,

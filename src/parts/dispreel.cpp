@@ -144,21 +144,6 @@ void DispReel::UIRenderPass2(Sur * const psur)
 }
 
 
-#pragma region Physics
-
-void DispReel::PhysicSetup(PhysicsEngine* physics, const bool isUI)
-{
-   if (isUI)
-   {
-      // FIXME implement UI picking
-   }
-}
-
-void DispReel::PhysicRelease(PhysicsEngine* physics, const bool isUI) { }
-
-#pragma endregion
-
-
 #pragma region Rendering
 
 void DispReel::RenderSetup(RenderDevice *device)

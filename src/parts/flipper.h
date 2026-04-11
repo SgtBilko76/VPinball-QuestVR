@@ -63,7 +63,7 @@ class Flipper :
    public EventProxy<Flipper, &DIID_IFlipperEvents>,
    public ISelect,
    public IEditable,
-   public Hitable,
+   public IHitable,
    public IRenderable,
    public IScriptable,
    public IFireEvents,

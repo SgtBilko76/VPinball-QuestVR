@@ -40,7 +40,7 @@ class DispReel :
    public IEditable,
    public IScriptable,
    public IFireEvents,
-   public Hitable,
+   //public Hitable, // FIXME implement UI picking
    public IRenderable,
    public IPerPropertyBrowsing     // Ability to fill in dropdown(s) in property browser
 {
@@ -52,7 +52,7 @@ public:
    HRESULT FireDispID(const DISPID dispid, DISPPARAMS * const pdispparams) final;
 #endif
    DispReel() { m_desktopBackdrop = true; } // DispReel is always located on backdrop
-   virtual ~DispReel();
+   ~DispReel() override;
 
    BEGIN_COM_MAP(DispReel)
       COM_INTERFACE_ENTRY(IDispatch)
@@ -71,15 +71,13 @@ public:
       CONNECTION_POINT_ENTRY(DIID_IDispReelEvents)
    END_CONNECTION_POINT_MAP()
 
-   STANDARD_EDITABLE_DECLARES(DispReel, eItemDispReel, DISPREEL, VIEW_BACKGLASS)
+   STANDARD_EDITABLE_DECLARES_NO_HITABLE(DispReel, eItemDispReel, DISPREEL, VIEW_BACKGLASS)
 
    void MoveOffset(const float dx, const float dy) final;
    void SetObjectPos() final;
    // Multi-object manipulation
    Vertex2D GetCenter() const final;
    void PutCenter(const Vertex2D &pv) final;
-
-   ItemTypeEnum HitableGetItemType() const final { return eItemDispReel; }
 
    void WriteRegDefaults() final;
 

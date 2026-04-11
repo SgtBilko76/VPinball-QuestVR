@@ -73,10 +73,9 @@ class LightSeq :
    public IEditable,
    public IScriptable,
    public IFireEvents,
-   public Hitable,
+   //public Hitable, // FIXME implement UI picking
    public IRenderable,
    public IPerPropertyBrowsing     // Ability to fill in dropdown(s) in property browser
-   //public EditableImpl<LightSeq>
 {
 public:
 #ifdef __STANDALONE__
@@ -113,11 +112,10 @@ public:
    void PutCenter(const Vertex2D& pv) final;
 
    void RenderBlueprint(Sur *psur, const bool solid) final { } // Renders the image onto the Blueprint, but we don't want light seqs on the blue print as it is non-essensial
-   ItemTypeEnum HitableGetItemType() const final { return eItemLightSeq; }
 
    void WriteRegDefaults() final;
 
-   STANDARD_EDITABLE_DECLARES(LightSeq, eItemLightSeq, LIGHTSEQ, VIEW_PLAYFIELD | VIEW_BACKGLASS)
+   STANDARD_EDITABLE_DECLARES_NO_HITABLE(LightSeq, eItemLightSeq, LIGHTSEQ, VIEW_PLAYFIELD | VIEW_BACKGLASS)
 
    //DECLARE_NOT_AGGREGATABLE(LightSeq)
    // Remove the comment from the line above if you don't want your object to

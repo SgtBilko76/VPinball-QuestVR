@@ -669,7 +669,7 @@ PinTable* PinTable::CopyForPlay()
    PLOGI << "Duplicating parts for live instance"; // For profiling
    for (IEditable* const editable : src->m_vedit)
    {
-      IEditable *const edit_dst = editable->CopyForPlay();
+      IEditable* const edit_dst = editable->CopyForPlay();
       if (editable->GetPartGroup())
       {
          PartGroup *dstParent = static_cast<PartGroup *>(dst->GetLiveFromStartup<IEditable>(editable->GetPartGroup()));

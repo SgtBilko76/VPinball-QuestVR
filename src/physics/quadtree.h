@@ -33,7 +33,7 @@ private:
    unsigned int m_items = 0; // number of items
 
    // everything below/including this node shares the same original primitive/hittarget object (just for early outs if not collidable), so this is actually cast then to a Primitive* or HitTarget*
-   Hitable* __restrict m_unique = nullptr; 
+   IHitable* __restrict m_unique = nullptr;
 
    HitQuadtreeNode * __restrict m_children = nullptr; // nullptr for leaf, or the 4 children otherwise
    Vertex2D m_vcenter; // center of node bounds, only defined for non leaf node

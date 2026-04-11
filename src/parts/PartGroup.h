@@ -45,7 +45,6 @@ class PartGroup :
    public IEditable,
    public IScriptable,
    public IFireEvents,
-   public Hitable,
    public IPerPropertyBrowsing     // Ability to fill in dropdown(s) in property browser
 {
 public:
@@ -71,9 +70,7 @@ public:
       CONNECTION_POINT_ENTRY(DIID_IPartGroupEvents)
    END_CONNECTION_POINT_MAP()
 
-   STANDARD_EDITABLE_DECLARES_NO_RENDERABLE(PartGroup, eItemPartGroup, PARTGROUP, VIEW_PLAYFIELD | VIEW_BACKGLASS)
-   IRenderable* GetIRenderable() final { return nullptr; }
-   const IRenderable* GetIRenderable() const final { return nullptr; }
+   STANDARD_EDITABLE_DECLARES_NO_RENDERABLE_NO_HITABLE(PartGroup, eItemPartGroup, PARTGROUP, VIEW_PLAYFIELD | VIEW_BACKGLASS)
 
    void MoveOffset(const float dx, const float dy) final;
    void SetObjectPos() final;
@@ -81,8 +78,6 @@ public:
    void PutCenter(const Vertex2D& pv) final;
 
    void RenderBlueprint(Sur *psur, const bool solid) final;
-
-   ItemTypeEnum HitableGetItemType() const final { return eItemPartGroup; }
 
    void WriteRegDefaults() final;
 

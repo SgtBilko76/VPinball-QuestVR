@@ -132,18 +132,6 @@ void LightSeq::RenderOutline(Sur * const psur)
    psur->Ellipse(m_d.m_vCenter.x, m_d.m_vCenter.y - 2.5f, 2.0f);
 }
 
-void LightSeq::PhysicSetup(PhysicsEngine* physics, const bool isUI)
-{
-   if (isUI)
-   {
-      // FIXME implement UI picking
-   }
-}
-
-void LightSeq::PhysicRelease(PhysicsEngine* physics, const bool isUI)
-{
-}
-
 #pragma region Rendering
 
 void LightSeq::RenderSetup(RenderDevice *device)

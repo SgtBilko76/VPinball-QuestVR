@@ -1372,7 +1372,7 @@ void Renderer::DrawBulbLightBuffer()
    m_render_mask |= Renderer::LIGHT_BUFFER;
    m_renderDevice->SetRenderTarget("Transmitted Light " + std::to_string(id), GetBloomBufferTexture(), true, true);
    m_renderDevice->SetRenderState(RenderState::ZENABLE, RenderState::RS_FALSE); // disable all z-tests as zbuffer is in different resolution
-   for (IEditable * const renderable : g_pplayer->m_vhitables)
+   for (auto renderable : g_pplayer->m_ptable->GetParts())
       if (renderable->GetItemType() == eItemLight)
          RenderItem(renderable, true);
    m_render_mask &= ~Renderer::LIGHT_BUFFER;
@@ -1420,7 +1420,7 @@ void Renderer::DrawStatics()
    const unsigned int mask = m_render_mask;
    const bool isNoBackdrop = m_noBackdrop || ((m_render_mask & Renderer::REFLECTION_PASS) != 0);
    m_render_mask |= Renderer::STATIC_ONLY;
-   for (IEditable* renderable : g_pplayer->m_vhitables)
+   for (auto renderable : g_pplayer->m_ptable->GetParts())
       RenderItem(renderable, isNoBackdrop);
    m_render_mask = mask;
 }
@@ -1438,7 +1438,7 @@ void Renderer::DrawDynamics(bool onlyBalls)
    else
    {
       DrawBulbLightBuffer();
-      for (IEditable* renderable : g_pplayer->m_vhitables)
+      for (auto renderable : g_pplayer->m_ptable->GetParts())
          RenderItem(renderable, isNoBackdrop);
    }
    m_render_mask = mask;
@@ -1472,8 +1472,11 @@ void Renderer::DrawSprite(const float posx, const float posy, const float width,
    m_renderDevice->GetCurrentPass()->m_commands.back()->SetDepth(-10000.f);
 }
 
-void Renderer::DrawWireframe(IEditable* renderable, const vec4& fillColor, const vec4& edgeColor, bool withDepthMask)
+void Renderer::DrawWireframe(IEditable* const renderable, const vec4& fillColor, const vec4& edgeColor, bool withDepthMask)
 {
+   if (!renderable->GetIRenderable())
+      return;
+
    unsigned int prevRenderMask = m_render_mask;
    m_renderDevice->ResetRenderState();
    m_renderDevice->EnableAlphaBlend(false);
@@ -1503,7 +1506,7 @@ void Renderer::DrawWireframe(IEditable* renderable, const vec4& fillColor, const
    m_render_mask = prevRenderMask;
 }
 
-void Renderer::RenderItem(IEditable* editable, bool isNoBackdrop)
+void Renderer::RenderItem(IEditable* const editable, bool isNoBackdrop)
 {
    if (!editable->GetIRenderable()
       || (isNoBackdrop && editable->m_desktopBackdrop) // Don't render backdrop items in reflections or VR & cabinet modes
@@ -1628,7 +1631,7 @@ void Renderer::RenderStaticPrepass()
 
          // Render static parts
          UpdateBasicShaderMatrix();
-         for (IEditable* renderable : g_pplayer->m_vhitables)
+         for (auto renderable : g_pplayer->m_ptable->GetParts())
             RenderItem(renderable, isNoBackdrop);
 
          // Rendering is done to the static render target then accumulated to accumulationSurface
@@ -1747,7 +1750,7 @@ void Renderer::RenderStaticPrepass()
          for (size_t i = 0; i < m_table->m_vrenderprobe.size(); ++i)
             m_table->m_vrenderprobe[i]->MarkDirty();
          UpdateBasicShaderMatrix();
-         for (IEditable* renderable : g_pplayer->m_vhitables)
+         for (auto renderable : g_pplayer->m_ptable->GetParts())
             RenderItem(renderable, isNoBackdrop);
       }
       // Copy supersampled color buffer
@@ -1819,7 +1822,7 @@ void Renderer::RenderDynamics()
       const bool isNoBackdrop = m_noBackdrop || ((m_render_mask & Renderer::REFLECTION_PASS) != 0) || g_pplayer->m_liveUI->IsEditorViewMode();
       m_render_mask |= IsUsingStaticPrepass() ? Renderer::DYNAMIC_ONLY : Renderer::DEFAULT;
       DrawBulbLightBuffer();
-      for (IEditable* renderable : g_pplayer->m_vhitables)
+      for (auto renderable : g_pplayer->m_ptable->GetParts())
          RenderItem(renderable, isNoBackdrop);
       m_render_mask = mask;
    }
@@ -1827,7 +1830,7 @@ void Renderer::RenderDynamics()
    {
       const vec4 fillColor = m_shadeMode == ShadeMode::NoDepthWireframe ? vec4(0.f, 0.f, 0.f, (float)(32. / 255.)) : vec4((float)(32. / 255.), (float)(32. / 255.), (float)(32. / 255.), 1.f);
       constexpr vec4 edgeColor{0.f, 0.f, 0.f, 1.f};
-      for (IEditable* renderable : g_pplayer->m_vhitables)
+      for (auto renderable : g_pplayer->m_ptable->GetParts())
          DrawWireframe(renderable, fillColor, edgeColor, m_shadeMode != ShadeMode::NoDepthWireframe);
    }
 
