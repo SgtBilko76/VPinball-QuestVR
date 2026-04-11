@@ -36,7 +36,7 @@ void LightSeqUIPart::Render(const EditorRenderContext& ctx)
 void LightSeqUIPart::UpdatePropertyPane(PropertyPane& props)
 {
    props.EditableHeader("LightSeq"s, m_lightSeq);
-   
+
    if (props.BeginSection("Visuals"s))
    {
       props.CollectionCombo<LightSeq>(

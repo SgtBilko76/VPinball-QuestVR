@@ -54,7 +54,7 @@ void BallUIPart::UpdatePropertyPane(PropertyPane& props)
          m_ball, "Reflection forced"s, //
          [](const Ball* ball) { return ball->m_d.m_forceReflection; }, //
          [](Ball* ball, bool v) { ball->m_d.m_forceReflection = v; });
-      
+
       props.Separator("Rendering"s);
       props.Checkbox<Ball>(
          m_ball, "Use Table Settings"s, //

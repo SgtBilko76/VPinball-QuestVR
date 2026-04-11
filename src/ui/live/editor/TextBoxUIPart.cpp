@@ -41,7 +41,7 @@ void TextBoxUIPart::Render(const EditorRenderContext& ctx)
 void TextBoxUIPart::UpdatePropertyPane(PropertyPane& props)
 {
    props.EditableHeader("TextBox"s, m_textbox);
-   
+
    if (props.BeginSection("Visuals"s))
    {
       props.EndSection();
@@ -52,6 +52,8 @@ void TextBoxUIPart::UpdatePropertyPane(PropertyPane& props)
       // Missing position
       props.EndSection();
    }
+
+   props.TimerSection(m_textbox);
 }
 
 }

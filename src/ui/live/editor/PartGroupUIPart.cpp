@@ -35,7 +35,7 @@ PartGroupUIPart::TransformMask PartGroupUIPart::GetTransform(Matrix3D& transform
 }
 
 void PartGroupUIPart::SetTransform(const vec3& pos, const vec3& scale, const vec3& rot)
-{ 
+{
 }
 
 void PartGroupUIPart::Render(const EditorRenderContext& ctx) { }
@@ -43,13 +43,13 @@ void PartGroupUIPart::Render(const EditorRenderContext& ctx) { }
 void PartGroupUIPart::UpdatePropertyPane(PropertyPane& props)
 {
    props.EditableHeader("PartGroup"s, m_partGroup);
-   
+
    if (props.BeginSection("Visuals"s))
    {
 
       props.EndSection();
    }
-   
+
    props.TimerSection(m_partGroup);
 }
 

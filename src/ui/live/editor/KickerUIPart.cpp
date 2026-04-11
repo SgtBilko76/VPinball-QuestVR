@@ -45,7 +45,7 @@ void KickerUIPart::Render(const EditorRenderContext& ctx)
 void KickerUIPart::UpdatePropertyPane(PropertyPane& props)
 {
    props.EditableHeader("Kicker"s, m_kicker);
-   
+
    if (props.BeginSection("Visuals"s))
    {
       props.MaterialCombo<Kicker>(

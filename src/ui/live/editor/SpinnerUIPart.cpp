@@ -44,7 +44,7 @@ void SpinnerUIPart::Render(const EditorRenderContext& ctx)
 void SpinnerUIPart::UpdatePropertyPane(PropertyPane& props)
 {
    props.EditableHeader("Spinner"s, m_spinner);
-   
+
    if (props.BeginSection("Visuals"s))
    {
       props.Checkbox<Spinner>(
