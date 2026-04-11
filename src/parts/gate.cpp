@@ -598,12 +598,12 @@ void Gate::Load(IObjectReader& reader)
          case FID(ROTA): m_d.m_rotation = reader.AsFloat(); break;
          case FID(MATR): m_d.m_szMaterial = reader.AsString(); break;
          case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(GSUP): m_d.m_showBracket = reader.AsBool(); break;
          case FID(GCOL): m_d.m_collidable = reader.AsBool(); break;
          case FID(TWWA): m_d.m_twoWay = reader.AsBool(); break;
          case FID(GVSB): m_d.m_visible = reader.AsBool(); break;
          case FID(REEN): m_d.m_reflectionEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(SURF): m_d.m_szSurface = reader.AsString(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          case FID(ELAS): m_d.m_elasticity = reader.AsFloat(); break;
@@ -914,7 +914,7 @@ STDMETHODIMP Gate::get_Friction(float *pVal)
 
 STDMETHODIMP Gate::put_Friction(float newVal)
 {
-   m_d.m_friction = clamp(newVal, 0.f, 1.f);
+   m_d.m_friction = saturate(newVal);
    return S_OK;
 }
 
@@ -926,7 +926,7 @@ STDMETHODIMP Gate::get_Damping(float *pVal)
 
 STDMETHODIMP Gate::put_Damping(float newVal)
 {
-   const float tmp = clamp(newVal, 0.0f, 1.0f);
+   const float tmp = saturate(newVal);
    if (g_pplayer)
       m_phitgate->m_gateMover.m_damping = powf(tmp, (float)PHYS_FACTOR); //0.996f;
    else

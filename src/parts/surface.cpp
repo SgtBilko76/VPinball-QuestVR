@@ -112,7 +112,7 @@ HRESULT Surface::InitTarget(const float x, const float y, const bool fromMouseCl
    }
 
    //SetDefaults();
-   //Set seperate defaults for targets (SetDefaults sets the Wall defaults)
+   //Set separate defaults for targets (SetDefaults sets the Wall defaults)
    LinkProp(m_timerEnabled, TimerEnabled);
    LinkProp(m_timerInterval, TimerInterval);
    LinkProp(m_d.m_hitEvent, HitEvent);
@@ -1562,7 +1562,7 @@ STDMETHODIMP Surface::get_Friction(float *pVal)
 
 STDMETHODIMP Surface::put_Friction(float newVal)
 {
-   m_d.m_friction = clamp(newVal, 0.f, 1.f);
+   m_d.m_friction = saturate(newVal);
    return S_OK;
 }
 

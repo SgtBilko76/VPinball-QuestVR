@@ -84,7 +84,7 @@ void Primitive::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
    LinkProp(m_timerEnabled, TimerEnabled);
    LinkProp(m_timerInterval, TimerInterval);
-   
+
    SetDefaultPhysics(fromMouseClick);
 
    m_d.m_use3DMesh = false;
@@ -189,7 +189,7 @@ void Primitive::PhysicSetup(PhysicsEngine* physics, const bool isUI)
    //
 
    // TODO limit vertex count for UI
-   const unsigned int reduced_vertices = max((unsigned int)pow((double)m_vertices.size(), clamp(1.f - m_d.m_collision_reductionFactor, 0.f, 1.f) * 0.25f + 0.75f), 420u); //!! 420 = magic
+   const unsigned int reduced_vertices = max((unsigned int)pow((double)m_vertices.size(), saturate(1.f - m_d.m_collision_reductionFactor) * 0.25f + 0.75f), 420u); //!! 420 = magic
 
    // Ported at: VisualPinball.Engine/VPT/Primitive/PrimitiveHitGenerator.cs
 
@@ -2460,7 +2460,7 @@ STDMETHODIMP Primitive::get_Friction(float *pVal)
 
 STDMETHODIMP Primitive::put_Friction(float newVal)
 {
-   m_d.m_friction = clamp(newVal, 0.f, 1.f);
+   m_d.m_friction = saturate(newVal);
    return S_OK;
 }
 

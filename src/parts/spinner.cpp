@@ -569,7 +569,7 @@ STDMETHODIMP Spinner::get_Damping(float *pVal)
 
 STDMETHODIMP Spinner::put_Damping(float newVal)
 {
-   const float tmp = clamp(newVal, 0.0f, 1.0f);
+   const float tmp = saturate(newVal);
    if (g_pplayer)
       m_phitspinner->m_spinnerMover.m_damping = powf(tmp, (float)PHYS_FACTOR);
    else

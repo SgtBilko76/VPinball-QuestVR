@@ -7,6 +7,7 @@
 #include "ui/win/resource.h"
 #ifndef __STANDALONE__
 #include "ui/win/dialogs/PlayerOptionsDialog.h"
+#include "dialogs/DrawingOrderDialog.h"
 #endif
 
 #ifdef __STANDALONE__

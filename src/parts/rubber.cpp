@@ -1042,7 +1042,7 @@ STDMETHODIMP Rubber::get_Friction(float *pVal)
 
 STDMETHODIMP Rubber::put_Friction(float newVal)
 {
-   newVal = clamp(newVal, 0.f, 1.f);
+   newVal = saturate(newVal);
    m_d.m_friction = newVal;
 
    return S_OK;

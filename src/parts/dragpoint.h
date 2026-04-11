@@ -26,8 +26,8 @@ public:
    void Init(IHaveDragPoints *pihdp, const float x, const float y, const float z, const bool smooth);
 
    // From ISelect
-   void UIRenderPass1(Sur *const psur) override { /* handled by owner */ }
-   void UIRenderPass2(Sur *const psur) override { /* handled by owner */ }
+   void UIRenderPass1(Sur *const psur) final { /* handled by owner */ }
+   void UIRenderPass2(Sur *const psur) final { /* handled by owner */ }
    void OnLButtonDown(int x, int y) final;
    void OnLButtonUp(int x, int y) final;
    void MoveOffset(const float dx, const float dy) final;
@@ -98,10 +98,10 @@ public:
    bool m_slingshot;
    bool m_autoTexture;
 
-   bool IsUILocked() const override { return m_uiLocked; }
-   void SetUILock(bool lock) override { m_uiLocked = lock; }
-   bool IsUIVisible() const override { return m_uiVisible; }
-   void SetUIVisible(bool visible) override { m_uiVisible = visible; }
+   bool IsUILocked() const final { return m_uiLocked; }
+   void SetUILock(bool lock) final { m_uiLocked = lock; }
+   bool IsUIVisible() const final { return m_uiVisible; }
+   void SetUIVisible(bool visible) final { m_uiVisible = visible; }
 
    bool m_uiLocked = false; // Can not be dragged in the editor
    bool m_uiVisible = true; // UI visibility (not the same as rendering visibility which is a member of part data)

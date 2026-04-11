@@ -148,7 +148,7 @@ public:
       // Discard if return value is overriden
       if (m_phitflipper && (m_d.m_OverridePhysics || (m_ptable->m_overridePhysicsFlipper && m_ptable->m_overridePhysics)))
          return;
-      m_d.m_return = clamp(value, 0.0f, 1.0f);
+      m_d.m_return = saturate(value);
    }
 
    float GetFlipperRadiusMin() const { return m_d.m_FlipperRadiusMin; }

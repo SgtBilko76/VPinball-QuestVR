@@ -21,7 +21,6 @@
    #include "dialogs/MaterialDialog.h"
    #include "dialogs/SoundDialog.h"
    #include "dialogs/AboutDialog.h"
-   #include "dialogs/DrawingOrderDialog.h"
    #include "dialogs/ToolbarDialog.h"
    #include "dialogs/LayersListDialog.h"
    #include "dialogs/NotesDialog.h"
@@ -112,7 +111,7 @@ public:
    void ShowDrawingOrderDialog(bool select);
 
    void SetStatusBarElementInfo(const string& info);
-   void SetStatusBarUnitInfo(const string& info, const bool isUnit) // inlined, in the hope that string conversions will be skipped in case of early out in here
+   void SetStatusBarUnitInfo(const string& info, const bool isUnit)
    {
     if (g_pplayer)
         return;

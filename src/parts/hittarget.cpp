@@ -1053,7 +1053,7 @@ STDMETHODIMP HitTarget::get_Friction(float *pVal)
 
 STDMETHODIMP HitTarget::put_Friction(float newVal)
 {
-   m_d.m_friction = clamp(newVal, 0.f, 1.f);
+   m_d.m_friction = saturate(newVal);
    return S_OK;
 }
 

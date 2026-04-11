@@ -417,7 +417,7 @@ void Renderer::SceneLighting::Update()
 
       const double cur = local_hour.tm_hour + local_hour.tm_min / 60.0;
 
-      const float factor = (float)(sin(M_PI * clamp((cur - srise) / (sset - srise), 0., 1.)) //!! leave space before sunrise and after sunset?
+      const float factor = (float)(sin(M_PI * saturate((cur - srise) / (sset - srise))) //!! leave space before sunrise and after sunset?
          * sqrt(tr / max_tr)); //!! magic, "emulates" that shorter days are usually also "darker",cloudier,whatever in most regions
 
       m_emissionScale = clamp(factor, 0.15f, 1.f); //!! configurable clamp?

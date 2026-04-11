@@ -355,7 +355,7 @@ void SoundPlayer::ApplyVolume()
 {
    if (m_sound)
    {
-      const float totalvolume = clamp(m_soundVolume * m_mainVolume, 0.0f, 1.0f);
+      const float totalvolume = saturate(m_soundVolume * m_mainVolume);
       // VP legacy conversion:
       // const float decibelvolume = (totalvolume == 0.0f) ? -100.f : max(logf(totalvolume) * (float)(10.0 / log(10.0)) - 20.0f, -100.f);
       // const float decibelvolume = logf(totalvolume) * (float)(10.0 / log(10.0)) - 20.0f; // as we don't need to handle silence separately with linear volume

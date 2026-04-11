@@ -41,7 +41,6 @@ class Bumper :
    public IScriptable,
    public IFireEvents,
    public IPerPropertyBrowsing // Ability to fill in dropdown in property browser
-   //public EditableImpl<Bumper>
 {
 public:
 #ifdef __STANDALONE__

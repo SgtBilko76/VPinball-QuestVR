@@ -1767,7 +1767,7 @@ STDMETHODIMP Ramp::get_Friction(float *pVal)
 
 STDMETHODIMP Ramp::put_Friction(float newVal)
 {
-   newVal = clamp(newVal, 0.f, 1.f);
+   newVal = saturate(newVal);
    m_d.m_friction = newVal;
 
    return S_OK;

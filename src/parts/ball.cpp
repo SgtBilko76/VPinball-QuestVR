@@ -21,7 +21,7 @@ unsigned int Ball::GetNextBallID() { unsigned int id = Ball::m_nextBallID; Ball:
 
 Ball::Ball() : m_id(GetNextBallID())
 {
-   m_wzName = L"LiveBall" + std::to_wstring(m_id); // Default name
+   m_wzName = std::format(L"LiveBall{}", m_id); // Default name
    m_hitBall.m_d.m_pos = Vertex3Ds(0.f, 0.f, DEFAULT_BALL_SIZE);
    m_hitBall.m_d.m_radius = DEFAULT_BALL_SIZE;
    m_hitBall.m_d.m_mass = 1.f;
@@ -309,7 +309,7 @@ void Ball::Render(const unsigned int renderMask)
    m_rd->m_ballShader->SetVector(SHADER_invTableRes_reflection, 
       1.0f / (g_pplayer->m_ptable->m_right - g_pplayer->m_ptable->m_left),
       1.0f / (g_pplayer->m_ptable->m_bottom - g_pplayer->m_ptable->m_top), 
-      clamp(g_pplayer->m_ptable->m_ballPlayfieldReflectionStrength * m_d.m_playfieldReflectionStrength, 0.f, 1.f), 0.f);
+      saturate(g_pplayer->m_ptable->m_ballPlayfieldReflectionStrength * m_d.m_playfieldReflectionStrength), 0.f);
 
    // collect the x nearest lights that can reflect on balls
    vector<Light*>& reflectedLights = g_pplayer->m_renderer->m_ballReflectedLights;
@@ -477,7 +477,7 @@ void Ball::Render(const unsigned int renderMask)
          // - the time the display will need to actually show it (3ms is just a magic number here)
          if (g_pplayer->IsPlaying())
          {
-            const float delay = static_cast<float>(usec() - g_pplayer->m_timeUpdateTimeStamp) / 1000000.f + rd->GetPredictedDisplayDelay() + 0.003f;
+            const float delay = (float)(static_cast<double>(usec() - g_pplayer->m_timeUpdateTimeStamp) / 1000000.) + rd->GetPredictedDisplayDelay() + 0.003f;
             posl += delay * m_hitBall.m_d.m_vel;
          }
          if (m_hitBall.m_d.m_lockedInKicker)

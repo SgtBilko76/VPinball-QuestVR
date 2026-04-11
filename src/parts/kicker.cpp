@@ -609,8 +609,8 @@ void Kicker::Load(IObjectReader& reader)
          case FID(KORI): m_d.m_orientation = reader.AsFloat(); break;
          case FID(MATR): m_d.m_szMaterial = reader.AsString(); break;
          case FID(TMON): m_timerEnabled = reader.AsBool(); break;
-         case FID(EBLD): m_d.m_enabled = reader.AsBool(); break;
          case FID(TMIN): m_timerInterval = reader.AsInt(); break;
+         case FID(EBLD): m_d.m_enabled = reader.AsBool(); break;
          case FID(TYPE):
          {
             m_d.m_kickertype = static_cast<KickerType>(reader.AsInt());
@@ -849,7 +849,7 @@ STDMETHODIMP Kicker::get_HitAccuracy(float *pVal)
 STDMETHODIMP Kicker::put_HitAccuracy(float newVal)
 {
    STARTUNDO
-   m_d.m_hitAccuracy = clamp(newVal, 0.f, 1.f);
+   m_d.m_hitAccuracy = saturate(newVal);
    STOPUNDO
 
    return S_OK;

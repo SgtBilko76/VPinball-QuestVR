@@ -899,9 +899,9 @@ void Plunger::Load(IObjectReader& reader)
          case FID(PSCV): m_d.m_scatterVelocity = reader.AsFloat(); break;
          case FID(MOMX): m_d.m_momentumXfer = reader.AsFloat(); break;
          case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(MECH): m_d.m_mechPlunger = reader.AsBool(); break;
          case FID(APLG): m_d.m_autoPlunger = reader.AsBool(); break;
-         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          case FID(TYPE): m_d.m_type = static_cast<PlungerType>(reader.AsInt()); break;
          case FID(ANFR): m_d.m_animFrames = reader.AsInt(); break;

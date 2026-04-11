@@ -10,7 +10,7 @@ class WinEditor;
 
 // Warning: these are Win32 ui part id, but also used to identify table parts (see IEditable)
 // These are used for file I/O and must not be changed/reordered!
-enum ItemTypeEnum : unsigned int
+enum ItemTypeEnum : uint32_t
 {
    eItemSurface,
    eItemFlipper,
@@ -38,7 +38,7 @@ enum ItemTypeEnum : unsigned int
    eItemBall,
    eItemPartGroup,
    eItemTypeCount,
-   eItemInvalid = 0xffffffff // Force enum to be 32 bits
+   eItemInvalid = 0xFFFFFFFFu
 };
 
 // ISelect is the interface for parts contributing to the Win32 editor (mouse, property sheet, ...)
