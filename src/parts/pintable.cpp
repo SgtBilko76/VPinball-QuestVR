@@ -669,32 +669,7 @@ PinTable* PinTable::CopyForPlay()
    PLOGI << "Duplicating parts for live instance"; // For profiling
    for (IEditable* const editable : src->m_vedit)
    {
-      IEditable* edit_dst = nullptr;
-      switch (editable->GetItemType())
-      {
-      case eItemBall:      edit_dst = static_cast<Ball*>(editable)->CopyForPlay(); break;
-      case eItemBumper:    edit_dst = static_cast<Bumper*>(editable)->CopyForPlay(); break;
-      case eItemDecal:     edit_dst = static_cast<Decal*>(editable)->CopyForPlay(); break;
-      case eItemDispReel:  edit_dst = static_cast<DispReel*>(editable)->CopyForPlay(); break;
-      case eItemFlasher:   edit_dst = static_cast<Flasher*>(editable)->CopyForPlay(); break;
-      case eItemFlipper:   edit_dst = static_cast<Flipper*>(editable)->CopyForPlay(); break;
-      case eItemGate:      edit_dst = static_cast<Gate*>(editable)->CopyForPlay(); break;
-      case eItemHitTarget: edit_dst = static_cast<HitTarget*>(editable)->CopyForPlay(); break;
-      case eItemKicker:    edit_dst = static_cast<Kicker*>(editable)->CopyForPlay(); break;
-      case eItemLight:     edit_dst = static_cast<Light*>(editable)->CopyForPlay(); break;
-      case eItemLightSeq:  edit_dst = static_cast<LightSeq*>(editable)->CopyForPlay(); break;
-      case eItemPartGroup: edit_dst = static_cast<PartGroup*>(editable)->CopyForPlay(); break;
-      case eItemPlunger:   edit_dst = static_cast<Plunger*>(editable)->CopyForPlay(); break;
-      case eItemPrimitive: edit_dst = static_cast<Primitive*>(editable)->CopyForPlay(); break;
-      case eItemRamp:      edit_dst = static_cast<Ramp*>(editable)->CopyForPlay(); break;
-      case eItemRubber:    edit_dst = static_cast<Rubber*>(editable)->CopyForPlay(); break;
-      case eItemSpinner:   edit_dst = static_cast<Spinner*>(editable)->CopyForPlay(); break;
-      case eItemSurface:   edit_dst = static_cast<Surface*>(editable)->CopyForPlay(); break;
-      case eItemTextbox:   edit_dst = static_cast<Textbox*>(editable)->CopyForPlay(); break;
-      case eItemTimer:     edit_dst = static_cast<Timer*>(editable)->CopyForPlay(); break;
-      case eItemTrigger:   edit_dst = static_cast<Trigger*>(editable)->CopyForPlay(); break;
-      default: assert(false); // Unexpected table part
-      }
+      IEditable *const edit_dst = editable->CopyForPlay();
       if (editable->GetPartGroup())
       {
          PartGroup *dstParent = static_cast<PartGroup *>(dst->GetLiveFromStartup<IEditable>(editable->GetPartGroup()));

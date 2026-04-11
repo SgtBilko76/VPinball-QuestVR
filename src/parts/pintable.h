@@ -295,6 +295,9 @@ public:
    PinTable();
    ~PinTable() override;
 
+private:
+   PinTable *CopyForPlay() const final { assert(!"const CopyForPlay not implemented"); return nullptr; } // inherited via IEditable
+public:
    PinTable *CopyForPlay();
 
    void RemoveInvalidReferences();

@@ -909,7 +909,7 @@ void WinEditor::DoPlay(const int playMode)
       return; // Can't play twice
 
    PinTableWnd *const tableEditor = GetActiveTableEditor();
-   CComObject<PinTable> *const table = GetActiveTable();
+   CComObject<PinTable> *const table = GetActiveTable(); //!! no const here because of CopyForPlay call below that changes some data implicitly inside
    if (tableEditor == nullptr || table == nullptr)
    {
       m_table_played_via_SelectTableOnStart = false;

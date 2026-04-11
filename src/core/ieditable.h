@@ -87,7 +87,7 @@ public:
         obj->Init(x, y, true); \
         return obj; \
     } \
-	T *CopyForPlay() const; \
+	T *CopyForPlay() const final; \
 	HRESULT Init(const float x, const float y, const bool fromMouseClick, const bool forPlay = false); \
 	void UIRenderPass1(Sur * const psur) final; \
 	void UIRenderPass2(Sur * const psur) final; \
@@ -242,6 +242,8 @@ public:
    virtual void GetBoundingVertices(vector<Vertex3Ds> &bounds, vector<Vertex3Ds> *const legacy_bounds) { }
 
    virtual void ExportMesh(class ObjLoader &loader) { }
+
+   virtual IEditable *CopyForPlay() const = 0;
 
    // Shared implementation
 protected:

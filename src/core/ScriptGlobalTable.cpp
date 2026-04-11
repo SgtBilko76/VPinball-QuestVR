@@ -1013,9 +1013,10 @@ STDMETHODIMP ScriptGlobalTable::GetElementByName(BSTR name, IDispatch* *pVal)
    if (!pVal || !g_pplayer)
       return E_POINTER;
 
+   const std::wstring_view wname(name, SysStringLen(name));
    for (IEditable *const pie : m_pt->GetParts())
    {
-      if (name == pie->GetIScriptable()->m_wzName)
+      if (wname == pie->GetIScriptable()->m_wzName)
       {
          IDispatch * const id = pie->GetISelect()->GetIDispatch();
          id->AddRef();
