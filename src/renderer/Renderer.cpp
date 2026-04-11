@@ -1505,7 +1505,8 @@ void Renderer::DrawWireframe(IEditable* renderable, const vec4& fillColor, const
 
 void Renderer::RenderItem(IEditable* editable, bool isNoBackdrop)
 {
-   if ((isNoBackdrop && editable->m_desktopBackdrop) // Don't render backdrop items in reflections or VR & cabinet modes
+   if (!editable->GetIRenderable()
+      || (isNoBackdrop && editable->m_desktopBackdrop) // Don't render backdrop items in reflections or VR & cabinet modes
       || (editable->GetPartGroup() != nullptr && ((editable->GetPartGroup()->GetPlayerModeVisibilityMask() & m_visibilityMask) == 0))) // Apply player mode visibility mask
       return;
 

@@ -108,28 +108,6 @@ void Timer::PhysicRelease(PhysicsEngine* physics, const bool isUI)
 
 #pragma endregion
 
-
-#pragma region Rendering
-
-void Timer::RenderSetup(RenderDevice *device)
-{
-}
-
-void Timer::UpdateAnimation(const float diff_time_msec)
-{
-}
-
-void Timer::Render(const unsigned int renderMask)
-{
-}
-
-void Timer::RenderRelease()
-{
-}
-
-#pragma endregion
-
-
 STDMETHODIMP Timer::InterfaceSupportsErrorInfo(REFIID riid)
 {
    static const IID* arr[] =

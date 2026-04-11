@@ -118,22 +118,6 @@ PartGroupData::SpaceReference PartGroup::GetReferenceSpace() const
    return PartGroupData::SpaceReference::SR_PLAYFIELD;
 }
 
-void PartGroup::RenderSetup(RenderDevice *device)
-{
-}
-
-void PartGroup::UpdateAnimation(const float diff_time_msec)
-{
-}
-
-void PartGroup::Render(const unsigned int renderMask)
-{
-}
-
-void PartGroup::RenderRelease()
-{
-}
-
 #pragma endregion
 
 

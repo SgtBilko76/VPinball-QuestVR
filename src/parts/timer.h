@@ -37,9 +37,7 @@ class Timer :
    public IEditable,
    public IScriptable,
    public IFireEvents,
-   public IRenderable,
    public Hitable
-   //public EditableImpl<Timer>
 {
 public:
 #ifdef __STANDALONE__
@@ -77,7 +75,9 @@ public:
 
    void WriteRegDefaults() final;
 
-   STANDARD_EDITABLE_DECLARES(Timer, eItemTimer, TIMER, VIEW_PLAYFIELD | VIEW_BACKGLASS)
+   STANDARD_EDITABLE_DECLARES_NO_RENDERABLE(Timer, eItemTimer, TIMER, VIEW_PLAYFIELD | VIEW_BACKGLASS)
+   IRenderable *GetIRenderable() final { return nullptr; }
+   const IRenderable *GetIRenderable() const final { return nullptr; }
 
    //DECLARE_NOT_AGGREGATABLE(Timer)
    // Remove the comment from the line above if you don't want your object to
