@@ -150,7 +150,7 @@ void RenderDevice::tBGFXCallback::screenShot(
                uint8_t* dst = static_cast<uint8_t*>(tex->data()) + i * _width * 4;
                bx::memCopy(dst, src, _width * 4);
             }
-            uint8_t* const pixels = static_cast<uint8_t*>(tex->data());
+            uint8_t* const __restrict pixels = static_cast<uint8_t*>(tex->data());
             for (uint32_t i = 0; i < _width * _height; i++)
                std::swap(pixels[i * 4], pixels[i * 4 + 2]);
          }
@@ -425,6 +425,9 @@ void RenderDevice::RenderThread(RenderDevice* rd, bgfx::Init init)
 
    PLOGI << "BGFX initialized using " << bgfx::getRendererName(bgfx::getRendererType()) << " backend (" << init.resolution.width << 'x' << init.resolution.height << " "
          << bimg::getName(bimg::TextureFormat::Enum(init.resolution.formatColor)) << ')';
+
+   rd->m_GPU_name = bgfx::getCaps()->gpuName;
+   rd->m_driver_name = bgfx::getRendererName(bgfx::getRendererType()) + " backend on "s + bgfx::getCaps()->vendorId + '/' + bgfx::getCaps()->deviceId;
 
    if (g_pplayer->IsVR())
    {
@@ -1186,6 +1189,13 @@ RenderDevice::RenderDevice(
    #endif
    #endif
 
+   const GLubyte* renderer = glGetString(GL_RENDERER);
+   const GLubyte* vendor = glGetString(GL_VENDOR);
+   if (renderer)
+      m_GPU_name = renderer;
+   if (vendor)
+      m_driver_name = vendor;
+
    int gl_majorVersion = 0;
    int gl_minorVersion = 0;
    glGetIntegerv(GL_MAJOR_VERSION, &gl_majorVersion);
@@ -1199,6 +1209,8 @@ RenderDevice::RenderDevice(
       exit(-1);
    }
    #endif
+
+   m_driver_name += "(OpenGL " + std::to_string(gl_majorVersion) + '.' + std::to_string(gl_minorVersion) + ')';
 
    m_GLversion = gl_majorVersion * 100 + gl_minorVersion;
 
@@ -1266,8 +1278,16 @@ RenderDevice::RenderDevice(
    }
    m_pD3DEx->QueryInterface(__uuidof(IDirect3D9), reinterpret_cast<void**>(&m_pD3D));
 
-   UINT adapterId = D3DADAPTER_DEFAULT;
-   const D3DDEVTYPE devtype = D3DDEVTYPE_HAL;
+   constexpr UINT adapterId = D3DADAPTER_DEFAULT;
+
+   D3DADAPTER_IDENTIFIER9 adapterInfo;
+   if (SUCCEEDED(m_pD3DEx->GetAdapterIdentifier(adapterId, 0, &adapterInfo)))
+   {
+      m_GPU_name = adapterInfo.Description;
+      m_driver_name = adapterInfo.Driver;
+   }
+
+   constexpr D3DDEVTYPE devtype = D3DDEVTYPE_HAL;
    D3DCAPS9 caps;
    m_pD3D->GetDeviceCaps(adapterId, devtype, &caps);
 

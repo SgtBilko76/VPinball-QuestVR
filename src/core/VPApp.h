@@ -13,6 +13,7 @@ public:
    ~VPApp();
 
    void SetSettingsFileName(const std::filesystem::path& path) { m_iniFileName = path; } // Must be defined before InitInstance() is called, otherwise it will be ignored
+   const std::filesystem::path& GetSettingsFileName() const { return m_iniFileName; }
    void InitInstance();
 
    // overall app settings

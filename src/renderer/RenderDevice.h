@@ -220,6 +220,9 @@ public:
 
    void CaptureScreenshot(const vector<VPX::Window*>& wnd, const vector<std::filesystem::path>& filename, const std::function<void(bool)>& callback, int frameDelay = 3);
 
+   string m_GPU_name;
+   string m_driver_name;
+
 private:
    const bool m_isAnaglyph;
    const bool m_isVR;

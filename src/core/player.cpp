@@ -2193,11 +2193,13 @@ void Player::FinishFrame()
    // Close requested with user input
    if (m_closing == CS_USER_INPUT)
    {
-      m_closing = CS_PLAYING;
       if (g_pvp && g_pvp->m_disable_pause_menu)
          m_closing = CS_STOP_PLAY;
       else
+      {
+         m_closing = CS_PLAYING;
          m_liveUI->OpenInGameUI();
+      }
    }
 
    // Brute force stop: blast into space

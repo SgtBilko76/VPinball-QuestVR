@@ -19,7 +19,7 @@ public:
       // deleted the base folder after installation. A missing folder will cause an error. This requires write access to the app
       // folder. This is the legacy behavior based on Windows 9x versions where applications had full access more or less everywhere,
       // but this causes quite a lot of issues & hacks with newer operating systems and platforms which are more restrictive.
-      AppOnly,
+      AppOnly
    };
    void UpdateFileLayoutMode(); // File layout mode is defined depending on where the application ini file is located, defaulting to AppPrefData mode if it is missing
    FileLayoutMode GetFileLayoutMode() const { return m_fileLayoutMode; }
@@ -36,7 +36,7 @@ public:
       GLShaders,
       // Read/write user documents
       Tables,
-      Preferences,
+      Preferences
    };
    std::filesystem::path GetAppPath(AppSubFolder sub, const std::filesystem::path& file = std::filesystem::path()) const;
 
@@ -47,7 +47,7 @@ public:
       Music, // 'music' folder along table file, used by PlayMusic() script function
       Cache, // 'cache/table_name/' folder along table file, used to cache player data (used textures to be loaded in GPU mem, compressed textures,...)
       User, // 'user' folder along table file, used to save user data (highscores, settings,...)
-      AutoSave,
+      AutoSave
    };
    std::filesystem::path GetTablePath(const PinTable* table, TableSubFolder sub, bool searchForWriting) const;
 
