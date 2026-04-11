@@ -42,7 +42,7 @@ void TimerUIPart::UpdatePropertyPane(PropertyPane& props)
 {
    props.EditableHeader("Timer"s, m_timer);
 
-   props.TimerSection<Timer>(m_timer, [](Timer* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_timer);
 }
 
 }

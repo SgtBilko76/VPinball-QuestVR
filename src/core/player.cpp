@@ -694,7 +694,7 @@ Player::Player(PinTable *const table, const PlayMode playMode)
          m_vhitables.push_back(editable);
    for (IEditable *hitable : m_vhitables)
    {
-      hitable->GetIHitable()->TimerSetup(m_vht);
+      hitable->TimerSetup(m_vht);
       if (hitable->GetIRenderable())
          hitable->GetIRenderable()->RenderSetup(m_renderer->m_renderDevice);
       if (hitable->GetItemType() == ItemTypeEnum::eItemBall)
@@ -994,7 +994,7 @@ Player::~Player()
       if (renderable->GetIRenderable())
          renderable->GetIRenderable()->RenderRelease();
    for (auto hitable : m_vhitables)
-      hitable->GetIHitable()->TimerRelease();
+      hitable->TimerRelease();
    assert(m_vballDelete.empty());
    m_vball.clear();
 

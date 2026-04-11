@@ -124,8 +124,8 @@ void Flipper::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_visible, Visible);
    LinkProp(m_d.m_enabled, Enabled);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    SetDefaultPhysics(fromMouseClick);
    m_d.m_FlipperRadius = m_d.m_FlipperRadiusMax;
 }
@@ -176,8 +176,8 @@ void Flipper::WriteRegDefaults()
    LinkProp(m_d.m_visible, Visible);
    LinkProp(m_d.m_enabled, Enabled);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -839,8 +839,8 @@ void Flipper::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteFloat(FID(ANGE), m_d.m_EndAngle);
    writer.WriteInt(FID(OVRP), m_d.m_OverridePhysics);
    writer.WriteFloat(FID(FORC), m_d.m_mass);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteString(FID(SURF), m_d.m_szSurface);
    writer.WriteString(FID(MATR), m_d.m_szMaterial);
    writer.WriteWideString(FID(NAME), m_wzName);
@@ -888,8 +888,8 @@ void Flipper::Load(IObjectReader& reader)
          case FID(ANGE): m_d.m_EndAngle = reader.AsFloat(); break;
          case FID(OVRP): m_d.m_OverridePhysics = reader.AsInt(); break;
          case FID(FORC): m_d.m_mass = reader.AsFloat(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(SURF): m_d.m_szSurface = reader.AsString(); break;
          case FID(MATR): m_d.m_szMaterial = reader.AsString(); break;
          case FID(RUMA): m_d.m_szRubberMaterial = reader.AsString(); break;

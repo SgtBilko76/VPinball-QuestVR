@@ -126,8 +126,8 @@ void Flasher::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_displayTexture, DisplayTexture);
    LinkProp(m_d.m_imagealignment, ImageMode);
    LinkProp(m_d.m_filter, Filter);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    m_d.m_intensity_scale = 1.0f;
    m_inPlayState = m_d.m_isVisible;
 #undef LinkProp
@@ -152,8 +152,8 @@ void Flasher::WriteRegDefaults()
    LinkProp(m_d.m_displayTexture, DisplayTexture);
    LinkProp(m_d.m_imagealignment, ImageMode);
    LinkProp(m_d.m_filter, Filter);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -437,8 +437,8 @@ void Flasher::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteFloat(FID(FROY), m_d.m_rotY);
    writer.WriteFloat(FID(FROZ), m_d.m_rotZ);
    writer.WriteInt(FID(COLR), m_d.m_color);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteWideString(FID(NAME), m_wzName);
    writer.WriteString(FID(IMAG), m_d.m_szImageA);
    writer.WriteString(FID(IMAB), m_d.m_szImageB);
@@ -488,8 +488,8 @@ void Flasher::Load(IObjectReader& reader)
          case FID(FROY): m_d.m_rotY = reader.AsFloat(); break;
          case FID(FROZ): m_d.m_rotZ = reader.AsFloat(); break;
          case FID(COLR): m_d.m_color = reader.AsInt(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(IMAG): m_d.m_szImageA = reader.AsString(); break;
          case FID(IMAB): m_d.m_szImageB = reader.AsString(); break;
          case FID(FALP): m_d.m_alpha = max(0, reader.AsInt()); break;

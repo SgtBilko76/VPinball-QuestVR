@@ -109,7 +109,7 @@ void KickerUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<Kicker>(m_kicker, [](Kicker* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_kicker);
 }
 
 }

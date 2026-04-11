@@ -170,8 +170,8 @@ void Trigger::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_szSurface, Surface);
    LinkProp(m_d.m_animSpeed, AnimSpeed);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -190,8 +190,8 @@ void Trigger::WriteRegDefaults()
    LinkProp(m_d.m_szSurface, Surface);
    LinkProp(m_d.m_animSpeed, AnimSpeed);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -913,8 +913,8 @@ void Trigger::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteFloat(FID(WITI), m_d.m_wireThickness);
    writer.WriteFloat(FID(SCAX), m_d.m_scaleX);
    writer.WriteFloat(FID(SCAY), m_d.m_scaleY);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteString(FID(SURF), m_d.m_szSurface);
    writer.WriteString(FID(MATR), m_d.m_szMaterial);
    writer.WriteBool(FID(EBLD), m_d.m_enabled);
@@ -950,8 +950,8 @@ void Trigger::Load(IObjectReader& reader)
          case FID(SCAX): m_d.m_scaleX = reader.AsFloat(); break;
          case FID(SCAY): m_d.m_scaleY = reader.AsFloat(); break;
          case FID(MATR): m_d.m_szMaterial = reader.AsString(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(SURF): m_d.m_szSurface = reader.AsString(); break;
          case FID(EBLD): m_d.m_enabled = reader.AsBool(); break;
          case FID(THOT): m_d.m_hit_height = reader.AsFloat(); break;

@@ -93,8 +93,8 @@ void Ball::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_color, Color);
    LinkProp(m_d.m_pinballEnvSphericalMapping, SphereMap);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -112,8 +112,8 @@ void Ball::WriteRegDefaults()
    LinkProp(m_d.m_color, Color);
    LinkProp(m_d.m_pinballEnvSphericalMapping, SphereMap);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -131,8 +131,8 @@ void Ball::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteInt(FID(COLR), m_d.m_color);
    writer.WriteBool(FID(SPHR), m_d.m_pinballEnvSphericalMapping);
    writer.WriteBool(FID(REEN), m_d.m_reflectionEnabled);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteWideString(FID(NAME), m_wzName);
    SaveSharedEditableFields(writer);
    writer.EndObject();
@@ -158,8 +158,8 @@ void Ball::Load(IObjectReader& reader)
          case FID(PFRF): m_d.m_playfieldReflectionStrength = reader.AsFloat(); break;
          case FID(COLR): m_d.m_color = reader.AsInt(); break;
          case FID(SPHR): m_d.m_pinballEnvSphericalMapping = reader.AsBool(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          default: LoadSharedEditableField(tag, reader); break;
          }

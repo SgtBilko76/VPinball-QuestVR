@@ -11,7 +11,6 @@
 class RubberData final : public BaseProperty
 {
 public:
-   TimerDataRoot m_tdr;
    float m_height;
    float m_hitHeight;
    int m_thickness;
@@ -52,8 +51,8 @@ public:
       m_menuid = IDR_SURFACEMENU;
       m_d.m_collidable = true;
       m_d.m_visible = true;
-      m_d.m_tdr.m_TimerEnabled = false;
-      m_d.m_tdr.m_TimerInterval = 0;
+      m_timerEnabled = false;
+      m_timerInterval = 0;
    }
    virtual ~Rubber();
 

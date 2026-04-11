@@ -165,7 +165,7 @@ void HitTargetUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<HitTarget>(m_hitTarget, [](HitTarget* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_hitTarget);
 }
 
 }

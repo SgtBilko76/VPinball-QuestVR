@@ -10,7 +10,6 @@
 class RampData final : public BaseProperty
 {
 public:
-   TimerDataRoot m_tdr;
    float m_heightbottom;
    float m_heighttop;
    float m_widthbottom;

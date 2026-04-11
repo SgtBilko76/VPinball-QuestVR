@@ -97,8 +97,8 @@ void Gate::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_twoWay, TwoWay);
    LinkProp(m_d.m_type, GateType);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    SetDefaultPhysics(fromMouseClick);
 }
 
@@ -131,8 +131,8 @@ void Gate::WriteRegDefaults()
    LinkProp(m_d.m_scatter, Scatter);
    LinkProp(m_d.m_gravityfactor, GravityFactor);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -555,10 +555,10 @@ void Gate::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteFloat(FID(HGTH), m_d.m_height);
    writer.WriteFloat(FID(ROTA), m_d.m_rotation);
    writer.WriteString(FID(MATR), m_d.m_szMaterial);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
    writer.WriteBool(FID(GSUP), m_d.m_showBracket);
    writer.WriteBool(FID(GCOL), m_d.m_collidable);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteString(FID(SURF), m_d.m_szSurface);
    writer.WriteFloat(FID(ELAS), m_d.m_elasticity);
    writer.WriteFloat(FID(GAMA), m_d.m_angleMax);
@@ -597,13 +597,13 @@ void Gate::Load(IObjectReader& reader)
          case FID(HGTH): m_d.m_height = reader.AsFloat(); break;
          case FID(ROTA): m_d.m_rotation = reader.AsFloat(); break;
          case FID(MATR): m_d.m_szMaterial = reader.AsString(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
          case FID(GSUP): m_d.m_showBracket = reader.AsBool(); break;
          case FID(GCOL): m_d.m_collidable = reader.AsBool(); break;
          case FID(TWWA): m_d.m_twoWay = reader.AsBool(); break;
          case FID(GVSB): m_d.m_visible = reader.AsBool(); break;
          case FID(REEN): m_d.m_reflectionEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(SURF): m_d.m_szSurface = reader.AsString(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          case FID(ELAS): m_d.m_elasticity = reader.AsFloat(); break;

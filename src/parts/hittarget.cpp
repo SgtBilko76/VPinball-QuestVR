@@ -137,8 +137,8 @@ void HitTarget::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_disableLightingBelow, DisableLightingBelow);
    LinkProp(m_d.m_raiseDelay, RaiseDelay);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    SetDefaultPhysics(fromMouseClick);
 }
 
@@ -175,8 +175,8 @@ void HitTarget::WriteRegDefaults()
    LinkProp(m_d.m_friction, Friction);
    LinkProp(m_d.m_scatter, Scatter);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -795,8 +795,8 @@ void HitTarget::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteFloat(FID(PIDB), m_d.m_depthBias);
    writer.WriteBool(FID(ISDR), m_d.m_isDropped);
    writer.WriteFloat(FID(DRSP), m_d.m_dropSpeed);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteInt(FID(RADE), m_d.m_raiseDelay);
    writer.WriteString(FID(MAPH), m_d.m_szPhysicsMaterial);
    writer.WriteBool(FID(OVPH), m_d.m_overwritePhysics);
@@ -842,8 +842,8 @@ void HitTarget::Load(IObjectReader& reader)
          case FID(DILT): m_d.m_disableLightingTop = reader.AsFloat(); break;
          case FID(DILB): m_d.m_disableLightingBelow = reader.AsFloat(); break;
          case FID(PIDB): m_d.m_depthBias = reader.AsFloat(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(RADE): m_d.m_raiseDelay = reader.AsInt(); break;
          case FID(MAPH): m_d.m_szPhysicsMaterial = reader.AsString(); break;
          case FID(OVPH): m_d.m_overwritePhysics = reader.AsBool(); break;

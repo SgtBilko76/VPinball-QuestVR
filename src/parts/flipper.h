@@ -19,7 +19,6 @@ public:
    float m_EndAngle;
    float m_height;
    Vertex2D m_Center;
-   TimerDataRoot m_tdr;
 
    string m_szSurface;
    COLORREF m_color;

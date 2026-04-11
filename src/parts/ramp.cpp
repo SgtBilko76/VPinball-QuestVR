@@ -82,8 +82,8 @@ void Ramp::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_wireDistanceX, WireDistanceX);
    LinkProp(m_d.m_wireDistanceY, WireDistanceY);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    SetDefaultPhysics(fromMouseClick);
 }
 
@@ -119,8 +119,8 @@ void Ramp::WriteRegDefaults()
    LinkProp(m_d.m_friction, Friction);
    LinkProp(m_d.m_scatter, Scatter);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -1330,8 +1330,8 @@ void Ramp::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteFloat(FID(WDBT), m_d.m_widthbottom);
    writer.WriteFloat(FID(WDTP), m_d.m_widthtop);
    writer.WriteString(FID(MATR), m_d.m_szMaterial);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteInt(FID(TYPE), m_d.m_type);
    writer.WriteWideString(FID(NAME), m_wzName);
    writer.WriteString(FID(IMAG), m_d.m_szImage);
@@ -1374,8 +1374,8 @@ void Ramp::Load(IObjectReader& reader)
          case FID(WDBT): m_d.m_widthbottom = reader.AsFloat(); break;
          case FID(WDTP): m_d.m_widthtop = reader.AsFloat(); break;
          case FID(MATR): m_d.m_szMaterial = reader.AsString(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(TYPE): m_d.m_type = static_cast<RampType>(reader.AsInt()); break;
          case FID(IMAG): m_d.m_szImage = reader.AsString(); break;
          case FID(ALGN): m_d.m_imagealignment = static_cast<RampImageAlignment>(reader.AsInt()); break;

@@ -56,8 +56,8 @@ void Kicker::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_szSurface, Surface);
    LinkProp(m_d.m_fallThrough, FallThrough);
    LinkProp(m_d.m_legacyMode, Legacy);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    SetDefaultPhysics(fromMouseClick);
 }
 
@@ -80,8 +80,8 @@ void Kicker::WriteRegDefaults()
    LinkProp(m_d.m_fallThrough, FallThrough);
    LinkProp(m_d.m_legacyMode, Legacy);
    LinkProp(m_d.m_scatter, Scatter);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -569,8 +569,8 @@ void Kicker::Save(IObjectWriter& writer, const bool saveForUndo)
 {
    writer.WriteVector2(FID(VCEN), m_d.m_vCenter);
    writer.WriteFloat(FID(RADI), m_d.m_radius);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteString(FID(MATR), m_d.m_szMaterial);
    writer.WriteString(FID(SURF), m_d.m_szSurface);
    writer.WriteBool(FID(EBLD), m_d.m_enabled);
@@ -608,9 +608,9 @@ void Kicker::Load(IObjectReader& reader)
          case FID(KHHI): m_d.m_hit_height = reader.AsFloat(); break;
          case FID(KORI): m_d.m_orientation = reader.AsFloat(); break;
          case FID(MATR): m_d.m_szMaterial = reader.AsString(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
          case FID(EBLD): m_d.m_enabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(TYPE):
          {
             m_d.m_kickertype = static_cast<KickerType>(reader.AsInt());

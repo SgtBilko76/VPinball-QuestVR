@@ -46,8 +46,8 @@ void DispReel::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_digitrange, DigitRange);
    LinkProp(m_d.m_updateinterval, UpdateInterval);
    LinkProp(m_d.m_backcolor, BackColor);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -68,8 +68,8 @@ void DispReel::WriteRegDefaults()
    LinkProp(m_d.m_digitrange, DigitRange);
    LinkProp(m_d.m_updateinterval, UpdateInterval);
    LinkProp(m_d.m_backcolor, BackColor);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -446,8 +446,8 @@ void DispReel::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteVector2(FID(VER1), m_d.m_v1);
    writer.WriteVector2(FID(VER2), m_d.m_v2);
    writer.WriteInt(FID(CLRB), m_d.m_backcolor);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteBool(FID(TRNS), m_d.m_transparent);
    writer.WriteString(FID(IMAG), m_d.m_szImage);
    writer.WriteString(FID(SOUN), m_d.m_szSound);
@@ -480,8 +480,8 @@ void DispReel::Load(IObjectReader& reader)
          case FID(WDTH): m_d.m_width = reader.AsFloat(); break;
          case FID(HIGH): m_d.m_height = reader.AsFloat(); break;
          case FID(CLRB): m_d.m_backcolor = reader.AsInt(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          case FID(TRNS): m_d.m_transparent = reader.AsBool(); break;
          case FID(IMAG): m_d.m_szImage = reader.AsString(); break;

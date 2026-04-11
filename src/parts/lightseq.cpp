@@ -29,8 +29,8 @@ void LightSeq::SetDefaults(const bool fromMouseClick)
    m_d.m_wzCollection = MakeWString(tmp);
    LinkProp(m_d.m_vCenter.x, CenterX);
    LinkProp(m_d.m_vCenter.y, CenterY);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -42,8 +42,8 @@ void LightSeq::WriteRegDefaults()
    LinkProp(tmp, Collection);
    LinkProp(m_d.m_vCenter.x, CenterX);
    LinkProp(m_d.m_vCenter.y, CenterY);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -366,8 +366,8 @@ void LightSeq::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteFloat(FID(CTRX), m_d.m_vCenter.x);
    writer.WriteFloat(FID(CTRY), m_d.m_vCenter.y);
    writer.WriteInt(FID(UPTM), m_d.m_updateinterval);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteWideString(FID(NAME), m_wzName);
    writer.WriteBool(FID(BGLS), m_desktopBackdrop);
    SaveSharedEditableFields(writer);
@@ -388,8 +388,8 @@ void LightSeq::Load(IObjectReader& reader)
          case FID(CTRX): m_d.m_vCenter.x = reader.AsFloat(); break;
          case FID(CTRY): m_d.m_vCenter.y = reader.AsFloat(); break;
          case FID(UPTM): m_d.m_updateinterval = reader.AsInt(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          case FID(BGLS): m_desktopBackdrop = reader.AsBool(); break;
          default: LoadSharedEditableField(tag, reader); break;

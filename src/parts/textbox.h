@@ -19,7 +19,6 @@ public:
    COLORREF m_fontcolor;
    float m_intensity_scale;
    string m_text;
-   TimerDataRoot m_tdr;
    TextAlignment m_talign;
    bool m_transparent;
    bool m_visible;

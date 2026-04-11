@@ -239,7 +239,7 @@ void FlasherUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<Flasher>(m_flasher, [](Flasher* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_flasher);
 }
 
 }

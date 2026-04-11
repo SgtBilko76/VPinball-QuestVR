@@ -12,7 +12,6 @@ public:
    Vertex2D m_vCenter;
    float m_length;
    float m_rotation;
-   TimerDataRoot m_tdr;
    float m_height;
    float m_damping;
    float m_angleMax;

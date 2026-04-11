@@ -26,8 +26,6 @@ public:
    float m_rotZ;
    TargetType m_targetType;
 
-   TimerDataRoot m_tdr;
-
    float m_elasticityFalloff;
    float m_dropSpeed;
    int   m_raiseDelay;

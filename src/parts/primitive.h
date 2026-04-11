@@ -28,7 +28,6 @@ public:
    string m_meshFileName;
 
    COLORREF m_SideColor = RGB(150, 150, 150);
-   TimerDataRoot m_tdr;
 
    float m_elasticityFalloff = 0.43f;
    float m_depthBias = 0.0f; // for determining depth sorting

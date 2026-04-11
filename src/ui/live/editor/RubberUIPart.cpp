@@ -140,7 +140,7 @@ void RubberUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<Rubber>(m_rubber, [](Rubber* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_rubber);
 }
 
 }

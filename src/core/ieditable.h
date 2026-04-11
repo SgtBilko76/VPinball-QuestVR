@@ -60,10 +60,10 @@ public:
 	EventProxyBase *GetEventProxyBase() final {return (EventProxyBase *)this;} \
 	STDMETHOD(get_Name)(/*[out, retval]*/ BSTR *pVal) { *pVal = SysAllocStringLen(m_wzName.c_str(), static_cast<UINT>(m_wzName.length())); return S_OK; } \
 	STDMETHOD(put_Name)(/*[in]*/ BSTR newVal) { SetName(newVal); return S_OK; } \
-	STDMETHOD(get_TimerInterval)(/*[out, retval]*/ LONG *pVal) {*pVal = m_d.m_tdr.m_TimerInterval; return S_OK;} \
-	STDMETHOD(put_TimerInterval)(/*[in]*/ LONG newVal) {return IEditable::put_TimerInterval(newVal, &m_d.m_tdr.m_TimerInterval);} \
-	STDMETHOD(get_TimerEnabled)(/*[out, retval]*/ VARIANT_BOOL *pVal) {*pVal = FTOVB(m_d.m_tdr.m_TimerEnabled); return S_OK;} \
-	STDMETHOD(put_TimerEnabled)(/*[in]*/ VARIANT_BOOL newVal) {BOOL tmp = m_d.m_tdr.m_TimerEnabled ? 1 : 0; const HRESULT res = IEditable::put_TimerEnabled(newVal, &tmp); m_d.m_tdr.m_TimerEnabled = (tmp != 0); return res;} \
+	STDMETHOD(get_TimerInterval)(/*[out, retval]*/ LONG *pVal) {*pVal = m_timerInterval; return S_OK;} \
+	STDMETHOD(put_TimerInterval)(/*[in]*/ LONG newVal) {return IEditable::put_TimerInterval(newVal, &m_timerInterval);} \
+	STDMETHOD(get_TimerEnabled)(/*[out, retval]*/ VARIANT_BOOL *pVal) {*pVal = FTOVB(m_timerEnabled); return S_OK;} \
+	STDMETHOD(put_TimerEnabled)(/*[in]*/ VARIANT_BOOL newVal) {BOOL tmp = m_timerEnabled ? 1 : 0; const HRESULT res = IEditable::put_TimerEnabled(newVal, &tmp); m_timerEnabled = (tmp != 0); return res;} \
 	STDMETHOD(get_UserValue)(VARIANT *pVal) {return IEditable::get_UserValue(pVal);} \
 	STDMETHOD(put_UserValue)(VARIANT *newVal) {return IEditable::put_UserValue(newVal);} \
 	IScriptable *GetIScriptable() final {return (IScriptable *)this;} \
@@ -116,24 +116,8 @@ public:
 	STDMETHOD(GetPredefinedValue)(DISPID dispID, DWORD dwCookie, VARIANT *pVarOut) {return GetPTable()->GetPredefinedValue(dispID, dwCookie, pVarOut, this);} \
 	void SetDefaults(const bool fromMouseClick) final; \
 	/* Hitable implementation */ \
-	void TimerSetup(vector<HitTimer*> &pvht) final { \
-		m_singleEvents = true; \
-		for (size_t i = 0; i < m_vCollection.size(); i++) \
-		{ \
-			Collection *const pcol = m_vCollection[i]; \
-			if (pcol->m_fireEvents) \
-			{ \
-				m_vEventCollection.push_back(pcol); \
-				m_viEventCollection.push_back(m_viCollection[i]); \
-			} \
-			if (pcol->m_stopSingleEvents) \
-				m_singleEvents = false; \
-		} \
-		IFireEvents * fe = GetIFireEvents(); if (fe) { m_phittimer = std::make_unique<HitTimer>(GetName(), m_d.m_tdr.m_TimerInterval, fe); if (m_d.m_tdr.m_TimerEnabled) pvht.push_back(m_phittimer.get()); } \
-	} \
-	void TimerRelease() final { m_phittimer = nullptr; } \
 	void PhysicSetup(PhysicsEngine* physics, const bool isUI) final; \
-	void PhysicRelease(PhysicsEngine* physics, const bool isUI) final; \
+	void PhysicRelease(PhysicsEngine* physics, const bool isUI) final;
 
 // used above, do not invoke directly
 #define _STANDARD_DISPATCH_INDEPENDENT_EDITABLE_RENDERABLE_DECLARES(T, ItemType) \
@@ -158,7 +142,9 @@ public:
    dst->m_desktopBackdrop = m_desktopBackdrop; \
    dst->m_uiLocked = m_uiLocked; \
    dst->m_uiVisible = m_uiVisible; \
-   dst->m_d = m_d;
+   dst->m_d = m_d; \
+   dst->m_timerInterval = m_timerInterval; \
+   dst->m_timerEnabled = m_timerEnabled;
 
 #define STANDARD_EDITABLE_WITH_DRAGPOINT_COPY_FOR_PLAY_IMPL(type, points) \
    STANDARD_EDITABLE_COPY_FOR_PLAY_IMPL(type) \
@@ -295,6 +281,34 @@ private:
 
 #pragma region Script events
 public:
+   void TimerSetup(vector<HitTimer *> &pvht)
+   {
+      m_singleEvents = true;
+      for (size_t i = 0; i < m_vCollection.size(); i++)
+      {
+         Collection *const pcol = m_vCollection[i];
+         if (pcol->m_fireEvents)
+         {
+            m_vEventCollection.push_back(pcol);
+            m_viEventCollection.push_back(m_viCollection[i]);
+         }
+         if (pcol->m_stopSingleEvents)
+            m_singleEvents = false;
+      }
+      IFireEvents *const fe = GetIFireEvents();
+      if (fe)
+      {
+         m_phittimer = std::make_unique<HitTimer>(GetName(), m_timerInterval, fe);
+         if (m_timerEnabled)
+            pvht.push_back(m_phittimer.get());
+      }
+   }
+   void TimerRelease() { m_phittimer = nullptr; }
+
+   // was: TimerDataRoot m_tdr: then it was limited to be used by a limited amount of table elements (most prominently not by decals and primitives though), could be changed/generalized nowadays
+   int m_timerInterval = 100;
+   bool m_timerEnabled = false;
+
    std::unique_ptr<HitTimer> m_phittimer; // timer event defined when playing (between TimerSetup and TimerRelease)
 
    // In game filtered copy of m_vCollection/m_viCollection for slightly faster event dispatching

@@ -125,7 +125,7 @@ void BallUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<Ball>(m_ball, [](Ball* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_ball);
 }
 
 }

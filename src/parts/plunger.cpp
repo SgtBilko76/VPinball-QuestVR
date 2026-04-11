@@ -51,8 +51,8 @@ void Plunger::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_springLoops, CustomSpringLoops);
    LinkProp(m_d.m_springEndLoops, CustomSpringEndLoops);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    SetDefaultPhysics(fromMouseClick);
 }
 
@@ -97,8 +97,8 @@ void Plunger::WriteRegDefaults()
    LinkProp(m_d.m_scatterVelocity, ScatterVelocity);
    LinkProp(m_d.m_momentumXfer, MomentumXfer);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -857,8 +857,8 @@ void Plunger::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteFloat(FID(PSCV), m_d.m_scatterVelocity);
    writer.WriteFloat(FID(MOMX), m_d.m_momentumXfer);
 
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteBool(FID(VSBL), m_d.m_visible);
    writer.WriteBool(FID(REEN), m_d.m_reflectionEnabled);
    writer.WriteString(FID(SURF), m_d.m_szSurface);
@@ -898,10 +898,10 @@ void Plunger::Load(IObjectReader& reader)
          case FID(MPRK): m_d.m_parkPosition = reader.AsFloat(); break;
          case FID(PSCV): m_d.m_scatterVelocity = reader.AsFloat(); break;
          case FID(MOMX): m_d.m_momentumXfer = reader.AsFloat(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
          case FID(MECH): m_d.m_mechPlunger = reader.AsBool(); break;
          case FID(APLG): m_d.m_autoPlunger = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          case FID(TYPE): m_d.m_type = static_cast<PlungerType>(reader.AsInt()); break;
          case FID(ANFR): m_d.m_animFrames = reader.AsInt(); break;

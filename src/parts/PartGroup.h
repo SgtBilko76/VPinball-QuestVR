@@ -9,7 +9,6 @@ class PartGroupData final
 {
 public:
    // Standard properties
-   TimerDataRoot m_tdr;
    Vertex2D m_v;
 
    // PartGroup properties

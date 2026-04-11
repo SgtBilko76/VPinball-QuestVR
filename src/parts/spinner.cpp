@@ -108,8 +108,8 @@ void Spinner::WriteRegDefaults()
    LinkProp(m_d.m_szImage, Image);
    LinkProp(m_d.m_szSurface, Surface);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -126,8 +126,8 @@ void Spinner::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_szImage, Image);
    LinkProp(m_d.m_szSurface, Surface);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    SetDefaultPhysics(fromMouseClick);
 }
 
@@ -457,8 +457,8 @@ void Spinner::Save(IObjectWriter& writer, const bool saveForUndo)
 {
    writer.WriteVector2(FID(VCEN), m_d.m_vCenter);
    writer.WriteFloat(FID(ROTA), m_d.m_rotation);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteFloat(FID(HIGH), m_d.m_height);
    writer.WriteFloat(FID(LGTH), m_d.m_length);
    writer.WriteFloat(FID(AFRC), m_d.m_damping);
@@ -491,8 +491,8 @@ void Spinner::Load(IObjectReader& reader)
          case FID(VCEN): m_d.m_vCenter = reader.AsVector2(); break;
          case FID(ROTA): m_d.m_rotation = reader.AsFloat(); break;
          case FID(MATR): m_d.m_szMaterial = reader.AsString(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(SSUP): m_d.m_showBracket = reader.AsBool(); break;
          case FID(HIGH): m_d.m_height = reader.AsFloat(); break;
          case FID(LGTH): m_d.m_length = reader.AsFloat(); break;

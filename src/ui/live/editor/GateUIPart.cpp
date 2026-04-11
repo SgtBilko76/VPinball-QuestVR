@@ -148,7 +148,7 @@ void GateUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<Gate>(m_gate, [](Gate* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_gate);
 }
 
 }

@@ -5,7 +5,6 @@
 class Sur;
 class PinTable;
 class IEditable;
-class TimerDataRoot;
 struct PropertyPane;
 class WinEditor;
 

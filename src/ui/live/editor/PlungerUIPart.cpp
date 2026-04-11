@@ -192,7 +192,7 @@ void PlungerUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<Plunger>(m_plunger, [](Plunger* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_plunger);
 }
 
 }

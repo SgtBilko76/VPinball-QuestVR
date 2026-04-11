@@ -8,17 +8,9 @@
 #include "physics/hittimer.h"
 #include "physics/hitable.h"
 
-class TimerDataRoot final
-{
-public:
-   int m_TimerInterval = 100;
-   bool m_TimerEnabled = false;
-};
-
 class TimerData final
 {
 public:
-   TimerDataRoot m_tdr;
    Vertex2D m_v;
 };
 

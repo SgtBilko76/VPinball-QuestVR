@@ -94,7 +94,7 @@ void DecalUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   //props.TimerSection<Decal>(m_decal, [](Decal* obj) { return &(obj->m_d.m_tdr); });
+   //props.TimerSection(m_decal);
 }
 
 }

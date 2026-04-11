@@ -50,7 +50,7 @@ void PartGroupUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
    
-   props.TimerSection<PartGroup>(m_partGroup, [](PartGroup* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_partGroup);
 }
 
 }

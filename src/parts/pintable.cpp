@@ -4652,29 +4652,38 @@ string PinTable::AuditTable(bool log) const
       }
 
       // Warning on very fast timers (lower than 5ms)
-      TimerDataRoot *tdr = nullptr;
       switch (type)
       {
-      // case eItemPrimitive: tdr = &prim->m_d.m_tdr; break; // Note: primitives have timers, but they are not exposed to the UI
-      case eItemSurface: tdr = &surf->m_d.m_tdr; break;
-      case eItemTimer: tdr = &((Timer *)part)->m_d.m_tdr; break;
-      case eItemLight: tdr = &((Light *)part)->m_d.m_tdr; break;
-      case eItemRamp: tdr = &((Ramp *)part)->m_d.m_tdr; break;
-      case eItemPlunger: tdr = &((Plunger *)part)->m_d.m_tdr; break;
-      case eItemSpinner: tdr = &((Spinner *)part)->m_d.m_tdr; break;
-      case eItemTrigger: tdr = &((Trigger *)part)->m_d.m_tdr; break;
-      case eItemKicker: tdr = &((Kicker *)part)->m_d.m_tdr; break;
-      case eItemRubber: tdr = &((Rubber *)part)->m_d.m_tdr; break;
-      case eItemFlasher: tdr = &((Flasher *)part)->m_d.m_tdr; break;
-      case eItemLightSeq: tdr = &((LightSeq *)part)->m_d.m_tdr; break;
-      case eItemHitTarget: tdr = &((HitTarget *)part)->m_d.m_tdr; break;
-      case eItemBumper: tdr = &((Bumper *)part)->m_d.m_tdr; break;
-      case eItemFlipper: tdr = &((Flipper *)part)->m_d.m_tdr; break;
-      case eItemGate: tdr = &((Gate *)part)->m_d.m_tdr; break;
+      case eItemBall:
+      // eItemDecal
+      case eItemPartGroup:
+      // eItemPrimitive
+      case eItemTextbox:
+      case eItemDispReel:
+      case eItemSurface:
+      case eItemTimer:
+      case eItemLight:
+      case eItemRamp:
+      case eItemPlunger:
+      case eItemSpinner:
+      case eItemTrigger:
+      case eItemKicker:
+      case eItemRubber:
+      case eItemFlasher:
+      case eItemLightSeq:
+      case eItemHitTarget:
+      case eItemBumper:
+      case eItemFlipper:
+      case eItemGate:
+         if (part->m_timerEnabled && part->m_timerInterval != -1 && part->m_timerInterval != -2 && part->m_timerInterval < 17)
+            ss << ". Warning: Part '" << part->GetName() << "' uses a timer with a very short period of " << part->m_timerInterval << "ms, below a 60FPS framerate. This will likely cause stutters and the table will not support 'frame pacing'.\r\n";
+         break;
+      // eItemTable
+      // eItemLightCenter
+      // eItemDragPoint
+      // eItemCollection
       default: break;
       }
-      if (tdr && tdr->m_TimerEnabled && tdr->m_TimerInterval != -1 && tdr->m_TimerInterval != -2 && tdr->m_TimerInterval < 17)
-         ss << ". Warning: Part '" << part->GetName() << "' uses a timer with a very short period of " << tdr->m_TimerInterval << "ms, below a 60FPS framerate. This will likely cause stutters and the table will not support 'frame pacing'.\r\n";
 
       if (type == eItemPrimitive && prim->m_d.m_visible
          && prim->m_d.m_disableLightingBelow != 1.f && !prim->m_d.m_staticRendering

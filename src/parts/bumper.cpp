@@ -45,8 +45,8 @@ void Bumper::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_collidable, Collidable);
    LinkProp(m_d.m_szSurface, Surface);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    m_ringAnimate = false;
    m_d.m_ringDropOffset = 0.0f;
    SetDefaultPhysics(fromMouseClick);
@@ -75,8 +75,8 @@ void Bumper::WriteRegDefaults()
    LinkProp(m_d.m_force, Force);
    LinkProp(m_d.m_scatter, Scatter);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -729,8 +729,8 @@ void Bumper::Save(IObjectWriter& writer, const bool saveForUndo)
 {
    writer.WriteVector2(FID(VCEN), m_d.m_vCenter);
    writer.WriteFloat(FID(RADI), m_d.m_radius);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteFloat(FID(THRS), m_d.m_threshold);
    writer.WriteFloat(FID(FORC), m_d.m_force);
    writer.WriteFloat(FID(BSCT), m_d.m_scatter);
@@ -774,8 +774,8 @@ void Bumper::Load(IObjectReader& reader)
          case FID(RIMA): m_d.m_szRingMaterial = reader.AsString(); break;
          case FID(BAMA): m_d.m_szBaseMaterial = reader.AsString(); break;
          case FID(SKMA): m_d.m_szSkirtMaterial = reader.AsString(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(THRS): m_d.m_threshold = reader.AsFloat(); break;
          case FID(FORC): m_d.m_force = reader.AsFloat(); break;
          case FID(BSCT): m_d.m_scatter = reader.AsFloat(); break;

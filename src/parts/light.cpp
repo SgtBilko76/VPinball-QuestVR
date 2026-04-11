@@ -88,8 +88,8 @@ void Light::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_modulate_vs_add, BulbModulateVsAdd);
    LinkProp(m_d.m_bulbHaloHeight, BulbHaloHeight);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    m_duration = 0;
    m_finalLightState = 0.f;
    m_d.m_shape = ShapeCustom;
@@ -122,8 +122,8 @@ void Light::WriteRegDefaults()
    LinkProp(m_d.m_modulate_vs_add, BulbModulateVsAdd);
    LinkProp(m_d.m_bulbHaloHeight, BulbHaloHeight);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -868,8 +868,8 @@ void Light::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteFloat(FID(STTF), m_d.m_state);
    writer.WriteInt(FID(COLR), m_d.m_color);
    writer.WriteInt(FID(COL2), m_d.m_color2);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteString(FID(BPAT), m_d.m_rgblinkpattern);
    writer.WriteString(FID(IMG1), m_d.m_szImage);
    writer.WriteInt(FID(BINT), m_d.m_blinkinterval);
@@ -907,8 +907,8 @@ void Light::Load(IObjectReader& reader)
    m_d.m_state = LightStateOff;
    m_d.m_shape = ShapeCustom;
 
-   m_d.m_tdr.m_TimerEnabled = false;
-   m_d.m_tdr.m_TimerInterval = 100;
+   m_timerEnabled = false;
+   m_timerInterval = 100;
 
    m_d.m_color = RGB(255, 255, 0);
    m_d.m_color2 = RGB(255, 255, 255);
@@ -949,8 +949,8 @@ void Light::Load(IObjectReader& reader)
          case FID(COLR): m_d.m_color = reader.AsInt(); break;
          case FID(COL2): m_d.m_color2 = reader.AsInt(); break;
          case FID(IMG1): m_d.m_szImage = reader.AsString(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(SHAP): roundLight = true; break;
          case FID(BPAT): m_d.m_rgblinkpattern = reader.AsString(); break;
          case FID(BINT): m_d.m_blinkinterval = reader.AsInt(); break;

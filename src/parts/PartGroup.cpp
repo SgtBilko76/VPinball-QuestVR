@@ -38,16 +38,16 @@ STDMETHODIMP PartGroup::InterfaceSupportsErrorInfo(REFIID riid)
 void PartGroup::SetDefaults(const bool fromMouseClick)
 {
 #define LinkProp(field, prop) field = fromMouseClick ? g_app->m_settings.GetDefaultPropsPartGroup_##prop() : Settings::GetDefaultPropsPartGroup_##prop##_Default()
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
 void PartGroup::WriteRegDefaults()
 {
 #define LinkProp(field, prop) g_app->m_settings.SetDefaultPropsPartGroup_##prop(field, false)
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -127,8 +127,8 @@ void PartGroup::Save(IObjectWriter& writer, const bool saveForUndo)
 {
    writer.WriteWideString(FID(NAME), m_wzName);
    writer.WriteVector2(FID(VCEN), m_d.m_v);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteUInt(FID(PMSK), static_cast<int>(m_d.m_playerModeVisibilityMask));
    writer.WriteInt(FID(SPRF), static_cast<int>(m_d.m_spaceReference));
    SaveSharedEditableFields(writer);
@@ -145,8 +145,8 @@ void PartGroup::Load(IObjectReader& reader)
          {
          case FID(PIID): reader.AsInt(); break;
          case FID(VCEN): m_d.m_v = reader.AsVector2(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          case FID(PMSK): m_d.m_playerModeVisibilityMask = reader.AsUInt(); break;
          case FID(SPRF): m_d.m_spaceReference = static_cast<PartGroupData::SpaceReference>(reader.AsInt()); break;

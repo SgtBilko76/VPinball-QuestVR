@@ -19,7 +19,6 @@ public:
    SizingType m_sizingtype;
    COLORREF m_color;
    bool m_verticalText;
-   TimerDataRoot m_tdr; // Unused but this is the only (legacy and deprecated) part that does not
    FontDesc m_font;
 };
 

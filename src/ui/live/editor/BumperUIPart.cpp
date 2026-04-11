@@ -169,7 +169,7 @@ void BumperUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<Bumper>(m_bumper, [](Bumper* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_bumper);
 }
 
 }

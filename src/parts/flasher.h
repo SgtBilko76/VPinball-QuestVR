@@ -54,8 +54,6 @@ public:
    Vertex2D m_vCenter;
    float m_height;
    float m_rotX, m_rotY, m_rotZ;
-
-   TimerDataRoot m_tdr;
 };
 
 class Flasher :

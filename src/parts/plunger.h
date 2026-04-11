@@ -23,7 +23,6 @@ public:
    float m_mechStrength;
    PlungerType m_type;
    int m_animFrames;
-   TimerDataRoot m_tdr;
    float m_parkPosition;
    string m_szSurface;
    float m_scatterVelocity;

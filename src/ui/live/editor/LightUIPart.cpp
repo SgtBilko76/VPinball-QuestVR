@@ -238,7 +238,7 @@ void LightUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<Light>(m_light, [](Light* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_light);
 }
 
 }

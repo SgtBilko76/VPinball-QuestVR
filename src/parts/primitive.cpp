@@ -82,8 +82,8 @@ void Primitive::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_objectSpaceNormalMap, ObjectSpaceNormalMap);
 
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    
    SetDefaultPhysics(fromMouseClick);
 
@@ -152,8 +152,8 @@ void Primitive::WriteRegDefaults()
    LinkProp(m_d.m_scatter, Scatter);
 
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 

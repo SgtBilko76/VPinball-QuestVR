@@ -13,7 +13,6 @@ public:
    float m_length;
    float m_height;
    float m_rotation;
-   TimerDataRoot m_tdr;
    float m_damping;
    float m_gravityfactor;
    string m_szSurface;

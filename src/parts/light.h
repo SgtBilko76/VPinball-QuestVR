@@ -40,7 +40,6 @@ public:
    int m_blinkinterval;
    COLORREF m_color;
    COLORREF m_color2; // color full
-   TimerDataRoot m_tdr;
    Shape m_shape;
 
    float m_depthBias; // for determining depth sorting

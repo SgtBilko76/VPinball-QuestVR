@@ -32,7 +32,7 @@ void DispReelUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<DispReel>(m_dispreel, [](DispReel* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_dispreel);
 }
 
 }

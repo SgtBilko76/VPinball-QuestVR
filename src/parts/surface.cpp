@@ -113,8 +113,8 @@ HRESULT Surface::InitTarget(const float x, const float y, const bool fromMouseCl
 
    //SetDefaults();
    //Set seperate defaults for targets (SetDefaults sets the Wall defaults)
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    LinkProp(m_d.m_hitEvent, HitEvent);
    LinkProp(m_d.m_threshold, HitThreshold);
    LinkProp(m_d.m_slingshot_threshold, SlingshotThreshold);
@@ -161,8 +161,8 @@ void Surface::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_disableLightingTop, DisableLighting);
    LinkProp(m_d.m_disableLightingBelow, DisableLightingBelow);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    SetDefaultPhysics(fromMouseClick);
 }
 
@@ -197,8 +197,8 @@ void Surface::WriteRegDefaults()
    LinkProp(m_d.m_disableLightingTop, DisableLighting);
    LinkProp(m_d.m_disableLightingBelow, DisableLightingBelow);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -1124,8 +1124,8 @@ void Surface::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteBool(FID(FLIP), m_d.m_flipbook);
    writer.WriteBool(FID(ISBS), m_d.m_isBottomSolid);
    writer.WriteBool(FID(CLDW), m_d.m_collidable);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteFloat(FID(THRS), m_d.m_threshold);
    writer.WriteString(FID(IMAG), m_d.m_szImage);
    writer.WriteString(FID(SIMG), m_d.m_szSideImage);
@@ -1176,8 +1176,8 @@ void Surface::Load(IObjectReader& reader)
          case FID(FLIP): m_d.m_flipbook = reader.AsBool(); break;
          case FID(ISBS): m_d.m_isBottomSolid = reader.AsBool(); break;
          case FID(CLDW): m_d.m_collidable = reader.AsBool(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(THRS): m_d.m_threshold = reader.AsFloat(); break;
          case FID(IMAG): m_d.m_szImage = reader.AsString(); break;
          case FID(SIMG): m_d.m_szSideImage = reader.AsString(); break;

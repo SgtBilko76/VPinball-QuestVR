@@ -41,8 +41,8 @@ void Textbox::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_intensity_scale, IntensityScale);
    LinkProp(m_d.m_text, Text);
    LinkProp(m_d.m_talign, TextAlignment);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    LinkProp(m_d.m_font.name, FontName);
    LinkProp(m_d.m_font.weight, FontWeight);
    LinkProp(m_d.m_font.charset, FontCharSet);
@@ -70,8 +70,8 @@ void Textbox::WriteRegDefaults()
    LinkProp(m_d.m_intensity_scale, IntensityScale);
    LinkProp(m_d.m_text, Text);
    LinkProp(m_d.m_talign, TextAlignment);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 
    const float fontSize = (float)(m_d.m_font.size / 10000.0);
    const bool fItalic = (m_d.m_font.attributes & 0x02) != 0;
@@ -96,8 +96,8 @@ void Textbox::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteInt(FID(CLRF), m_d.m_fontcolor);
    writer.WriteFloat(FID(INSC), m_d.m_intensity_scale);
    writer.WriteString(FID(TEXT), m_d.m_text);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteWideString(FID(NAME), m_wzName);
    writer.WriteInt(FID(ALGN), m_d.m_talign);
    writer.WriteBool(FID(TRNS), m_d.m_transparent);
@@ -121,8 +121,8 @@ void Textbox::Load(IObjectReader& reader)
          case FID(CLRB): m_d.m_backcolor = reader.AsInt(); break;
          case FID(CLRF): m_d.m_fontcolor = reader.AsInt(); break;
          case FID(INSC): m_d.m_intensity_scale = reader.AsFloat(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(TEXT): m_d.m_text = reader.AsString(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          case FID(ALGN): m_d.m_talign = static_cast<TextAlignment>(reader.AsInt()); break;

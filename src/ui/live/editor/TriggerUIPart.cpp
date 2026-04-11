@@ -113,7 +113,7 @@ void TriggerUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<Trigger>(m_trigger, [](Trigger* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_trigger);
 }
 
 }

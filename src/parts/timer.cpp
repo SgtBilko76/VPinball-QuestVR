@@ -24,16 +24,16 @@ HRESULT Timer::Init(const float x, const float y, const bool fromMouseClick, con
 void Timer::SetDefaults(const bool fromMouseClick)
 {
 #define LinkProp(field, prop) field = fromMouseClick ? g_app->m_settings.GetDefaultPropsTimer_##prop() : Settings::GetDefaultPropsTimer_##prop##_Default()
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
 void Timer::WriteRegDefaults()
 {
 #define LinkProp(field, prop) g_app->m_settings.SetDefaultPropsTimer_##prop(field, false)
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -125,8 +125,8 @@ STDMETHODIMP Timer::InterfaceSupportsErrorInfo(REFIID riid)
 void Timer::Save(IObjectWriter& writer, const bool saveForUndo)
 {
    writer.WriteVector2(FID(VCEN), m_d.m_v);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteWideString(FID(NAME), m_wzName);
    writer.WriteBool(FID(BGLS), m_desktopBackdrop);
    SaveSharedEditableFields(writer);
@@ -143,8 +143,8 @@ void Timer::Load(IObjectReader& reader)
          {
          case FID(PIID): reader.AsInt(); break;
          case FID(VCEN): m_d.m_v = reader.AsVector2(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          case FID(BGLS): m_desktopBackdrop = reader.AsBool(); break;
          default: LoadSharedEditableField(tag, reader); break;

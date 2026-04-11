@@ -12,7 +12,6 @@ class TriggerData final : public BaseProperty
 public:
    Vertex2D m_vCenter;
    float m_radius;
-   TimerDataRoot m_tdr;
    string m_szSurface;
    TriggerShape m_shape;
    float m_rotation;

@@ -180,7 +180,7 @@ void RampUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<Ramp>(m_ramp, [](Ramp* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_ramp);
 }
 
 }

@@ -13,7 +13,6 @@ public:
    Vertex2D      m_vCenter; // Center position used to compute light animations
    std::wstring  m_wzCollection;
    int           m_updateinterval;
-   TimerDataRoot m_tdr;
 };
 
 struct LightSeqQueueData

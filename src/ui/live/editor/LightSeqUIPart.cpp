@@ -63,7 +63,7 @@ void LightSeqUIPart::UpdatePropertyPane(PropertyPane& props)
       props.EndSection();
    }
 
-   props.TimerSection<LightSeq>(m_lightSeq, [](LightSeq* obj) { return &(obj->m_d.m_tdr); });
+   props.TimerSection(m_lightSeq);
 }
 
 }

@@ -81,7 +81,6 @@ public:
 class BallData final : public BaseProperty
 {
 public:
-   TimerDataRoot m_tdr;
    // Vertex3Ds m_pos; implemented in HitBall to avoid duplication
    // float m_radius; implemented in HitBall to avoid duplication
    // float m_mass; implemented in HitBall to avoid duplication

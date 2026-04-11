@@ -66,8 +66,8 @@ void Rubber::SetDefaults(const bool fromMouseClick)
    LinkProp(m_d.m_rotY, RotY);
    LinkProp(m_d.m_rotZ, RotZ);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
    SetDefaultPhysics(fromMouseClick);
 }
 
@@ -101,8 +101,8 @@ void Rubber::WriteRegDefaults()
    LinkProp(m_d.m_rotY, RotY);
    LinkProp(m_d.m_rotZ, RotZ);
    LinkProp(m_d.m_reflectionEnabled, ReflectionEnabled);
-   LinkProp(m_d.m_tdr.m_TimerEnabled, TimerEnabled);
-   LinkProp(m_d.m_tdr.m_TimerInterval, TimerInterval);
+   LinkProp(m_timerEnabled, TimerEnabled);
+   LinkProp(m_timerInterval, TimerInterval);
 #undef LinkProp
 }
 
@@ -771,8 +771,8 @@ void Rubber::Save(IObjectWriter& writer, const bool saveForUndo)
    writer.WriteInt(FID(WDTP), m_d.m_thickness);
    writer.WriteBool(FID(HTEV), m_d.m_hitEvent);
    writer.WriteString(FID(MATR), m_d.m_szMaterial);
-   writer.WriteBool(FID(TMON), m_d.m_tdr.m_TimerEnabled);
-   writer.WriteInt(FID(TMIN), m_d.m_tdr.m_TimerInterval);
+   writer.WriteBool(FID(TMON), m_timerEnabled);
+   writer.WriteInt(FID(TMIN), m_timerInterval);
    writer.WriteWideString(FID(NAME), m_wzName);
    writer.WriteString(FID(IMAG), m_d.m_szImage);
    writer.WriteFloat(FID(ELAS), m_d.m_elasticity);
@@ -809,8 +809,8 @@ void Rubber::Load(IObjectReader& reader)
          case FID(WDTP): m_d.m_thickness = reader.AsInt(); break;
          case FID(HTEV): m_d.m_hitEvent = reader.AsBool(); break;
          case FID(MATR): m_d.m_szMaterial = reader.AsString(); break;
-         case FID(TMON): m_d.m_tdr.m_TimerEnabled = reader.AsBool(); break;
-         case FID(TMIN): m_d.m_tdr.m_TimerInterval = reader.AsInt(); break;
+         case FID(TMON): m_timerEnabled = reader.AsBool(); break;
+         case FID(TMIN): m_timerInterval = reader.AsInt(); break;
          case FID(IMAG): m_d.m_szImage = reader.AsString(); break;
          case FID(NAME): m_wzName = reader.AsWideString(); break;
          case FID(ELAS): m_d.m_elasticity = reader.AsFloat(); break;

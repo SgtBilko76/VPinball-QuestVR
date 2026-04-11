@@ -17,7 +17,7 @@ public:
    bool BeginSection(const string& name);
    void EndSection();
    template <class T> T* GetEditedPart(T* obj) const;
-   template <class T> void TimerSection(T* obj, const std::function<TimerDataRoot*(T*)>& getTimerData);
+   void TimerSection(IEditable* obj);
 
    enum class Unit
    {
@@ -108,37 +108,37 @@ template <class T> T* PropertyPane::GetEditedPart(T* obj) const
    return obj;
 }
 
-template <class T> void PropertyPane::TimerSection(T* obj, const std::function<TimerDataRoot*(T*)>& getTimerData)
+inline void PropertyPane::TimerSection(IEditable* obj)
 {
    if (BeginSection("Timer"s))
    {
-      Checkbox<T>(
+      Checkbox<IEditable>(
          obj, "Enable"s, //
-         [getTimerData](const T* pObj) { return getTimerData((T*)pObj)->m_TimerEnabled; }, //
-         [getTimerData](T* pObj, bool v) { getTimerData(pObj)->m_TimerEnabled = v; });
+         [](const IEditable* pObj) { return pObj->m_timerEnabled; }, //
+         [](IEditable* pObj, bool v) { pObj->m_timerEnabled = v; });
 
-      Combo<T>(
+      Combo<IEditable>(
          obj, "Timer mode"s, vector { "Fixed interval"s, "Per Frame"s, "Game Logic Sync"s }, //
-         [getTimerData](const T* pObj)
+         [](const IEditable* pObj)
          {
-            int interval = getTimerData((T*)pObj)->m_TimerInterval;
+            int interval = pObj->m_timerInterval;
             return interval == -2 ? 2 : interval == -1 ? 1 : 0;
          }, //
-         [getTimerData](T* pObj, int v)
+         [](IEditable* pObj, int v)
          {
             if (v == 2)
-               getTimerData(pObj)->m_TimerInterval = -2;
+               pObj->m_timerInterval = -2;
             else if (v == 1)
-               getTimerData(pObj)->m_TimerInterval = -1;
+               pObj->m_timerInterval = -1;
             else
-               getTimerData(pObj)->m_TimerInterval = 100;
+               pObj->m_timerInterval = 100;
          });
-      if (getTimerData(GetEditedPart<T>(obj))->m_TimerInterval >= 0)
+      if (GetEditedPart<IEditable>(obj)->m_timerInterval >= 0)
       {
-         InputInt<T>(
+         InputInt<IEditable>(
             obj, "Interval (ms)"s, //
-            [getTimerData](const T* pObj) { return getTimerData((T*)pObj)->m_TimerInterval; }, //
-            [getTimerData](T* pObj, int v) { getTimerData(pObj)->m_TimerInterval = v; });
+            [](const IEditable* pObj) { return pObj->m_timerInterval; }, //
+            [](IEditable* pObj, int v) { pObj->m_timerInterval = v; });
       }
       EndSection();
    }

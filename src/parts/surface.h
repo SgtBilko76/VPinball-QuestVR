@@ -10,7 +10,6 @@
 class SurfaceData final : public BaseProperty
 {
 public:
-   TimerDataRoot m_tdr;
    float m_slingshot_threshold;	// speed at which ball needs to trigger slingshot 
    string m_szSideImage;
    string m_szTopMaterial;
