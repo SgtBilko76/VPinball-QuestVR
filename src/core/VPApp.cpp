@@ -297,25 +297,26 @@ int VPApp::GetLogicalNumberOfProcessors() const
 
 void VPApp::InitInstance()
 {
+   std::filesystem::path iniFileName = m_commandLineCustomSettingsFileName;
    // Define settings location and load them
-   if (m_iniFileName.empty())
+   if (iniFileName.empty()) // nothing passed via command line
    {
       std::filesystem::path defaultPath = m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Preferences) / "VPinballX.ini"sv;
       std::filesystem::path appPath = m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Root) / "VPinballX.ini"sv;
       if (FileExists(defaultPath))
-         m_iniFileName = defaultPath;
+         iniFileName = defaultPath;
       else if (FileExists(appPath))
-         m_iniFileName = appPath;
+         iniFileName = appPath;
       else
-         m_iniFileName = defaultPath;
+         iniFileName = defaultPath;
    }
-   m_settings.SetIniPath(m_iniFileName);
+   m_settings.SetIniPath(iniFileName);
    m_settings.Load(true);
 
    // The file layout must be defined before loading the settings file, so we apply the following rules:
-   // - if we have a settings location commandline override, we loads it and use the setting in it (to locate other files than the ini)
-   // - if not but we have a settings file in the default preference location, we use it and update the setting accordingly ('Table' layout mode)
-   // - if not but we have a settings file along the app executable, we use it and update the setting accordingly ('App' layout mode)
+   // - if we have a settings location commandline override, we load it and use the setting in it (to locate other files than the ini)
+   // - if not, but we have a settings file in the default preference location, we use it and update the setting accordingly ('Table' layout mode)
+   // - if not, but we have a settings file along the app executable, we use it and update the setting accordingly ('App' layout mode)
    // - if we don't have anything, then we use the default ('Table' layout mode)
 
    Logger::Init();
@@ -343,11 +344,11 @@ void VPApp::InitInstance()
 
    Logger::SetupLogger(m_settings.GetEditor_EnableLog());
    PLOGI << "Starting VPX - " << VP_VERSION_STRING_FULL_LITERAL;
-   PLOGI << "Settings file was loaded from " << m_iniFileName;
+   PLOGI << "Settings file was loaded from " << m_settings.GetIniPath();
    PLOGI << "Number of logical CPU cores: " << GetLogicalNumberOfProcessors();
    PLOGI << "Application path: " << m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Root);
    PLOGI << "Preference path: " << m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Preferences);
-   
+
    Settings::SetRecentDir_ImportDir_Default((m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Tables) / ""sv).string());
    Settings::SetRecentDir_LoadDir_Default((m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Tables) / ""sv).string());
    Settings::SetRecentDir_FontDir_Default((m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Tables) / ""sv).string());

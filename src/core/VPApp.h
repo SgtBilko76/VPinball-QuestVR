@@ -12,8 +12,7 @@ public:
    VPApp();
    ~VPApp();
 
-   void SetSettingsFileName(const std::filesystem::path& path) { m_iniFileName = path; } // Must be defined before InitInstance() is called, otherwise it will be ignored
-   const std::filesystem::path& GetSettingsFileName() const { return m_iniFileName; }
+   void SetCommandLineCustomSettingsFileName(const std::filesystem::path& path) { m_commandLineCustomSettingsFileName = path; } // Must be defined before InitInstance() is called, otherwise it will be ignored
    void InitInstance();
 
    // overall app settings
@@ -51,6 +50,6 @@ public:
 #endif
 
 private:
-   std::filesystem::path m_iniFileName; // Override default ini filename, must be defined before InitInstance
+   std::filesystem::path m_commandLineCustomSettingsFileName; // Override default ini filename, must be defined before InitInstance
    int m_logicalNumberOfProcessors = -1;
 };

@@ -419,7 +419,7 @@ void CommandLineProcessor::ProcessCommandLine()
 
 void CommandLineProcessor::ProcessCommandLine(int nArgs, const char* szArglist[])
 {
-   g_app->SetSettingsFileName(""s);
+   g_app->SetCommandLineCustomSettingsFileName(""s);
 
    std::filesystem::path tableIniFileName;
    bool win32EditorMinimized = false;
@@ -465,7 +465,7 @@ void CommandLineProcessor::ProcessCommandLine(int nArgs, const char* szArglist[]
             OnCommandLineError("Command Line Error"s, "Option '"s + szArglist[i] + "' must be followed by a valid setting file path");
             exit(1);
          }
-         g_app->SetSettingsFileName(GetPathFromArg(szArglist[i + 1]));
+         g_app->SetCommandLineCustomSettingsFileName(GetPathFromArg(szArglist[i + 1]));
          i++;
          break;
 
