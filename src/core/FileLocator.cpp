@@ -387,6 +387,8 @@ std::filesystem::path FileLocator::SearchScript(const PinTable* table, const std
       return path;
    if (auto path = find_case_insensitive_file_path(m_appPath / "scripts"sv / script); !path.empty())
       return path;
+   if (auto path = find_case_insensitive_file_path(m_appPath / "tables"sv / script); !path.empty())
+      return path;
 
    // Search in the preference paths
    if (auto path = find_case_insensitive_file_path(m_prefPath / script); !path.empty())
