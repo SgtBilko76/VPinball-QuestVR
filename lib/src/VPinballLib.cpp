@@ -184,7 +184,7 @@ void VPinballLib::Init(VPinballEventCallback callback)
       auto* lib = static_cast<VPinballLib*>(userdata);
 
       g_app = new ::VPApp();
-      g_app->SetSettingsFileName((g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Preferences) / "VPinballX.ini").string());
+      g_app->SetCommandLineCustomSettingsFileName((g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Preferences) / "VPinballX.ini"sv));
       g_app->InitInstance();
 
       lib->UpdateWebServer();
