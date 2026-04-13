@@ -1784,7 +1784,7 @@ void RenderDevice::AddWindow(VPX::Window* wnd)
 
 void RenderDevice::RemoveWindow(VPX::Window* wnd)
 {
-   m_outputWnd.erase(std::remove(m_outputWnd.begin(), m_outputWnd.end(), wnd), m_outputWnd.end());
+   std::erase(m_outputWnd, wnd);
 }
 
 bool RenderDevice::DepthBufferReadBackAvailable() const

@@ -25,11 +25,11 @@
 
 namespace ProgMesh {
 
-template<class T> int   Contains(const vector<T> & c, const T & t) { return (int)std::count(begin(c), end(c), t); }
-template<class T> int   IndexOf(const vector<T> & c, const T & v)  { return (int)(std::find(begin(c), end(c), v) - begin(c)); }
+template<class T> int   Contains(const vector<T> & c, const T & t) { return (int)std::ranges::count(c, t); }
+template<class T> int   IndexOf(const vector<T> & c, const T & v)  { return (int)(std::ranges::find(c, v) - c.begin()); }
 //template<class T> T &   Add(vector<T> & c, T t)                    { c.push_back(t); return c.back(); }
 template<class T> T     Pop(vector<T> & c)                         { const T val = std::move(c.back()); c.pop_back(); return val; }
-template<class T> void  AddUnique(vector<T> & c, T t)              { if (!Contains(c, t)) c.push_back(t); }
+template<class T> void  AddUnique(vector<T> & c, T t)              { if (std::ranges::find(c, t) == c.end()) c.push_back(t); }
 //template<class T> void  Remove(vector<T> & c, T t)                 { const vector<T>::const_iterator it = std::find(begin(c), end(c), t); assert(it != end(c)); c.erase(it); assert(!Contains(c, t)); }
 template<class T> void  RemoveFillWithBack(vector<T> & c, T t)     { const int idxof = IndexOf(c, t); const T val = Pop(c); if (idxof == (int)c.size()) return; c[idxof] = val; assert(!Contains(c, t)); }
 
@@ -178,7 +178,7 @@ __forceinline Vertex::~Vertex()
 inline void Vertex::RemoveIfNonNeighbor(Vertex * const n) 
 {
 	// removes n from neighbor Array if n isn't a neighbor.
-	if (!Contains(neighbor, n))
+	if (std::ranges::find(neighbor, n) == neighbor.end())
 		return;
 	for (size_t i = 0; i < face.size(); i++)
 		if (face[i]->HasVertex(n))

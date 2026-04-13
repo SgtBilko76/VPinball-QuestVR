@@ -198,9 +198,7 @@ void ScriptInterpreter::AddItem(const wstring& name, IDispatch *dispatch, const 
 void ScriptInterpreter::RemoveItem(IScriptable *const piscript)
 {
    piscript->GetIDispatch()->Release();
-   auto it = m_vcvd.find(piscript->get_Name());
-   if (it != m_vcvd.end())
-      m_vcvd.erase(it);
+   m_vcvd.erase(piscript->get_Name());
 }
 
 void ScriptInterpreter::Evaluate(const string &script, bool isDebugStatement)

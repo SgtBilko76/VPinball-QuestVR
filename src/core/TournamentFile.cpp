@@ -304,17 +304,17 @@ void GenerateImageFromTournamentFile(PinTable* table, const std::filesystem::pat
    }
    if (tablefileChecksum != tablefileChecksum_in)
    {
-      ShowError("Cannot decode Tournament file\nas the table version differs"s);
+      ShowError("Cannot decode Tournament file\nas the table version differs");
       return;
    }
    if (vpxChecksum != vpxChecksum_in)
    {
-      ShowError("Cannot decode Tournament file\nas VP was modified"s);
+      ShowError("Cannot decode Tournament file\nas VP was modified");
       return;
    }
    if (scriptsChecksum != scriptsChecksum_in)
    {
-      ShowError("Cannot decode Tournament file\nas scripts version differs"s);
+      ShowError("Cannot decode Tournament file\nas scripts version differs");
       return;
    }
    GenerateTournamentFileInternal2(dmd_data.data(), dmd_size, res);

@@ -44,7 +44,7 @@ void DecalUIPart::Render(const EditorRenderContext& ctx)
 void DecalUIPart::UpdatePropertyPane(PropertyPane& props)
 {
    props.EditableHeader("Decal"s, m_decal);
-   
+
    if (props.BeginSection("Visuals"s))
    {
       props.MaterialCombo<Decal>(

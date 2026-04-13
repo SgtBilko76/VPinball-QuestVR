@@ -189,19 +189,16 @@ constexpr __forceinline T smoothstep(const T edge0, const T edge1, T x)
 template <typename T>
 inline void RemoveFromVectorSingle(vector<T>& v, const T& val)
 {
-   typename vector<T>::const_iterator it = std::find(v.begin(), v.end(), val);
-   if (it != v.end())
+   if (auto it = std::ranges::find(v, val); it != v.end())
       v.erase(it);
 }
 
 template <typename T>
 inline int FindIndexOf(const vector<T>& v, const T& val)
 {
-   typename vector<T>::const_iterator it = std::find(v.begin(), v.end(), val);
-   if (it != v.end())
-      return (int)(it - v.begin());
-   else
-      return -1;
+   if (auto it = std::ranges::find(v, val); it != v.end())
+      return static_cast<int>(it - v.begin());
+   return -1;
 }
 
 #ifndef __STANDALONE__
@@ -222,7 +219,7 @@ inline void ShowError(const string& sz) { ShowError(sz.c_str()); }
 inline void ref_count_trigger(const ULONG r, const char *file, const int line) // helper for debugging
 {
 #ifdef DEBUG_REFCOUNT_TRIGGER
-   ShowError(("Ref Count: "+std::to_string(r)+" at "+file+':'+std::to_string(line)).c_str());
+   ShowError("Ref Count: "+std::to_string(r)+" at "+file+':'+std::to_string(line));
 #endif
 }
 
