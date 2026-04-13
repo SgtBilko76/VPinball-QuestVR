@@ -1656,6 +1656,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                   {
                      PLOGE << "Failed to load one of the table parts";
                      parts.erase(parts.begin() + i);
+                     --i;
                   }
                   else
                   {
@@ -1775,6 +1776,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                   {
                      PLOGE << "Failed to load one of the table sounds";
                      m_vsound.erase(m_vsound.begin() + i);
+                     --i;
                   }
                   else if (i < m_vsound.size() - 1)
                   {
@@ -1795,6 +1797,7 @@ HRESULT PinTable::LoadGameFromFilename(const std::filesystem::path &filename, VP
                   {
                      PLOGE << "Failed to load one of the table images";
                      m_vimage.erase(m_vimage.begin() + i);
+                     --i;
                   }
                   else if (i < m_vimage.size() - 1)
                   {
