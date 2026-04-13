@@ -993,7 +993,7 @@ Player::~Player()
    {
       if (auto ph = editable->GetIRenderable(); ph)
          ph->RenderRelease();
-      editable->TimerRelease();
+      editable->TimerRelease(/*m_vht*/); // as everything is killed, not necessary to remove from timer list
    }
    assert(m_vballDelete.empty());
    m_vball.clear();
@@ -2175,6 +2175,7 @@ void Player::FinishFrame()
    // Remove ball from table (but they may outlive as they may be in use for rendering) for balls that may have been destroyed from scripts
    for (Ball *const pBall : m_vballDelete)
    {
+      pBall->TimerRelease(m_vht);
       if (m_scriptInterpreter)
          m_scriptInterpreter->RemoveItem(pBall);
       m_ptable->RemovePart(pBall);

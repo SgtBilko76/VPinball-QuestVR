@@ -324,6 +324,12 @@ public:
       if (m_timerEnabled)
          pvht.push_back(m_phittimer.get());
    }
+   void TimerRelease(vector<HitTimer *> &pvht)
+   {
+      if (m_timerEnabled)
+         RemoveFromVectorSingle(pvht, m_phittimer.get());
+      m_phittimer = nullptr;
+   }
    void TimerRelease() { m_phittimer = nullptr; }
 
    // was: TimerDataRoot m_tdr: then it was limited to be used by a limited amount of table elements (most prominently not by decals and primitives though), could be changed/generalized nowadays

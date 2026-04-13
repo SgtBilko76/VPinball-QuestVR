@@ -839,7 +839,7 @@ void EditorUI::DeleteSelection()
          {
             if (edit->GetIRenderable())
                edit->GetIRenderable()->RenderRelease();
-            edit->TimerRelease();
+            edit->TimerRelease(/*m_player->m_vht*/); // FIXME should release from timer list?!
             edit->Release();
          });
    }
