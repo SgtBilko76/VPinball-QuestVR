@@ -386,11 +386,13 @@ Renderer::SceneLighting::SceneLighting(PinTable* const table)
 
 void Renderer::SceneLighting::Update()
 {
+#ifndef ENABLE_BGFX
    if (g_app->m_bgles) // Overriden from command line
    {
       m_emissionScale = g_app->m_fgles;
       return;
    }
+#endif
    switch (m_mode)
    {
    case Mode::Table:

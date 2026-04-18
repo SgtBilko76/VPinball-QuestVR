@@ -312,10 +312,12 @@ enum option_names
    OPTION_CUSTOM8,
    OPTION_CUSTOM9,
    OPTION_PREFPATH,
+   OPTION_LESSCPUTHREADS,
+#ifndef ENABLE_BGFX
    OPTION_DISABLETRUEFULLSCREEN,
    OPTION_ENABLETRUEFULLSCREEN,
    OPTION_GLES,
-   OPTION_LESSCPUTHREADS,
+#endif
    OPTION_INVALID,
 };
 struct CommandLineOption
@@ -361,9 +363,11 @@ static const CommandLineOption options[] = {
    { OPTION_CUSTOM9, "c9"s, "Custom value 9"s },
    { OPTION_PREFPATH, "PrefPath"s, "[path]  Use a custom preferences path instead of default"s },
    { OPTION_LESSCPUTHREADS, "LessCPUthreads"s, "Limit the amount of parallel execution"s },
+#ifndef ENABLE_BGFX
    { OPTION_DISABLETRUEFULLSCREEN, "DisableTrueFullscreen"s, "Force-disable True Fullscreen setting [Deprecated, uses ini serttings instead]"s },
    { OPTION_ENABLETRUEFULLSCREEN, "EnableTrueFullscreen"s, "Force-enable True Fullscreen setting [Deprecated, uses ini serttings instead]"s },
    { OPTION_GLES, "GLES"s, "[value]  Overrides the global emission scale (day/night setting, value range: 0.115..0.925) [Deprecated, uses ini serttings instead]"s },
+#endif
 };
 
 std::filesystem::path CommandLineProcessor::GetPathFromArg(const string& arg)
@@ -473,6 +477,7 @@ void CommandLineProcessor::ProcessCommandLine(int nArgs, const char* szArglist[]
          g_app->LimitMultiThreading();
          break;
 
+#ifndef ENABLE_BGFX
       // FIXME remove as this is now handled by the ini system
       case OPTION_DISABLETRUEFULLSCREEN:
          g_app->m_disEnableTrueFullscreen = 0;
@@ -500,6 +505,7 @@ void CommandLineProcessor::ProcessCommandLine(int nArgs, const char* szArglist[]
             OnCommandLineError("Command Line Error"s, "Missing global emission scale adjustment"s);
          }
          break;
+#endif
 
       case OPTION_CUSTOM1:
       case OPTION_CUSTOM2:

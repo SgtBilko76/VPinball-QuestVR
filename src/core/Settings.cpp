@@ -149,16 +149,23 @@ void Settings::UpdateDefaults()
             break;
 
          const auto& conf = VPX::Window::GetDisplayConfig(GetWindow_Display(i));
+         #ifndef ENABLE_BGFX
          reg.Register(GetWindow_FSWidth_Property(i)->WithDefault(conf.width));
          reg.Register(GetWindow_FSHeight_Property(i)->WithDefault(conf.height));
+         #endif
          reg.Register(GetWindow_Width_Property(i)->WithDefault(i == 0 ? conf.width : (conf.width / 4)));
          reg.Register(GetWindow_Height_Property(i)->WithDefault(i == 0 ? conf.height : min(conf.width * 4 / 9, conf.height)));
          break;
       }
       case VPX::RenderOutput::OutputMode::OM_EMBEDDED:
       {
+         #ifdef ENABLE_BGFX
+         const auto w = GetWindow_Width(VPXWindowId::VPXWINDOW_Playfield);
+         const auto h = GetWindow_Height(VPXWindowId::VPXWINDOW_Playfield);
+         #else
          const auto w = GetWindow_FullScreen(VPXWindowId::VPXWINDOW_Playfield) ? GetWindow_FSWidth(VPXWindowId::VPXWINDOW_Playfield) : GetWindow_Width(VPXWindowId::VPXWINDOW_Playfield);
          const auto h = GetWindow_FullScreen(VPXWindowId::VPXWINDOW_Playfield) ? GetWindow_FSHeight(VPXWindowId::VPXWINDOW_Playfield) : GetWindow_Height(VPXWindowId::VPXWINDOW_Playfield);
+         #endif
          reg.Register(GetWindow_Width_Property(i)->WithDefault(w / 4));
          reg.Register(GetWindow_Height_Property(i)->WithDefault(min(w * 4 / 9, h)));
          break;

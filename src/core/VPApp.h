@@ -26,10 +26,12 @@ public:
    // Global custom parameters that can be set through command line and accessed in the script via GetCustomParam(X)
    wstring m_customParameters[MAX_CUSTOM_PARAM_INDEX];
 
+#ifndef ENABLE_BGFX
    // FIXME Deprecated command line options (supposed to be handled through INI nowadays)
    int m_disEnableTrueFullscreen = -1;
    bool m_bgles = false; // override global emission scale by m_fgles below
    float m_fgles = 0.f;
+#endif
 
    // Script security level
    int m_securitylevel;

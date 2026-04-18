@@ -619,10 +619,10 @@ void RenderDevice::RenderThread(RenderDevice* rd, bgfx::Init init)
                // we start a flush sequence:
                // - process a few frames without VSync to flush the queue (as they will be discarded or presented directly)
                // - then process a few frame with VSync enabled, to measure the new number of frames in flights
-               // This is not really correct as gpuFrameNum is the last porocessed frame, not the last presented frame. Therefore
+               // This is not really correct as gpuFrameNum is the last processed frame, not the last presented frame. Therefore
                // if all frames are quickly processed, gpuFrameNum will be the same as m_lastPresentFrameIdx, but the present queue
                // will be filled up anyway, leading to high latency. The user needs to limit the maximum number of prerendered frame to
-               // avoid this situation. Still, the tests seem to dhow that the estimate is good enough.
+               // avoid this situation. Still, the tests seem to show that the estimate is good enough.
                const uint32_t framesInFlight = rd->m_lastPresentFrameIdx - bgfx::getStats()->gpuFrameNum;
                if (framesInFlight > 3)
                   framePacingFlushing = 8;

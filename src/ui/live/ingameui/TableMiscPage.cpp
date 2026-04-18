@@ -64,7 +64,9 @@ void TableMiscPage::BuildPage()
       }));
 
    // Global emission scale, if not overriden on commandline
+   #ifndef ENABLE_BGFX
    if (!g_app->m_bgles)
+   #endif
    {
       AddItem(std::make_unique<InGameUIItem>(
          VPX::Properties::EnumPropertyDef(

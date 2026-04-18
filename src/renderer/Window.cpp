@@ -70,6 +70,9 @@ Window::Window(const string& title, const Settings& settings, VPXWindowId window
    : m_windowId(windowId)
    , m_isVR(false)
 {
+#ifdef ENABLE_BGFX
+   m_fullscreen = false;
+#else
    m_fullscreen = g_isMobile || settings.GetWindow_FullScreen(m_windowId);
    if (!g_isMobile && m_windowId == VPXWindowId::VPXWINDOW_Playfield)
    {
@@ -79,6 +82,7 @@ Window::Window(const string& title, const Settings& settings, VPXWindowId window
       else if (g_app->m_disEnableTrueFullscreen == 1)
          m_fullscreen = true;
    }
+#endif
 
    // Both fullscreen and windowed modes are anchored to a user selected display
    const DisplayConfig selectedDisplay = GetDisplayConfig(settings.GetWindow_Display((int)m_windowId));
@@ -96,6 +100,7 @@ Window::Window(const string& title, const Settings& settings, VPXWindowId window
    const SDL_DisplayMode* fullscreenDisplayMode = nullptr;
 
    constexpr bool isExtCreatedWindow = g_isMobile && g_isIOS;
+   #ifndef ENABLE_BGFX
    if (m_fullscreen && !isExtCreatedWindow)
    {
       if (g_isAndroid) {
@@ -141,6 +146,7 @@ Window::Window(const string& title, const Settings& settings, VPXWindowId window
                << settings.GetWindow_FSRefreshRate(m_windowId) << "Hz, Bit depth: " << settings.GetWindow_FSColorDepth(m_windowId) << " is not available. Switching to windowed mode.";
       }
    }
+   #endif
 
    // Fullscreen failed or was not requested, setup windowed mode
    if (!m_fullscreen || fullscreenDisplayMode == nullptr)
