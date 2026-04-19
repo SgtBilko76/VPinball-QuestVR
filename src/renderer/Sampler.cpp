@@ -668,7 +668,7 @@ IDirect3DTexture9* Sampler::CreateSystemTexture(std::shared_ptr<const BaseTextur
    {
       uint16_t* const __restrict pdest = (uint16_t*)locked.pBits;
       const uint16_t* const __restrict psrc = (const uint16_t*)(surf->datac());
-      const uint16_t one16 = float2half_noLUT(1.f);
+      constexpr uint16_t one16 = float2half_noLUT(1.f);
       for (size_t i = 0; i < (size_t)texwidth * texheight; ++i)
       {
          pdest[i * 4 + 0] = psrc[i * 3 + 0];

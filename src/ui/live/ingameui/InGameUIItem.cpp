@@ -61,7 +61,7 @@ InGameUIItem::InGameUIItem(const FloatPropertyDef& prop, float displayScale, con
    , m_tooltip(prop.m_description)
    , m_property(std::make_unique<FloatPropertyDef>(prop))
    , m_floatValueDisplayScale(displayScale)
-   , m_format(std::move(format))
+   , m_format(format)
    , m_getFloatValue(getValue)
    , m_getStoredFloatValue(getStoredValue)
    , m_onChangeFloat(onChange)

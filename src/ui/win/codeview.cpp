@@ -1353,14 +1353,14 @@ void CodeViewer::FindCodeFromEvent()
 
       const size_t lineLength = ::SendMessage(m_hwndScintilla, SCI_LINELENGTH, line, 0);
       string szLine(lineLength, '\0'); // SCI_GETLINE does not null-terminate the string
-      SOURCE_TEXT_ATTR *const wzFormat = new SOURCE_TEXT_ATTR[lineLength];
+      //SOURCE_TEXT_ATTR *const wzFormat = new SOURCE_TEXT_ATTR[lineLength]; // SEE FIXME BELOW
 
       const size_t cchar = ::SendMessage(m_hwndScintilla, SCI_GETLINE, line, (LPARAM)szLine.data());
       const wstring wzText = MakeWString(szLine);
       assert(cchar == lineLength);
       assert(cchar == szLine.length());
       assert(cchar == wzText.length()); // otherwise may need to pass wzText.length() to next function????
-      
+
       // FIXME FIXME FIXME m_pScriptDebug->GetScriptTextAttributes(wzText.c_str(), (ULONG)cchar, nullptr, 0, wzFormat);
 
       const size_t inamechar = posFind - beginchar - 1;
@@ -1368,14 +1368,14 @@ void CodeViewer::FindCodeFromEvent()
       int i;
       for (i = (int)inamechar; i >= 0; i--)
       {
-         if (wzFormat[i] == SOURCETEXT_ATTR_KEYWORD)
-            break;
+         //if (wzFormat[i] == SOURCETEXT_ATTR_KEYWORD) // SEE FIXME ABOVE
+         //   break;
 
          if (!IsWhitespace(szLine[i]) /*&& (wzFormat[i] != 0 || wzFormat[i] != SOURCETEXT_ATTR_COMMENT)*/) //!!?
             goodMatch = false;
       }
 
-      delete[] wzFormat;
+      //delete[] wzFormat; // SEE FIXME ABOVE
 
       if (i < 2) // Can't fit the word 'sub' in here
       {
