@@ -1186,7 +1186,7 @@ void Player::ApplyPlayingState(const bool play)
    #endif
    if (play)
    {
-      m_LastKnownGoodCounter++; // Reset hang script detection
+      m_lastKnownGoodCounter++; // Reset hang script detection
       m_noTimeCorrect = true;   // Disable physics engine time correction on next physic update
       UnpauseMusic();
       PLOGI << "Unpausing Game";
@@ -2089,11 +2089,11 @@ void Player::PrepareFrame()
    m_logicProfiler.EnterProfileSection(FrameProfiler::PROFILE_PREPARE_FRAME);
 
    m_overall_frames++; // This causes the next VPinMAME <-> VPX sync to update light status which can be heavy since it needs to perform PWM integration of all lights
-   m_LastKnownGoodCounter++;
+   m_lastKnownGoodCounter++;
    m_startFrameTick = usec();
-   
+
    m_pluginAPI.BroadcastVPXMsg(m_onPrepareFrameMsgId, nullptr);
-   
+
    // Update visually animated parts (e.g. primitives, reels, gates, lights, bumper-skirts, hittargets, etc)
    if (IsPlaying())
    {

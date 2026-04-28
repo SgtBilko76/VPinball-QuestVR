@@ -37,7 +37,7 @@ InGameUI::InGameUI(LiveUI &liveUI)
    AddPage("settings/cabinet"s, []() { return std::make_unique<CabinetSettingsPage>(); });
    AddPage("settings/display_profiles"s, []() { return std::make_unique<DisplayProfileSettingsPage>(); });
    AddPage("settings/displays"s, []() { return std::make_unique<DisplayHomePage>(); });
-   AddPage("settings/graphic"s, []() { return std::make_unique<GraphicSettingsPage>(); });
+   AddPage("settings/graphics"s, []() { return std::make_unique<GraphicSettingsPage>(); });
    AddPage("settings/input"s, []() { return std::make_unique<InputSettingsPage>(); });
    AddPage("settings/misc"s, []() { return std::make_unique<MiscSettingsPage>(); });
    AddPage("settings/nudge"s, []() { return std::make_unique<NudgeSettingsPage>(); });

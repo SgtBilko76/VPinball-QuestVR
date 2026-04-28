@@ -262,19 +262,19 @@ public:
 
     static bool GetCheckboxState(const HWND checkBoxHwnd)
     {
-        const size_t selected = ::SendMessage(checkBoxHwnd, BM_GETCHECK, 0, 0);
-        return selected != 0;
+       const size_t selected = ::SendMessage(checkBoxHwnd, BM_GETCHECK, 0, 0);
+       return selected != 0;
     }
 
     static void SetCheckboxState(const HWND checkBoxHwnd, const bool checked)
     {
-        ::SendMessage(checkBoxHwnd, BM_SETCHECK, checked ? BST_CHECKED : BST_UNCHECKED, 0);
+       ::SendMessage(checkBoxHwnd, BM_SETCHECK, checked ? BST_CHECKED : BST_UNCHECKED, 0);
     }
     
     static float GetFloatTextbox(const CEdit &textbox)
     {
-        const float fv = sz2f(textbox.GetWindowText().GetString());
-        return fv;
+       const float fv = sz2f(textbox.GetWindowText().GetString());
+       return fv;
     }
 
     static float GetFloatTextboxInchesToVPU(const CEdit &textbox)
@@ -285,38 +285,37 @@ public:
 
     static int GetIntTextbox(const CEdit &textbox)
     {
-        int value;
-        CString text = textbox.GetWindowText();
-        const string& t = text.GetString();
-        return (std::from_chars(t.c_str(), t.c_str() + t.length(), value).ec == std::errc{}) ? value : 0;
+       int value;
+       const string t = textbox.GetWindowText().GetString();
+       return (std::from_chars(t.c_str(), t.c_str() + t.length(), value).ec == std::errc{}) ? value : 0;
     }
 
     static void SetFloatTextbox(const CEdit &textbox, const float value)
     {
-        textbox.SetWindowText(f2sz(value).c_str());
+       textbox.SetWindowText(f2sz(value).c_str());
     }
 
     static void SetIntTextbox(const CEdit &textbox, const int value)
     {
-        textbox.SetWindowText(std::to_string(value).c_str());
+       textbox.SetWindowText(std::to_string(value).c_str());
     }
 
     static string GetComboBoxText(const CComboBox &combo)
     {
-        vector<char> buf(combo.GetLBTextLen(combo.GetCurSel()) + 1);
-        combo.GetLBText(combo.GetCurSel(), buf.data());
-        return buf.data();
+       vector<char> buf(combo.GetLBTextLen(combo.GetCurSel()) + 1);
+       combo.GetLBText(combo.GetCurSel(), buf.data());
+       return buf.data();
     }
 
     static int GetComboBoxIndex(const CComboBox &combo, const vector<string>& contentList)
     {
-        char buf[MAXSTRING];
-        combo.GetLBText(combo.GetCurSel(), buf);
-        const string s(buf);
-        for (size_t i = 0; i < contentList.size(); i++)
-            if (contentList[i] == s)
-                return (int)i;
-        return -1;
+       char buf[MAXSTRING];
+       combo.GetLBText(combo.GetCurSel(), buf);
+       const string s(buf);
+       for (size_t i = 0; i < contentList.size(); i++)
+          if (contentList[i] == s)
+             return (int)i;
+       return -1;
     }
 
     BOOL IsSubDialogMessage(MSG &msg) const;

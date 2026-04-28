@@ -8,7 +8,7 @@ namespace VPX::InGameUI
 {
 
 GraphicSettingsPage::GraphicSettingsPage()
-   : InGameUIPage("Graphic Settings"s, ""s, SaveMode::Both)
+   : InGameUIPage("Graphics Settings"s, ""s, SaveMode::Both)
 {
    BuildPage();
 }

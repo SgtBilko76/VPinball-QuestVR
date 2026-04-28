@@ -34,7 +34,7 @@ using namespace std::string_view_literals;
 using std::vector;
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+#define M_PI 3.1415926535897932384626433832795
 #endif
 
 namespace B2SLegacy

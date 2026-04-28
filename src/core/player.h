@@ -320,8 +320,8 @@ public:
 
    // Used to detect script hangs (modal is used by script to tell VPX that it is in a modal state, so disabling watch dog)
    bool m_detectScriptHang;
-   int m_LastKnownGoodCounter = 0;
-   int m_ModalRefCount = 0;
+   int m_lastKnownGoodCounter = 0;
+   int m_modalRefCount = 0;
 
    Primitive *m_implicitPlayfieldMesh = nullptr;
    Flasher *m_implicitVRBackglass = nullptr;

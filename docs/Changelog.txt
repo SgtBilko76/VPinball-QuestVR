@@ -149,7 +149,12 @@ FEATURES:
   . UpscaleDMD: upscale or anti-alias DMD content (modes: xBRZ 2x/3x/4x/5x/6x, ScaleFX AA 1x, ScaleFX 3x and Super-XBR 2x)
   . WMP: the window media player, but as a portable plugin, running on any of the supported platforms
 
-- LiveEditor (used to be called LiveUI, now split between LiveEditor for editing and InGameUI for all settings):
+- note that the old LiveUI/TweakUI is now split between a LiveEditor for editing, and the InGameUI to change all settings:
+
+ - ESC (by default) now exits the table/player directly
+ - 'F11' (note that on macOS its 'F1') will not cycle through the various buffers anymore, but only display framerate, and performance profiling information
+
+ - LiveEditor (via 'F7' in the editor):
   . Fix picking, now supporting precise picking of most elements
   . Change mouse & keyboard interaction to mostly match Blender UX (no more view cube, use mouse drag to orient view, keypad to focus or use predefined views)
   . Support adjusting table at runtime for most elements (update physics, support picking after moving, handle resuming gameplay)
@@ -158,7 +163,7 @@ FEATURES:
   . Fix invalid overlays (missing parts, incorrect position)
   . 3 render modes are available, switchable using the 'Z' key: render, wireframe, passthrough wireframe
 
-- InGameUI (used to be called LiveUI or TweakUI):
+ - InGameUI (via default 'F12' ingame):
   . Supports all player modes (VR, XR, cabinet, desktop) and all screen orientations
   . Add mouse interaction support
   . Add setting pages, moving lots of settings inside these pages
@@ -268,8 +273,6 @@ FEATURES:
      2. Start BAM-Tracker.exe, select head tracking method, leave it running.
      3. Run VPinballX (the OpenGL version)
      https://www.youtube.com/watch?v=g-EpTp_3wKo
-
-- completely revamped F11 (note that on macOS its F1)/ESC menu, including much more detailed live editing options of table elements
 
 - the playfield is now processed like all the other parts, i.e. its not forced as static/preprocessed anymore, and thus underlying table elements will work as expected now (so no more under playfield clipping, and alpha blending is not limited to simple alpha clipping/cutouts anymore):
   - if the 'playfield_mesh' primitive has 'Static rendering' disabled, it will be rendered with transparent parts (this results in the 'playfield_mesh' to be blended like plain primitives, so no more need for alpha test or insert overlays)

@@ -4,13 +4,13 @@
 
 HANDLE g_hWorkerStarted;
 
-static size_t hangsnooptimerid;
-static int lasthangsnoopvalue;
+static size_t hangSnoopTimerID;
+static int lastHangSnoopValue;
 
 VOID CALLBACK HangSnoopProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-   const int newvalue = g_pplayer->m_LastKnownGoodCounter;
-   if (newvalue == lasthangsnoopvalue && !g_pplayer->m_ModalRefCount && g_pplayer->IsPlaying(false))
+   const int newvalue = g_pplayer->m_lastKnownGoodCounter;
+   if (newvalue == lastHangSnoopValue && !g_pplayer->m_modalRefCount && g_pplayer->IsPlaying(false))
    {
       // Nothing happened since the last time - we are probably hung
       EXCEPINFO eiInterrupt = {};
@@ -19,7 +19,7 @@ VOID CALLBACK HangSnoopProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime
       eiInterrupt.wCode = 2345;
       g_pplayer->m_scriptInterpreter->Stop(g_pplayer->m_ptable, true);
    }
-   lasthangsnoopvalue = newvalue;
+   lastHangSnoopValue = newvalue;
 }
 
 unsigned int WINAPI VPWorkerThreadStart(void *param)
@@ -44,8 +44,8 @@ unsigned int WINAPI VPWorkerThreadStart(void *param)
 
       case HANG_SNOOP_START:
       {
-         lasthangsnoopvalue = -1;
-         hangsnooptimerid = SetTimer(nullptr, 0, 1000, (TIMERPROC)HangSnoopProc);
+         lastHangSnoopValue = -1;
+         hangSnoopTimerID = SetTimer(nullptr, 0, 1000, (TIMERPROC)HangSnoopProc);
          const HANDLE hEvent = (HANDLE)msg.wParam;
          CloseHandle(hEvent);
          //HangSnoopProc(nullptr, 0, 0, 0);
@@ -54,7 +54,7 @@ unsigned int WINAPI VPWorkerThreadStart(void *param)
 
       case HANG_SNOOP_STOP:
       {
-         KillTimer(nullptr, hangsnooptimerid);
+         KillTimer(nullptr, hangSnoopTimerID);
          const HANDLE hEvent = (HANDLE)msg.wParam;
          CloseHandle(hEvent);
       }

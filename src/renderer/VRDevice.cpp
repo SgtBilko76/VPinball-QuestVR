@@ -1188,7 +1188,7 @@ void VRDevice::RenderFrame(RenderDevice* rd, const std::function<void(RenderTarg
 
                const vec3 rightPos = vec3(rightSpaceLocation.pose.position.x, rightSpaceLocation.pose.position.y, rightSpaceLocation.pose.position.z);
                const vec3 leftPos = vec3(leftSpaceLocation.pose.position.x, leftSpaceLocation.pose.position.y, leftSpaceLocation.pose.position.z);
-               const vec3 centerPos = -(rightPos + leftPos) * 0.5f * 100.f;
+               const vec3 centerPos = -(rightPos + leftPos) * (float)(0.5 * 100.);
                const vec3 lockbarAxis = rightPos - leftPos;
                const float lockbarAngle = atan2f(-lockbarAxis.z, lockbarAxis.x);
                m_headsetViewCentering = false;

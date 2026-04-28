@@ -105,7 +105,7 @@ void HomePage::BuildPage()
 
    AddItem(std::make_unique<InGameUIItem>("Sound Settings"s, ""s, "settings/audio"s));
 
-   AddItem(std::make_unique<InGameUIItem>("Graphic Settings"s, ""s, "settings/graphic"s));
+   AddItem(std::make_unique<InGameUIItem>("Graphics Settings"s, ""s, "settings/graphics"s));
 
    #ifndef ENABLE_DX9
    if (m_player->m_renderer->m_stereo3D != STEREO_VR)
