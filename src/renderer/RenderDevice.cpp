@@ -152,12 +152,9 @@ void RenderDevice::tBGFXCallback::screenShot(
             for (unsigned int i = 0; i < _height; i++)
             {
                const uint8_t* src = static_cast<const uint8_t*>(_data) + i * _pitch;
-               uint8_t* dst = static_cast<uint8_t*>(tex->data()) + i * _width * 4;
-               bx::memCopy(dst, src, _width * 4);
+               uint8_t* dst = static_cast<uint8_t*>(tex->data()) + i * (_width * 4);
+               copy_bgra_rgba(dst, src, _width);
             }
-            uint8_t* const __restrict pixels = static_cast<uint8_t*>(tex->data());
-            for (uint32_t i = 0; i < _width * _height; i++)
-               std::swap(pixels[i * 4], pixels[i * 4 + 2]);
          }
          success = true;
          break;
@@ -446,17 +443,17 @@ void RenderDevice::RenderThread(RenderDevice* rd, bgfx::Init init)
    string vendorString;
    switch (vendorId)
    {
-      case BGFX_PCI_ID_SOFTWARE_RASTERIZER: vendorString = "Software Raster"; break;
-      case BGFX_PCI_ID_NVIDIA: vendorString = "NVIDIA"; break;
+      case BGFX_PCI_ID_SOFTWARE_RASTERIZER: vendorString = "Software Raster"s; break;
+      case BGFX_PCI_ID_NVIDIA: vendorString = "NVIDIA"s; break;
       case BGFX_PCI_ID_AMD:
-      case 0x1022: vendorString = "AMD"; break;
-      case BGFX_PCI_ID_INTEL: vendorString = "Intel"; break;
-      case BGFX_PCI_ID_ARM: vendorString = "arm"; break;
-      case 0x5143: vendorString = "Qualcomm"; break;
-      case 0x1010: vendorString = "ImgTec (PowerVR)"; break;
-      case BGFX_PCI_ID_APPLE: vendorString = "Apple"; break;
-      case BGFX_PCI_ID_MICROSOFT: vendorString = "Microsoft"; break;
-      default: vendorString = "Unknown"; break;
+      case 0x1022: vendorString = "AMD"s; break;
+      case BGFX_PCI_ID_INTEL: vendorString = "Intel"s; break;
+      case BGFX_PCI_ID_ARM: vendorString = "arm"s; break;
+      case 0x5143: vendorString = "Qualcomm"s; break;
+      case 0x1010: vendorString = "ImgTec (PowerVR)"s; break;
+      case BGFX_PCI_ID_APPLE: vendorString = "Apple"s; break;
+      case BGFX_PCI_ID_MICROSOFT: vendorString = "Microsoft"s; break;
+      default: vendorString = "Unknown"s; break;
    }
    rd->m_GPU_name = vendorString + '/' + std::to_string(bgfx::getCaps()->deviceId);
    rd->m_driver_name = bgfx::getRendererName(bgfx::getRendererType()) + " backend"s;

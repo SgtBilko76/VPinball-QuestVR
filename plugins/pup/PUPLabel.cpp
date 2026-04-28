@@ -30,7 +30,7 @@ namespace PUP {
 #endif
 
 // FIXME rotation is done via CPU (90/270 degress render blank via GPU?)
-static SDL_Surface* RotateSurface(SDL_Surface* src, float angleDeg)
+static SDL_Surface* RotateSurface(SDL_Surface* const src, float angleDeg)
 {
    if (!src || angleDeg == 0.f)
       return nullptr;
@@ -41,20 +41,20 @@ static SDL_Surface* RotateSurface(SDL_Surface* src, float angleDeg)
    const float absC = fabsf(c);
    const float absS = fabsf(s);
 
-   const int srcW = src->w;
-   const int srcH = src->h;
+   const unsigned int srcW = src->w;
+   const unsigned int srcH = src->h;
    const int dstW = (int)ceilf(srcW * absC + srcH * absS);
    const int dstH = (int)ceilf(srcW * absS + srcH * absC);
 
-   SDL_Surface* dst = SDL_CreateSurface(dstW, dstH, SDL_PIXELFORMAT_RGBA32);
+   SDL_Surface* const dst = SDL_CreateSurface(dstW, dstH, SDL_PIXELFORMAT_RGBA32);
    if (!dst)
       return nullptr;
 
    SDL_LockSurface(src);
    SDL_LockSurface(dst);
 
-   const uint32_t* srcPixels = (const uint32_t*)src->pixels;
-   uint32_t* dstPixels = (uint32_t*)dst->pixels;
+   const uint32_t* const __restrict srcPixels = (const uint32_t*)src->pixels;
+   uint32_t* const __restrict dstPixels = (uint32_t*)dst->pixels;
    const int srcPitch = src->pitch / 4;
    const int dstPitch = dst->pitch / 4;
 
@@ -71,7 +71,7 @@ static SDL_Surface* RotateSurface(SDL_Surface* src, float angleDeg)
          const float ry = -(dx - dstCx) * s + (dy - dstCy) * c + srcCy;
          const int sx = (int)rx;
          const int sy = (int)ry;
-         if (sx >= 0 && sx < srcW && sy >= 0 && sy < srcH)
+         if (/*sx >= 0 &&*/ (unsigned int)sx < srcW && /*sy >= 0 &&*/ (unsigned int)sy < srcH)
             dstPixels[dy * dstPitch + dx] = srcPixels[sy * srcPitch + sx];
          else
             dstPixels[dy * dstPitch + dx] = 0;
@@ -91,7 +91,7 @@ static void ApplyFilter(SDL_Surface* surf, int filterMode)
       return;
 
    SDL_LockSurface(surf);
-   uint32_t* pixels = (uint32_t*)surf->pixels;
+   uint32_t* const pixels = (uint32_t*)surf->pixels;
    const int pitch = surf->pitch / 4;
    const int w = surf->w;
    const int h = surf->h;
@@ -104,7 +104,7 @@ static void ApplyFilter(SDL_Surface* surf, int filterMode)
          const uint8_t r = px & 0xFF;
          const uint8_t g = (px >> 8) & 0xFF;
          const uint8_t b = (px >> 16) & 0xFF;
-         const uint8_t a = (px >> 24) & 0xFF;
+         const uint8_t a = (px >> 24) /*& 0xFF*/;
 
          switch (filterMode)
          {
@@ -1106,7 +1106,7 @@ PUPLabel::RenderState PUPLabel::UpdateLabelTexture(int outHeight, TTF_Font* pFon
       if (m_gradState > 0)
       {
          SDL_LockSurface(pMergedSurface);
-         uint32_t* pixels = (uint32_t*)pMergedSurface->pixels;
+         uint32_t* const pixels = (uint32_t*)pMergedSurface->pixels;
          const int pitch = pMergedSurface->pitch / 4;
          const int h = pMergedSurface->h;
          for (int y = 0; y < h; y++)
@@ -1118,7 +1118,7 @@ PUPLabel::RenderState PUPLabel::UpdateLabelTexture(int outHeight, TTF_Font* pFon
             for (int x = 0; x < pMergedSurface->w; x++)
             {
                uint32_t& px = pixels[y * pitch + x];
-               const uint8_t a = (px >> 24) & 0xFF;
+               const uint8_t a = (px >> 24) /*& 0xFF*/;
                if (a > 0)
                   px = (a << 24) | (gb << 16) | (gg << 8) | gr;
             }
@@ -1188,7 +1188,7 @@ PUPLabel::RenderState PUPLabel::UpdateLabelTexture(int outHeight, TTF_Font* pFon
    if (m_gradState > 0)
    {
       SDL_LockSurface(pMergedSurface);
-      uint32_t* pixels = (uint32_t*)pMergedSurface->pixels;
+      uint32_t* const pixels = (uint32_t*)pMergedSurface->pixels;
       const int pitch = pMergedSurface->pitch / 4;
       const int h = pMergedSurface->h;
       for (int y = 0; y < h; y++)
@@ -1200,7 +1200,7 @@ PUPLabel::RenderState PUPLabel::UpdateLabelTexture(int outHeight, TTF_Font* pFon
          for (int x = 0; x < pMergedSurface->w; x++)
          {
             uint32_t& px = pixels[y * pitch + x];
-            const uint8_t a = (px >> 24) & 0xFF;
+            const uint8_t a = (px >> 24) /*& 0xFF*/;
             if (a > 0)
                px = (a << 24) | (gb << 16) | (gg << 8) | gr;
          }
@@ -1409,7 +1409,7 @@ bool PUPLabel::Animation::Update(const SDL_Rect& screenRect, const SDL_FRect& la
          // See pDMDLabelFadePulse — bounce alpha between astart and aend
          // Approximate one full cycle takes range/speed*2 ticks * 33ms
          const float range = static_cast<float>(m_alphaEnd - m_alphaStart);
-         const float periodMs = (range / static_cast<float>(m_pulseSpeed)) * 2.0f * 33.0f;
+         const float periodMs = (range / static_cast<float>(m_pulseSpeed)) * (float)(2.0 * 33.0);
          const float cyclePos = fmodf(static_cast<float>(elapsed), periodMs) / periodMs;
          const float t = cyclePos < 0.5f ? cyclePos * 2.0f : 2.0f - cyclePos * 2.0f;
          m_alpha = as + t * (ae - as);
