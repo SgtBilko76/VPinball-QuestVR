@@ -2,10 +2,13 @@ VP 10.8.1 Changelog
 ------------------------
 
 Main highlighted features, detailed below:
-- VPX is now available as part of a standalone player for a large variety of platforms: Linux, Mac, iPhone, Android, RaspBerry,... The standalone player package includes all components needed to play tables.
+- VPX is now also available as part of a standalone player, and for a large variety of platforms: Linux, Mac, iPhone, Android, RaspBerry,...
+  The standalone player package includes all components needed to play tables. It even exists for Windows, removing some sporadic slowdown/stutters (due to VBScript scanning done by the OS).
 - Major internal technical update: The BGFX variant is now the default flavor, the DX9 and OpenGL versions are deprecated and should not be used anymore, as these do not feature all of the new improvements.
 - Deep work on gameplay stability and latency has been performed, leading to much improved overall game stability, less latency, better framerates, and nudging.
-- A new plugin system allows to hook all kinds of 3rdparty extensions, apps and tools into VPX
+  Note that the 'Frame Pacing' vsync setting is now the recommended setting if using the BGFX variant due to this!
+- The LiveEditor is now (mostly) as powerful as the 'old' Windows UI Editor, but its fully realtime!
+- A new plugin system allows to hook up all kinds of 3rdparty extensions, apps and tools into VPX
 
 Note that these changes need explicit configuration updates when upgrading to 10.8.1, at least for input, display and nudging.
 
@@ -30,6 +33,9 @@ FEATURES:
     the corresponding option in the 'INI->Editor->UI Options' dialog. It requires the application to be installed in a folder with read/write access. It breaks
     the ability to have multiple versions of VPX installed on a single computer without their settings conflicting.
 
+- table settings override will only save actual overrides, so only those settings that are different from application settings and default values
+- note that in general, the separation of table settings vs global settings (and overrides) has been dramatically revamped, also in the InGameUI
+
 - add "Surface" to the "Select Element" list
 - add overall GPU memory used, and overall file size to the image dialog
 
@@ -40,6 +46,7 @@ FEATURES:
 - add new FAAA postprocessing anti-aliasing mode (its mostly subtle, but also rather fast and less blurry)
 
 - balls can now be created and edited directly from the editor like all other parts, and not only from the script
+- the movement of the ball is now slightly extrapolated/predicted to (ideally) reduce the display latency to 0
 
 - move the plumb simulation to VPX's physics engine with an improved physics model. NudgePlugIn_xxx.vbs files that were used depending on each user setup are not needed anymore and were removed.
   Emulation of the plumb must be enabled in the settings, and adjusted to user setup. The LiveUI offers a dedicated UI with live feedback to ease this process.
@@ -57,9 +64,10 @@ FEATURES:
 
 - add support to visual screen nudge to sensor based nudge (strength/disabling is available in the 'Nudge/Tilt Settings' page).
 
-- add a new flavor of VPX named 'BGFX'. This flavor uses the BGFX library to interface with all the latest rendering backends (Vulkan, Metal, DirectX11/12, OpenGL,...) with some unique benefits:
+- the BGFX library employs all the latest rendering backends (Vulkan, Metal, DirectX11/12, OpenGL, ...) with some unique benefits: (note that DX11 should be preferred on Windows)
   . it supports Variable Refresh Rate display (when VSync is switched off)
-  . it uses multiple CPU cores to separately process the rendering from the game simulation, allowing for lower input/physics/controller latency, better nudging, more stable gameplay emulation, as well as a performance boost
+  . it uses multiple CPU cores to separately process the rendering from the game simulation, allowing for lower input/physics/controller latency,
+    better nudging, more stable gameplay emulation, as well as a performance boost
   . it supports rendering to multiple outputs (windows)
 
 - input system was rewritten with the following changes:
@@ -85,33 +93,34 @@ FEATURES:
   This change requires users to redefine their input settings in the new UI.
 
 - add Wide Color Gamut output (a.k.a. HDR display) support (BGFX using DirectX output only):
-  this comes with an additional video preference option to ignore all tonemappers in order to fully exploit the high dynamic range
+  This comes with an additional video preference option to ignore all tonemappers in order to fully exploit the high dynamic range (its recommended to disable tonemapping, which is the default)
   and an additional global exposure scale multiplier to adapt to the display capabilities
-  (note that one should use Windows 11 and the MS HDR calibration tool for best results with optimal range)
+  (note that one should use Windows 11, along with the MS HDR calibration tool for best results with optimal range)
+  It will also disable the bloom postprocessing as it is not necessary anymore on HDR displays
 
-- add 'Where Used' dialog in the Image/Material Manager
-   One of the challenges when creating or modding tables is hunting down all the table objects that reference a particular image/material
-   that should be updated with a new (better) one.
-   The new dialog contains a listview of all the images/materials in use and each table object that is referencing them.
-   One can select any row of the listview and click a button on the dialog labeled 'Edit Control' and it will place
-   that table object into the 'Properties' editor dialog for you.
+- add 'Where Used' dialog in the Image/Material Manager:
+  One of the challenges when creating or modding tables is hunting down all the table objects that reference a particular image/material
+  that should be updated with a new (better) one.
+  The new dialog contains a listview of all the images/materials in use and each table object that is referencing them.
+  One can select any row of the listview and click a button on the dialog labeled 'Edit Control' and it will place
+  that table object into the 'Properties' editor dialog for you.
 
 - VR/XR was rewritten and is now fully supported by VPX, using OpenXR in its BGFX variant.
   Note that the previous OpenVR variant (using OpenGL) is deprecated and is unlikely to work well, as it does not include any of the improvements listed below and will be removed in upcoming VPX updates.
-  . All OpenXR backend are supported (Virtual Desktop, SteamVR, Meta Quest Link, ...),
+  . All OpenXR backends are supported (Virtual Desktop, SteamVR, Meta Quest Link, ...)
   . Layers (see below) now have properties to automatically show/hide parts depending on the player mode
   . Layers (see below) now have properties to perform adequate positioning & stretching, depending on player situation, allowing to keep room elements sized to the real world, while adjusting the pinball machine to user choice, eventually matching a real world cabinet or controller
   . All scaling is now done using the OpenXR framework, based on target lockbar width, which can be adjusted in the tweak UI, for example to match the width of a cab, a keyboard or any controller.
   . Table files now include cabinet size informations (glass heights as well as playfield position inside cabinet, which must correspond to the cabinet model included in the VR scene)
   . Support for color keyed passthrough mode has been added allowing to play in mixed reality (for example using Virtual Desktop),
   . OpenXR latency reduction framework is fully implemented:
-    - by taking into account the headset latency when rendering,
+    - by taking into account the headset latency when rendering
     - by providing the headset with information for live reprojection (depth data).
   . Correct colorspace for all headsets (no more washed out colors that needed hacks in the previous version),
   . VPX's TweakUI is now fully supported in VR, which allows to adjust all settings in-game using the usual pinball controls, also supporting continuous recentering.
   . (hacky) external window capture has been removed and replaced by the ability to use external plugin renderers in the 3D scene, using flashers. Tables using the
     legacy feature are automatically updated. This allows to use all plugins in 3D at full resolution (backglass, scoreview, PinUp player, dimmed segment, toppers,...).
-  . New option to add a plugin rendered backglass flasher to handle non VR tables (there used to be a limited hacky fixed backglass image added on all tables with some hacks to allow VR tables to overwrite it)
+  . New option to add a plugin rendered backglass flasher to handle non VR tables (there used to be a limited hacky fixed backglass image added on all tables, with some hacks to allow VR tables to overwrite it)
   . OpenXR controllers can be used as input, including thumbstick nudging and plunger.
   . OpenXR controllers can be used to position the virtual table in the room.
 
@@ -132,6 +141,10 @@ FEATURES:
     beneath it. Segment display flashers are 'max blended' to support overlapping without graphical glitches.
   . flashers may now be placed on the desktop backdrop, deprecating the use of a textbox for DMD rendering on the desktop backdrop.
 
+- replace layers by hierarchical groups
+  Allow groups to have properties (VR space reference, view visibility, ...)
+  Prepare for nesting groups (import/export, combined transforms, ...)
+
 - a new preliminary plugin architecture has been added to support adding functionality to VPX in a cross platform and reusable (across other applications of the pinball simulation ecosystem) way.
   This feature is still in early stage and should be considered as a 'feature preview' as it will most likely evolve more, and the programming interface is not yet fully stabilized, so breaking changes may still happen!
   The following plugins are included with VPX:
@@ -148,6 +161,7 @@ FEATURES:
   . Serum: a DMD colorizer
   . UpscaleDMD: upscale or anti-alias DMD content (modes: xBRZ 2x/3x/4x/5x/6x, ScaleFX AA 1x, ScaleFX 3x and Super-XBR 2x)
   . WMP: the window media player, but as a portable plugin, running on any of the supported platforms
+  Note that due to this, some settings (e.g. DMD upscale) moved from VPX itself to the plugins
 
 - note that the old LiveUI/TweakUI is now split between a LiveEditor for editing, and the InGameUI to change all settings:
 
@@ -166,16 +180,16 @@ FEATURES:
  - InGameUI (via default 'F12' ingame):
   . Supports all player modes (VR, XR, cabinet, desktop) and all screen orientations
   . Add mouse interaction support
-  . Add setting pages, moving lots of settings inside these pages
+  . Add settings pages, moving lots of settings inside these pages
+  . Add a system info page, displaying some details of the GPU,CPU,Display,etc, and the paths used to load the various components
   . Navigation using flipper input has been unified: magna buttons allow to move, while flipper buttons allow to select
 
-- for cabinet users, a new option in the graphic settings allows to enable an automatic window camera fitting at table startup, based on table or screen fitting
+- for cabinet users, a new option in the graphics settings allows to enable an automatic window camera fitting at table startup, based on table or screen fitting
 
 - performance overlay has been improved with better insights and its display state is now persistent
 
-- table settings override will only save actual overrides, so only those settings that are different from application settings and default values
-
 - after many years of great service, 'Fake' 3D stereo mode has been removed, replaced by real stereo. Note that the 'Reshade' app could be used to get approximate 3D stereo if still wanted.
+  Also, the stereo calibration has been enhanced and refined again.
 
 FIXES:
 
@@ -187,17 +201,21 @@ FIXES:
 
 - fix 0-scaled rubber crash (like it can happen if invalid UI-inputs like 'Scale' are mapped to 0)
 
+- improved 'resting' ball detection and better filtering for physics hit events
+
 - export of a sound from the sound manager will now export the sound file as-is (without adding a wave header in front of non-WAV files)
 - fix wrong/too-loud volume for the test play in the sound manager
 
 - respect the decimal point locale in more UI editboxes (e.g. video/vr/physics preferences, sound/dimension manager, element search, VPP im-/exports, etc) for consistency,
   and be more robust against wrong inputs (including the .ini/.vpp files)
+- (hopefully) more robust handling of non-ASCII characters (i.e. unicode), incl. (file)paths, throughout all of VPX
 
 - reduce startup time (or even potential freezes/deadlocks) for large fade-speed bulb values
+- in general, all table loading, and image conversions have been optimized
 
 - remove some of the limits (like maximum line length) of the code view/script editor
 
-- LiveUI: fix delayed mipmap generation (happens when starting with static rendering, then opening LiveUI)
+- LiveUI: fix delayed mipmap generation (happens when starting with static rendering, then opening LiveUI) (used for trilinear and anisotropic texture filtering)
 
 - note that the support for ancient windows versions (e.g. Windows XP) for the DX9 build has been removed in order to be able to use newer compilers
 - due to this, VPX now allows to use the C++20 language feature set, which means that the windows build system requires Visual Studio 2019 or newer
@@ -398,10 +416,10 @@ FEATURES:
   This allows a table script to adjust the properties of static parts during startup.
 
 - video synchronization and target frame rate are now 2 separate settings and a new video synchronization mode for low latency input/physics/rendering has been added. The choices are:
-  - None: no synchronization, VPX just runs as fast as possible. Unless when playing on a very powerful system, this should lead to some input latency (due to lack of input syncing) and render latency 
+  - None: no synchronization, VPX just runs as fast as possible. Unless when playing on a very powerful system, this should lead to more input latency (due to lack of input syncing) and render latency 
           (due to flooding the GPU frame queue). This setting used to be 'Adaptive Sync: 0'
   - VSync: synchronize on the display vertical blank signal. This can limit stutters and avoids tearing, but will lead to high input latency. This used to be mode 'Adaptive Sync: 1'
-  - Adaptive VSync: same as 'VSync', but when a frame is late (=missing the refresh rate), it is displayed immediately. This should reduce stutters but features the same input latency.
+  - Adaptive VSync: same as 'VSync', but when a frame is late (=missing the refresh rate), it is displayed immediately. This should reduce stutters, but features the same input latency.
                     The DirectX 9 version uses software synchronization, while OpenGL uses hardware (driver) synchronization which should give slightly better results. This used to be mode 'Adaptive Sync: 2'
   - Frame Pacing: *NEW* VPX will try to run the input & physics simulation continuously in real time instead of only once per frame. This lowers the input latency, especially if the
                   computer is powerful enough to run at the monitor refresh rate. This also allows to have the input synchronized to PinMAME when enabling it, fixing some synchronization bugs like in 
