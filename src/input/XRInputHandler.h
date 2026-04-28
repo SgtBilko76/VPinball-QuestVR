@@ -63,7 +63,7 @@ public:
          { "/user/hand/left/input/thumbstick/x"s, XR_ACTION_TYPE_FLOAT_INPUT }, { "/user/hand/left/input/thumbstick/y"s, XR_ACTION_TYPE_FLOAT_INPUT },
          { "/user/hand/right/input/thumbstick/x"s, XR_ACTION_TYPE_FLOAT_INPUT }, { "/user/hand/right/input/thumbstick/y"s, XR_ACTION_TYPE_FLOAT_INPUT },
          { "/user/hand/left/input/trackpad/x"s, XR_ACTION_TYPE_FLOAT_INPUT }, { "/user/hand/left/input/trackpad/y"s, XR_ACTION_TYPE_FLOAT_INPUT },
-         { "/user/hand/right/input/trackpad/x"s, XR_ACTION_TYPE_FLOAT_INPUT }, { "/user/hand/right/input/trackpad/y"s, XR_ACTION_TYPE_FLOAT_INPUT }
+         { "/user/hand/right/input/trackpad/x"s, XR_ACTION_TYPE_FLOAT_INPUT }, { "/user/hand/right/input/trackpad/y"s, XR_ACTION_TYPE_FLOAT_INPUT },
 
          // Poses
          { "/user/hand/left/input/grip/pose"s, XR_ACTION_TYPE_POSE_INPUT }, { "/user/hand/right/input/grip/pose"s, XR_ACTION_TYPE_POSE_INPUT }
