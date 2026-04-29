@@ -152,7 +152,7 @@ void RenderDevice::tBGFXCallback::screenShot(
             for (unsigned int i = 0; i < _height; i++)
             {
                const uint32_t* src = reinterpret_cast<const uint32_t*>(static_cast<const uint8_t*>(_data) + i * _pitch);
-               uint32_t* dst = static_cast<uint32_t*>(tex->data()) + i * _width);
+               uint32_t* dst = static_cast<uint32_t*>(tex->data()) + i * _width;
                copy_bgra_rgba<false>(dst, src, _width);
             }
          }
