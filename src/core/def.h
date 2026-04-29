@@ -483,7 +483,7 @@ __forceinline unsigned int swap_byteorder(unsigned int x)
 #endif
 }
 
-float map_u32_to_unifloat(const unsigned int u) // places all the bits of an (equidistant) u32 number exactly into the matching f32 slots/ranges. For all fp numbers >=1/256 there will be duplicates, but there is no way around that, as not all 32bits can fit perfectly by design (23bit mantissa per exponent)
+constexpr __forceinline float map_u32_to_unifloat(const unsigned int u) // places all the bits of an (equidistant) u32 number exactly into the matching f32 slots/ranges. For all fp numbers >=1/256 there will be duplicates, but there is no way around that, as not all 32bits can fit perfectly by design (23bit mantissa per exponent)
 {
 #if 0 // platforms that offer a single-op rounding towards 0 (or neginf) could use this:
     return __uint2float_rz(u) * 2.3283064365386962890625e-10f; // 0x1p-32
