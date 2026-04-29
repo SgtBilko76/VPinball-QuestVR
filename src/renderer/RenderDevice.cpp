@@ -139,7 +139,7 @@ void RenderDevice::tBGFXCallback::screenShot(
          else
          {
             for (unsigned int i = 0; i < _height; i++)
-               bx::memCopy(static_cast<uint8_t*>(tex->data()) + i * _width * 4, static_cast<const uint8_t*>(_data) + i * _pitch, _width * 4);
+               bx::memCopy(static_cast<uint8_t*>(tex->data()) + i * (_width * 4), static_cast<const uint8_t*>(_data) + i * _pitch, _width * 4);
          }
          success = true;
          break;
@@ -151,8 +151,8 @@ void RenderDevice::tBGFXCallback::screenShot(
          {
             for (unsigned int i = 0; i < _height; i++)
             {
-               const unsigned int* src = static_cast<const unsigned int*>(_data) + i * _pitch;
-               unsigned int* dst = static_cast<unsigned int*>(tex->data()) + i * (_width * 4);
+               const unsigned int* src = static_cast<const unsigned int*>(static_cast<const uint8*>(_data) + i * _pitch);
+               unsigned int* dst = static_cast<unsigned int*>(tex->data()) + i * _width);
                copy_bgra_rgba<false>(dst, src, _width);
             }
          }
