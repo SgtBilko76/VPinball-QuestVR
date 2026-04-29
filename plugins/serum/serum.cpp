@@ -361,7 +361,7 @@ static void OnControllerGameStart(const unsigned int eventId, void* userData, vo
       return;
    }
 
-   LOGI("Serum: Loading from " + serumPath.string() + " for "s + msg->gameId);
+   LOGI("Serum: Loading from " + serumPath.string() + " for " + msg->gameId);
 
    pSerum = Serum_Load(serumPath.string().c_str(), msg->gameId, FLAG_REQUEST_32P_FRAMES | FLAG_REQUEST_64P_FRAMES);
    OnDmdSrcChanged(onDmdSrcChangedId, nullptr, nullptr);

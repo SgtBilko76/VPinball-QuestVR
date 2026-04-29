@@ -138,7 +138,7 @@ namespace VPX::Colors
       if (hsv.y == 0.0f)
          return vec3 { hsv.z, hsv.z, hsv.z }; // gray
  
-      const float h = fmodf(hsv.x, 1.0f) / (float)(60.0 / 360.0);
+      const float h = (hsv.x - floorf(hsv.x)) * (float)(360.0 / 60.0);
       int i = static_cast<int>(h);
       float f = h - static_cast<float>(i);
       float p = hsv.z * (1.0f - hsv.y);

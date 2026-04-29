@@ -483,6 +483,15 @@ __forceinline unsigned int swap_byteorder(unsigned int x)
 #endif
 }
 
+float map_u32_to_unifloat(const unsigned int u) // places all the bits of an (equidistant) u32 number exactly into the matching f32 slots/ranges. For all fp numbers >=1/256 there will be duplicates, but there is no way around that, as not all 32bits can fit perfectly by design (23bit mantissa per exponent)
+{
+#if 0 // platforms that offer a single-op rounding towards 0 (or neginf) could use this:
+    return __uint2float_rz(u) * 2.3283064365386962890625e-10f; // 0x1p-32
+#else
+    return static_cast<float>(u & ~(u >> 24)) * 2.3283064365386962890625e-10f; // 0x1p-32
+#endif
+}
+
 #if 0
 //
 // TinyMT64 for random numbers (much better than rand())
@@ -517,7 +526,7 @@ inline uint64_t tinymtu(uint64_t state[2]) {
 
 extern uint64_t tinymt64state[2];
 
-__forceinline float rand_mt_01()  { return (float)(tinymtu(tinymt64state) >> (64-24)) * 0.000000059604644775390625f; } // [0..1)
+__forceinline float rand_mt_01()  { return map_u32_to_unifloat(tinymtu(tinymt64state) >> 32); } // [0..1)
 __forceinline float rand_mt_m11() { return (float)((int64_t)tinymtu(tinymt64state) >> (64-25)) * 0.000000059604644775390625f; } // [-1..1)
 
 #else
@@ -535,7 +544,7 @@ constexpr __forceinline unsigned int mwc64x(uint64_t& s)
    return x ^ c;
 }
 
-__forceinline float rand_mt_01()  { return (float)(mwc64x(mwc64x_state) >> (32-24)) * 0.000000059604644775390625f; } // [0..1)
+__forceinline float rand_mt_01()  { return map_u32_to_unifloat(mwc64x(mwc64x_state)); } // [0..1)
 __forceinline float rand_mt_m11() { return (float)((int)mwc64x(mwc64x_state) >> (32-25)) * 0.000000059604644775390625f; } // [-1..1)
 #endif
 
@@ -545,11 +554,11 @@ __forceinline float rand_mt_m11() { return (float)((int)mwc64x(mwc64x_state) >> 
 __forceinline float radical_inverse(unsigned int i)
 {
 #if (defined(_M_ARM) || defined(_M_ARM64) || defined(__arm__) || defined(__arm64__) || defined(__aarch64__)) && defined(_MSC_VER)
-   return (float)(__rbit(i) >> 8) * 0.000000059604644775390625f;
+   return map_u32_to_unifloat(__rbit(i));
 #elif (defined(_M_ARM) || defined(_M_ARM64) || defined(__arm__) || defined(__arm64__) || defined(__aarch64__)) && defined(__clang__) //!! gcc does not have an intrinsic yet
-   return (float)(__builtin_arm_rbit(i) >> 8) * 0.000000059604644775390625f;
+   return map_u32_to_unifloat(__builtin_arm_rbit(i));
 #elif defined(__clang__)
-   return (float)(__builtin_bitreverse32(i) >> 8) * 0.000000059604644775390625f;
+   return map_u32_to_unifloat(__builtin_bitreverse32(i));
 #else
    /*v = (v << 16) | (v >> 16);
    v = ((v & 0x55555555u) << 1) | ((v & 0xAAAAAAAAu) >> 1);
@@ -570,7 +579,7 @@ __forceinline float radical_inverse(unsigned int i)
    i = _rotr(i & 0x66666666u, 4) | (i & 0x99999999u);
    i = _rotr(i & 0x1e1e1e1eu, 8) | (i & 0xe1e1e1e1u);
    i = _rotl(i, 7);
-   return (float)(swap_byteorder(i) >> 8) * 0.000000059604644775390625f;
+   return map_u32_to_unifloat(swap_byteorder(i));
 #endif
 }
 
@@ -594,7 +603,7 @@ constexpr __forceinline float sobol(unsigned int i, unsigned int scramble = 0)
    for (unsigned int v = 1u << 31; (i != 0); i >>= 1, v ^= v >> 1) if (i & 1)
       scramble ^= v;
 
-   return (float)(scramble >> 8) * 0.000000059604644775390625f;
+   return map_u32_to_unifloat(scramble);
 }
 
 //
