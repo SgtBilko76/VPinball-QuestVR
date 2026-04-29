@@ -151,7 +151,7 @@ void RenderDevice::tBGFXCallback::screenShot(
          {
             for (unsigned int i = 0; i < _height; i++)
             {
-               const unsigned int* src = static_cast<const unsigned int*>(static_cast<const uint8*>(_data) + i * _pitch);
+               const unsigned int* src = static_cast<const unsigned int*>(static_cast<const uint8_t*>(_data) + i * _pitch);
                unsigned int* dst = static_cast<unsigned int*>(tex->data()) + i * _width);
                copy_bgra_rgba<false>(dst, src, _width);
             }
