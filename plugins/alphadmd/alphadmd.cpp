@@ -101,24 +101,26 @@ typedef enum {
 } DmdLayouts;
 static DmdLayouts dmdLayout = DmdLayouts::Undefined;
 
-static const std::string_view& LayoutName(DmdLayouts layout)
+static const std::array<std::string, 13> dmdLayoutNames{"Undefined"s, "4x6+2x2"s, "4x7"s, "4x7+2x2"s, "6x4+2x2"s, "2x16+1x7"s, "2x16"s, "2x20"s, "2x7+2x2+1x16"s, "1x7+2x16"s, "1x7+1x4+2x16"s, "4x7+5x2"s, "4x6+2x2+1x6"s}; 
+
+static const std::string& LayoutName(DmdLayouts layout)
 {
    switch (layout)
    {
-      case DmdLayouts::Layout_4x6_2x2:      return "4x6+2x2"sv;
-      case DmdLayouts::Layout_4x7:          return "4x7"sv;
-      case DmdLayouts::Layout_4x7_2x2:      return "4x7+2x2"sv;
-      case DmdLayouts::Layout_6x4_2x2:      return "6x4+2x2"sv;
-      case DmdLayouts::Layout_2x16_1x7:     return "2x16+1x7"sv;
-      case DmdLayouts::Layout_2x16:         return "2x16"sv;
-      case DmdLayouts::Layout_2x20:         return "2x20"sv;
-      case DmdLayouts::Layout_2x7_2x2_1x16: return "2x7+2x2+1x16"sv;
-      case DmdLayouts::Layout_1x7_2x16:     return "1x7+2x16"sv;
-      case DmdLayouts::Layout_1x7_1x4_2x16: return "1x7+1x4+2x16"sv;
-      case DmdLayouts::Layout_4x7_5x2:      return "4x7+5x2"sv;
-      case DmdLayouts::Layout_4x6_2x2_1x6:  return "4x6+2x2+1x6"sv;
       case DmdLayouts::Undefined:
-      default:                              return "Undefined"sv;
+      default:                              return dmdLayoutNames[DmdLayouts::Undefined];
+      case DmdLayouts::Layout_4x6_2x2:
+      case DmdLayouts::Layout_4x7:
+      case DmdLayouts::Layout_4x7_2x2:
+      case DmdLayouts::Layout_6x4_2x2:
+      case DmdLayouts::Layout_2x16_1x7:
+      case DmdLayouts::Layout_2x16:
+      case DmdLayouts::Layout_2x20:
+      case DmdLayouts::Layout_2x7_2x2_1x16:
+      case DmdLayouts::Layout_1x7_2x16:
+      case DmdLayouts::Layout_1x7_1x4_2x16:
+      case DmdLayouts::Layout_4x7_5x2:
+      case DmdLayouts::Layout_4x6_2x2_1x6:  return dmdLayoutNames[layout];
    }
 }
 
