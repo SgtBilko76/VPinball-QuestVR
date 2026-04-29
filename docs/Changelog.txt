@@ -2,8 +2,8 @@ VP 10.8.1 Changelog
 ------------------------
 
 Main highlighted features, detailed below:
-- VPX is now also available as part of a standalone player, and for a large variety of platforms: Linux, Mac, iPhone, Android, RaspBerry,...
-  The standalone player package includes all components needed to play tables. It even exists for Windows, removing some sporadic slowdown/stutters (due to VBScript scanning done by the OS).
+- VPX is now also available as part of a standalone player, and for a large variety of platforms: Linux, macOS (incl. HiDPI), iOS, Android (13+), Raspberry Pi, Windows, ...
+  The standalone player package includes all components needed to play tables. As it also exists for Windows, it can help remove some sporadic slowdown/stutters (due to VBScript scanning done by the OS, which is non-existant in the standalone build due to libwinevbs usage).
 - Major internal technical update: The BGFX variant is now the default flavor, the DX9 and OpenGL versions are deprecated and should not be used anymore, as these do not feature all of the new improvements.
 - Deep work on gameplay stability and latency has been performed, leading to much improved overall game stability, less latency, better framerates, and nudging.
   Note that the 'Frame Pacing' vsync setting is now the recommended setting if using the BGFX variant due to this!
@@ -35,6 +35,7 @@ FEATURES:
 
 - table settings override will only save actual overrides, so only those settings that are different from application settings and default values
 - note that in general, the separation of table settings vs global settings (and overrides) has been dramatically revamped, also in the InGameUI
+  (e.g. screen-space reflections)
 
 - add "Surface" to the "Select Element" list
 - add overall GPU memory used, and overall file size to the image dialog
@@ -46,7 +47,8 @@ FEATURES:
 - add new FAAA postprocessing anti-aliasing mode (its mostly subtle, but also rather fast and less blurry)
 
 - balls can now be created and edited directly from the editor like all other parts, and not only from the script
-- the movement of the ball is now slightly extrapolated/predicted to (ideally) reduce the display latency to 0
+- the movement of the ball is now slightly extrapolated/predicted to (ideally) reduce the display/visual latency to 0
+- improved ball trail, also exposing strength control
 
 - move the plumb simulation to VPX's physics engine with an improved physics model. NudgePlugIn_xxx.vbs files that were used depending on each user setup are not needed anymore and were removed.
   Emulation of the plumb must be enabled in the settings, and adjusted to user setup. The LiveUI offers a dedicated UI with live feedback to ease this process.
@@ -87,7 +89,7 @@ FEATURES:
   . on the Windows platform, the accessibility shortcuts are now fully disabled when playing
   . on the Windows platform, the Windows keys can now be used as a normal key input
   . a few hardware devices and generic layouts are automatically detected, when this happens, the user is supposed to apply the corresponding default mapping.
-    Support for some very old hardware has been removed (Microsoft's Sidewinder, UltraCade's UltraPin,...)
+    Explicit support for some very old hardware has been removed (Microsoft's Sidewinder, UltraCade's UltraPin,...)
   . the hardware acceleration filter may not be enabled anymore for keyboard nudge (as it is not supposed to be used for keyboard nudge)
   The new input setup is stored along the old one to allow to use older versions of VPX together with newers.
   This change requires users to redefine their input settings in the new UI.
@@ -111,7 +113,7 @@ FEATURES:
   . Layers (see below) now have properties to automatically show/hide parts depending on the player mode
   . Layers (see below) now have properties to perform adequate positioning & stretching, depending on player situation, allowing to keep room elements sized to the real world, while adjusting the pinball machine to user choice, eventually matching a real world cabinet or controller
   . All scaling is now done using the OpenXR framework, based on target lockbar width, which can be adjusted in the tweak UI, for example to match the width of a cab, a keyboard or any controller.
-  . Table files now include cabinet size informations (glass heights as well as playfield position inside cabinet, which must correspond to the cabinet model included in the VR scene)
+  . Table files now include/store cabinet size informations (glass heights as well as playfield position inside cabinet, which must correspond to the cabinet model included in the VR scene)
   . Support for color keyed passthrough mode has been added allowing to play in mixed reality (for example using Virtual Desktop),
   . OpenXR latency reduction framework is fully implemented:
     - by taking into account the headset latency when rendering
@@ -161,7 +163,7 @@ FEATURES:
   . Serum: a DMD colorizer
   . UpscaleDMD: upscale or anti-alias DMD content (modes: xBRZ 2x/3x/4x/5x/6x, ScaleFX AA 1x, ScaleFX 3x and Super-XBR 2x)
   . WMP: the window media player, but as a portable plugin, running on any of the supported platforms
-  Note that due to this, some settings (e.g. DMD upscale) moved from VPX itself to the plugins
+  Note that due to this, some settings (e.g. DMD antialias/upscale) moved from VPX itself to the plugins
 
 - note that the old LiveUI/TweakUI is now split between a LiveEditor for editing, and the InGameUI to change all settings:
 
@@ -171,9 +173,9 @@ FEATURES:
  - LiveEditor (via 'F7' in the editor):
   . Fix picking, now supporting precise picking of most elements
   . Change mouse & keyboard interaction to mostly match Blender UX (no more view cube, use mouse drag to orient view, keypad to focus or use predefined views)
-  . Support adjusting table at runtime for most elements (update physics, support picking after moving, handle resuming gameplay)
+  . Supports adjusting table at runtime for most elements (update physics, support picking after moving, handle resuming gameplay)
   . Add selection and display filters
-  . Allow to display physics collider as a red overlay
+  . Allow to display physics-collider-geometry as a red overlay
   . Fix invalid overlays (missing parts, incorrect position)
   . 3 render modes are available, switchable using the 'Z' key: render, wireframe, passthrough wireframe
 
@@ -191,6 +193,10 @@ FEATURES:
 - after many years of great service, 'Fake' 3D stereo mode has been removed, replaced by real stereo. Note that the 'Reshade' app could be used to get approximate 3D stereo if still wanted.
   Also, the stereo calibration has been enhanced and refined again.
 
+- texture compression is actually usable (=much faster) when using BGFX
+
+- backside lighting for normal-mapped parts
+
 FIXES:
 
 - fix SMAA looking worse compared to 10.7.X, and slightly improve its quality in general
@@ -201,10 +207,13 @@ FIXES:
 
 - fix 0-scaled rubber crash (like it can happen if invalid UI-inputs like 'Scale' are mapped to 0)
 
-- improved 'resting' ball detection and better filtering for physics hit events
+- improve 'resting' ball detection and better filtering for physics hit events
+
+- improve flipper latency reporting in the performance UI
 
 - export of a sound from the sound manager will now export the sound file as-is (without adding a wave header in front of non-WAV files)
 - fix wrong/too-loud volume for the test play in the sound manager
+- improve looping sounds
 
 - respect the decimal point locale in more UI editboxes (e.g. video/vr/physics preferences, sound/dimension manager, element search, VPP im-/exports, etc) for consistency,
   and be more robust against wrong inputs (including the .ini/.vpp files)
@@ -231,6 +240,10 @@ FIXES:
 - see Changelog_Scripts.txt for the respective core script changes (version 3.62)
 - see CommandReference.txt for the changelog of all the scripting properties/interface changes
 - see Scripts.txt for the actual usage and "documentation" of the scripts that come with VPX
+
+- add Visual Studio 2026 support
+- employ C++20
+- DX9 build does not need the old DX SDK to be downloaded anymore
 
 - note that the vast majority of the code base is now available under GPLv3+ (see license.txt for all details)
 
