@@ -4,6 +4,7 @@
 
 #include "common.h"
 
+#include <climits>
 #include <future>
 
 #include <SDL3_ttf/SDL_ttf.h>
