@@ -226,6 +226,8 @@ FIXES:
 
 - LiveUI: fix delayed mipmap generation (happens when starting with static rendering, then opening LiveUI) (used for trilinear and anisotropic texture filtering)
 
+- BAM headtracking has been removed again. It could be re-added via the new plugin system though. Any volunteers?
+
 - note that the support for ancient windows versions (e.g. Windows XP) for the DX9 build has been removed in order to be able to use newer compilers
 - due to this, VPX now allows to use the C++20 language feature set, which means that the windows build system requires Visual Studio 2019 or newer
 
