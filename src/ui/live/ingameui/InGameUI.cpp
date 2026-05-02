@@ -203,19 +203,21 @@ void InGameUI::HandlePageInput(const InputManager::ActionState &state)
       m_useFlipperNav |= page->IsFlipperNavNeeded();
    const uint32_t flipperNavRepeat = m_flipperNavRepeatCount == 0 ? 500 : m_flipperNavRepeatCount == 1 ? 250 : 125;
 
+   const uint32_t now = msec();
+
    if (state.IsKeyPressed(m_player->m_pininput.GetUIUpActionId(), m_prevActionState))
    {
       const bool wasFlipperNav = m_useFlipperNav;
       m_useFlipperNav = true;
-      m_flipperNavStart = msec();
+      m_flipperNavStart = now;
       m_flipperNavRepeatCount = 0;
       GetActivePage()->SelectPrevItem();
       if (!wasFlipperNav)
          GetActivePage()->SelectNextItem();
    }
-   else if (m_useFlipperNav && state.IsKeyDown(m_player->m_pininput.GetUIUpActionId()) && (msec() - m_flipperNavStart) > flipperNavRepeat)
+   else if (m_useFlipperNav && state.IsKeyDown(m_player->m_pininput.GetUIUpActionId()) && (now - m_flipperNavStart) > flipperNavRepeat)
    {
-      m_flipperNavStart = msec();
+      m_flipperNavStart = now;
       m_flipperNavRepeatCount++;
       GetActivePage()->SelectPrevItem();
    }
@@ -224,15 +226,15 @@ void InGameUI::HandlePageInput(const InputManager::ActionState &state)
    {
       const bool wasFlipperNav = m_useFlipperNav;
       m_useFlipperNav = true;
-      m_flipperNavStart = msec();
+      m_flipperNavStart = now;
       m_flipperNavRepeatCount = 0;
       GetActivePage()->SelectNextItem();
       if (!wasFlipperNav)
          GetActivePage()->SelectPrevItem();
    }
-   else if (m_useFlipperNav && state.IsKeyDown(m_player->m_pininput.GetUIDownActionId()) && (msec() - m_flipperNavStart) > flipperNavRepeat)
+   else if (m_useFlipperNav && state.IsKeyDown(m_player->m_pininput.GetUIDownActionId()) && (now - m_flipperNavStart) > flipperNavRepeat)
    {
-      m_flipperNavStart = msec();
+      m_flipperNavStart = now;
       m_flipperNavRepeatCount++;
       GetActivePage()->SelectNextItem();
    }

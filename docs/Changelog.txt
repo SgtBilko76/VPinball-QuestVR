@@ -49,6 +49,7 @@ FEATURES:
 - balls can now be created and edited directly from the editor like all other parts, and not only from the script
 - the movement of the ball is now slightly extrapolated/predicted to (ideally) reduce the display/visual latency to 0
 - improved ball trail, also exposing strength control
+- add 'raytraced'/true ball motion blur (BGFX only, not supported in VR or headtracking)
 
 - move the plumb simulation to VPX's physics engine with an improved physics model. NudgePlugIn_xxx.vbs files that were used depending on each user setup are not needed anymore and were removed.
   Emulation of the plumb must be enabled in the settings, and adjusted to user setup. The LiveUI offers a dedicated UI with live feedback to ease this process.
@@ -66,7 +67,7 @@ FEATURES:
 
 - add support to visual screen nudge to sensor based nudge (strength/disabling is available in the 'Nudge/Tilt Settings' page).
 
-- the BGFX library employs all the latest rendering backends (Vulkan, Metal, DirectX11/12, OpenGL, ...) with some unique benefits: (note that DX11 should be preferred on Windows)
+- the BGFX library employs all the latest rendering backends (Vulkan, Metal, DirectX11, OpenGL, ...) with some unique benefits: (note that DX11 should be preferred on Windows) (DX12 currently disabled)
   . it supports Variable Refresh Rate display (when VSync is switched off)
   . it uses multiple CPU cores to separately process the rendering from the game simulation, allowing for lower input/physics/controller latency,
     better nudging, more stable gameplay emulation, as well as a performance boost
@@ -147,8 +148,6 @@ FEATURES:
   Allow groups to have properties (VR space reference, view visibility, ...)
   Prepare for nesting groups (import/export, combined transforms, ...)
 
-- add 'raytraced' ball motion blur (BGFX only, not supported in VR or headtracking)
-
 - a new preliminary plugin architecture has been added to support adding functionality to VPX in a cross platform and reusable (across other applications of the pinball simulation ecosystem) way.
   This feature is still in early stage and should be considered as a 'feature preview' as it will most likely evolve more, and the programming interface is not yet fully stabilized, so breaking changes may still happen!
   The following plugins are included with VPX:
@@ -186,7 +185,7 @@ FEATURES:
   . Add mouse interaction support
   . Add settings pages, moving lots of settings inside these pages
   . Add a system info page, displaying some details of the GPU,CPU,Display,etc, and the paths used to load the various components
-  . Navigation using flipper input has been unified: magna buttons allow to move, while flipper buttons allow to select
+  . Navigation using flipper input has been unified: per default, magna buttons allow to move, while flipper buttons allow to select
 
 - for cabinet users, a new option in the graphics settings allows to enable an automatic window camera fitting at table startup, based on table or screen fitting
 

@@ -410,12 +410,10 @@ void GraphicSettingsPage::BuildPage()
       [this]() { return m_player->m_renderer->m_bloomOff; }, //
       [this](bool v) { m_player->m_renderer->m_bloomOff = v; }));
 
-   // Disabled as this needs some fixes for VR, nudgeing & latency correction
-   if (false)
-      AddItem(std::make_unique<InGameUIItem>( //
-         Settings::m_propPlayer_ForceMotionBlurOff, //
-         [this]() { return m_player->m_renderer->m_motionBlurOff; }, //
-         [this](bool v) { m_player->m_renderer->m_motionBlurOff = v; }));
+   AddItem(std::make_unique<InGameUIItem>( //
+      Settings::m_propPlayer_ForceMotionBlurOff, //
+      [this]() { return m_player->m_renderer->m_motionBlurOff; }, //
+      [this](bool v) { m_player->m_renderer->m_motionBlurOff = v; }));
 
 #ifdef ENABLE_DX9
    // TODO this property is directly persisted. It does not follow the overall UI design: App/Table/Live state => Implement live state (will also enable table override)

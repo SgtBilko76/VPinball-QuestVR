@@ -49,7 +49,7 @@ void InputProfilePage::Render(float elapsedS)
 void InputProfilePage::BuildPage()
 {
    ClearItems();
-   AddItem(std::make_unique<InGameUIItem>(InGameUIItem::LabelType::Info, "Device '"s + m_deviceName + "' was detected."s));
+   AddItem(std::make_unique<InGameUIItem>(InGameUIItem::LabelType::Info, "Device '" + m_deviceName + "' was detected."));
 
    AddItem(std::make_unique<InGameUIItem>(InGameUIItem::LabelType::Info, "Would you like the default input layout to be applied ?"s));
 
