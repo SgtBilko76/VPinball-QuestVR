@@ -271,7 +271,7 @@ static void RenderThread()
          case UpscalerMode::UM_xBRZ_4x:
          case UpscalerMode::UM_xBRZ_5x:
          case UpscalerMode::UM_xBRZ_6x:
-            xbrz::scale(scaleFactors[upscalerMode], rgbaSrcFrame.data(), rgbaDstFrame.data(), dmdSrc.width, dmdSrc.height, xbrz::ColorFormat::RGB);
+            xbrz::scale(scaleFactors[upscalerMode], rgbaSrcFrame.data(), rgbaDstFrame.data(), dmdSrc.width, dmdSrc.height, xbrz::ColorFormat::rgb);
             break;
          }
 
