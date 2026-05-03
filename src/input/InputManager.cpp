@@ -159,8 +159,11 @@ void InputManager::AddInputHandler(std::unique_ptr<InputHandler> handler)
 
 std::unique_ptr<InputManager::InputHandler> InputManager::RemoveInputHandler(InputHandler* handler)
 {
-
-   return nullptr;
+   const auto& it = std::ranges::find_if(m_inputHandlers, [handler](const auto& ih) { return ih.get() == handler; });
+   assert(it != m_inputHandlers.end());
+   std::unique_ptr<InputManager::InputHandler> ownedHandler = std::move(*it);
+   m_inputHandlers.erase(it);
+   return ownedHandler;
 }
 
 
@@ -484,13 +487,22 @@ void InputManager::ProcessInput()
       {
          if (device.m_hasPendingLayoutApply)
          {
+            const uint16_t deviceId = device.m_id;
             const auto noAutoLayoutId = Settings::GetRegistry().GetPropertyId("Input"s, "Device." + device.m_settingsId + ".NoAutoLayout").value();
             if (g_app->m_settings.GetBool(noAutoLayoutId))
             {
                device.m_hasPendingLayoutApply = false;
                continue;
             }
-            const uint16_t deviceId = device.m_id;
+
+            // For VR controllers, the propose-layout dialog isn't reachable in the headset before the VR controller is registered, so auto-apply
+            if (device.m_type == DeviceType::VRController)
+            {
+               ApplyDefaultDeviceMapping(deviceId);
+               device.m_hasPendingLayoutApply = false;
+               continue;
+            }
+
             if (m_player->m_liveUI->m_inGameUI.ProposeInputLayout(device.m_name,
                    [this, deviceId, noAutoLayoutId](bool isOk, bool isDontAskAnymore)
                    {
@@ -1079,17 +1091,17 @@ Vertex2D InputManager::GetNudge() const
    return nudge / weight;
 }
 
-void InputManager::SetPlungerPos(bool override, const float pos)
+void InputManager::SetPlungerPos(bool overrideInput, const float pos)
 {
    // FIXME
 }
 
-void InputManager::SetPlungerSpeed(bool override, const float speed)
+void InputManager::SetPlungerSpeed(bool overrideInput, const float speed)
 {
    // FIXME
 }
 
-void InputManager::SetNudge(bool override, const float nudgeAccelerationX, const float nudgeAccelerationY)
+void InputManager::SetNudge(bool overrideInput, const float nudgeAccelerationX, const float nudgeAccelerationY)
 {
    // FIXME
 }
