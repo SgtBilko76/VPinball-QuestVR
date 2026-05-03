@@ -25,6 +25,8 @@
 
 #include "scalefx/scalefx.h"
 
+#include "mmpx/mmpx.h"
+
 #include "plugins/ResURIResolver.h"
 
 #ifdef _WIN32
@@ -95,6 +97,7 @@ enum UpscalerMode {
    UM_Disabled,
    UM_ScaleFX_AA,
    UM_ScaleFX_3x,
+   UM_MMPX_2x,
    UM_xBRZ_2x,
    UM_xBRZ_3x,
    UM_xBRZ_4x,
@@ -102,8 +105,8 @@ enum UpscalerMode {
    UM_xBRZ_6x,
    UM_SuperXBR_2x
 };
-static const char* upscalerNames[] = { "Disabled", "ScaleFX AA 1x", "ScaleFX 3x", "xBRZ 2x", "xBRZ 3x", "xBRZ 4x", "xBRZ 5x", "xBRZ 6x", "Super-XBR 2x" };
-static constexpr int scaleFactors[] = { 1, 1, 3, 2, 3, 4, 5, 6, 2 };
+static const char* upscalerNames[] = { "Disabled", "ScaleFX AA 1x", "ScaleFX 3x", "MMPX 2x", "xBRZ 2x", "xBRZ 3x", "xBRZ 4x", "xBRZ 5x", "xBRZ 6x", "Super-XBR 2x" };
+static constexpr int scaleFactors[] = { 1, 1, 3, 2, 2, 3, 4, 5, 6, 2 };
 static UpscalerMode upscalerMode = UM_Disabled;
 static UpscalerMode nextUpscalerMode = UM_Disabled;
 static int GetUpscalerMode() { return (int)upscalerMode; }
@@ -247,7 +250,7 @@ static void RenderThread()
                rgbaSrcFrame[ofs] = 0xFF000000u | ((uint32_t)lum32[rgb565 & 0x1F] << 16) | ((uint32_t)lum64[(rgb565 >> 5) & 0x3F] << 8) | (uint32_t)lum32[(rgb565 >> 11) & 0x1F];
             }
          }
-         
+
          switch (upscalerMode)
          {
          case UpscalerMode::UM_Disabled:
@@ -261,11 +264,18 @@ static void RenderThread()
          case UpscalerMode::UM_ScaleFX_3x:
             scalefx::upscale<true>(rgbaSrcFrame.data(), rgbaDstFrame.data(), dmdSrc.width, dmdSrc.height, displayId.frameFormat == CTLPI_DISPLAY_FORMAT_LUM32F);
             break;
-            
+
+         case UpscalerMode::UM_MMPX_2x:
+            {
+               mmpx::MMPXAlgorithm a;
+               a.run(rgbaSrcFrame.data(), rgbaDstFrame.data(), dmdSrc.width, dmdSrc.height);
+            }
+            break;
+
          case UpscalerMode::UM_SuperXBR_2x:
             superxbr::scale<2, false>(rgbaSrcFrame.data(), rgbaDstFrame.data(), dmdSrc.width, dmdSrc.height);
             break;
-            
+
          case UpscalerMode::UM_xBRZ_2x:
          case UpscalerMode::UM_xBRZ_3x:
          case UpscalerMode::UM_xBRZ_4x:

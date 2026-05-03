@@ -102,7 +102,7 @@ typedef enum {
 } DmdLayouts;
 static DmdLayouts dmdLayout = DmdLayouts::Undefined;
 
-static const std::array<std::string, 13> dmdLayoutNames{"Undefined"s, "4x6+2x2"s, "4x7"s, "4x7+2x2"s, "6x4+2x2"s, "2x16+1x7"s, "2x16"s, "2x20"s, "2x7+2x2+1x16"s, "1x7+2x16"s, "1x7+1x4+2x16"s, "4x7+5x2"s, "4x6+2x2+1x6"s}; 
+static const std::array<std::string, 13> dmdLayoutNames{"Undefined"s, "4x6+2x2"s, "4x7"s, "4x7+2x2"s, "6x4+2x2"s, "2x16+1x7"s, "2x16"s, "2x20"s, "2x7+2x2+1x16"s, "1x7+2x16"s, "1x7+1x4+2x16"s, "4x7+5x2"s, "4x6+2x2+1x6"s};
 
 static const std::string& LayoutName(DmdLayouts layout)
 {
