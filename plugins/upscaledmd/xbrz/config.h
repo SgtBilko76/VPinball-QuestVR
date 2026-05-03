@@ -7,6 +7,7 @@
 // * to link the code of this program with the following libraries            *
 // * (or with modified versions that use the same licenses), and distribute   *
 // * linked combinations including the two: MAME, FreeFileSync, Snes9x, ePSXe *
+// *                                                                          *
 // * You must obey the GNU General Public License in all respects for all of  *
 // * the code used other than MAME, FreeFileSync, Snes9x, ePSXe.              *
 // * If you modify this file, you may extend this exception to your version   *
@@ -23,12 +24,11 @@ namespace xbrz
 {
 struct ScalerCfg
 {
-    static constexpr float luminanceWeight            = 1.f;
     static constexpr float equalColorTolerance        = 30.f;
     static constexpr float centerDirectionBias        = 4.f;
     static constexpr float dominantDirectionThreshold = 3.6f;
-    static constexpr float steepDirectionThreshold    = 2.2f;
-    static constexpr float newTestAttribute           = 0.f; //unused; test new parameters
+    static constexpr float steepDirectionThreshold    = 2.4f;
+    static constexpr float testAttribute              = 0.f; //unused; test new parameters
 };
 }
 
