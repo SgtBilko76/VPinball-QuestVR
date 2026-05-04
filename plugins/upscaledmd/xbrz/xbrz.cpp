@@ -301,15 +301,15 @@ BlendResult preProcessCorners(const Kernel_4x4& ker, const xbrz::ScalerCfg& cfg)
          ker.f == ker.i))
         return {};
 
-    auto dist = [&](uint32_t pix1, uint32_t pix2) { return ColorDistance::dist(pix1, pix2, cfg.testAttribute); };
+    auto dist = [&](uint32_t pix1, uint32_t pix2) { return ColorDistance::dist(pix1, pix2, ScalerCfg::testAttribute); };
 
-    const float hf = dist(ker.g, ker.e) + dist(ker.e, ker.c) + dist(ker.k, ker.i) + dist(ker.i, ker.o) + cfg.centerDirectionBias * dist(ker.h, ker.f);
-    const float ei = dist(ker.d, ker.h) + dist(ker.h, ker.l) + dist(ker.b, ker.f) + dist(ker.f, ker.n) + cfg.centerDirectionBias * dist(ker.e, ker.i);
+    const float hf = dist(ker.g, ker.e) + dist(ker.e, ker.c) + dist(ker.k, ker.i) + dist(ker.i, ker.o) + ScalerCfg::centerDirectionBias * dist(ker.h, ker.f);
+    const float ei = dist(ker.d, ker.h) + dist(ker.h, ker.l) + dist(ker.b, ker.f) + dist(ker.f, ker.n) + ScalerCfg::centerDirectionBias * dist(ker.e, ker.i);
 
     BlendResult result = {};
     if (hf < ei) //test sample: 70% of values max(hf, ei) / min(hf, ei) are between 1.1 and 3.7 with median being 1.8
     {
-        const bool dominantGradient = cfg.dominantDirectionThreshold * hf < ei;
+        const bool dominantGradient = ScalerCfg::dominantDirectionThreshold * hf < ei;
         if (ker.e != ker.f && ker.e != ker.h)
             result.blend_e = dominantGradient ? BLEND_DOMINANT : BLEND_NORMAL;
 
@@ -318,7 +318,7 @@ BlendResult preProcessCorners(const Kernel_4x4& ker, const xbrz::ScalerCfg& cfg)
     }
     else if (ei < hf)
     {
-        const bool dominantGradient = cfg.dominantDirectionThreshold * ei < hf;
+        const bool dominantGradient = ScalerCfg::dominantDirectionThreshold * ei < hf;
         if (ker.h != ker.e && ker.h != ker.i)
             result.blend_h = dominantGradient ? BLEND_DOMINANT : BLEND_NORMAL;
 
@@ -413,10 +413,10 @@ void blendPixel(const Kernel_3x3& ker,
 
     if (getBottomR(blend) >= BLEND_NORMAL)
     {
-        auto eq   = [&](uint32_t pix1, uint32_t pix2) { return ColorDistance::dist(pix1, pix2, cfg.testAttribute) < cfg.equalColorTolerance; };
-        auto dist = [&](uint32_t pix1, uint32_t pix2) { return ColorDistance::dist(pix1, pix2, cfg.testAttribute); };
+        auto eq   = [&](uint32_t pix1, uint32_t pix2) { return ColorDistance::dist(pix1, pix2, ScalerCfg::testAttribute) < ScalerCfg::equalColorTolerance; };
+        auto dist = [&](uint32_t pix1, uint32_t pix2) { return ColorDistance::dist(pix1, pix2, ScalerCfg::testAttribute); };
 
-        const bool doLineBlend = [&] -> bool
+        const bool doLineBlend = [&]() -> bool
         {
             if (getBottomR(blend) >= BLEND_DOMINANT)
                 return true;
@@ -443,8 +443,8 @@ void blendPixel(const Kernel_3x3& ker,
             const float fg = dist(f, g); //test sample: 70% of values max(fg, hc) / min(fg, hc) are between 1.1 and 3.7 with median being 1.9
             const float hc = dist(h, c); //
 
-            const bool haveShallowLine = cfg.steepDirectionThreshold * fg <= hc && e != g && d != g;
-            const bool haveSteepLine   = cfg.steepDirectionThreshold * hc <= fg && e != c && b != c;
+            const bool haveShallowLine = ScalerCfg::steepDirectionThreshold * fg <= hc && e != g && d != g;
+            const bool haveSteepLine   = ScalerCfg::steepDirectionThreshold * hc <= fg && e != c && b != c;
 
             if (haveShallowLine)
             {
@@ -1239,9 +1239,9 @@ bool xbrz::equalColorTest2(uint32_t col1, uint32_t col2, ColorFormat colFmt, flo
 void xbrz::bilinearScale(const uint32_t* src, int srcWidth, int srcHeight,
                          /**/  uint32_t* trg, int trgWidth, int trgHeight)
 {
-    const auto pixRead = [src, srcWidth](int x, int y)
+    const auto pixRead = [src](int offs)
     {
-        const uint32_t pixSrc = src[y * srcWidth + x];
+        const uint32_t pixSrc = src[offs];
 
         return [pixSrc, a = int(getAlpha(pixSrc))](int channel)
         {
@@ -1273,7 +1273,7 @@ void xbrz::bilinearScale(const uint32_t* src, int srcWidth, int srcHeight,
 void xbrz::nearestNeighborScale(const uint32_t* src, int srcWidth, int srcHeight,
                                 /**/  uint32_t* trg, int trgWidth, int trgHeight)
 {
-    const auto pixRead = [src, srcWidth](int x, int y) { return src[y * srcWidth + x]; };
+    const auto pixRead = [src](int offs) { return src[offs]; };
 
     const auto pixWrite = [trg](uint32_t pix) mutable { *trg++ = pix; };
 

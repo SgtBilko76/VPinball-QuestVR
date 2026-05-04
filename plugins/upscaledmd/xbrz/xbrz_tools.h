@@ -46,19 +46,18 @@ FORCE_INLINE uint16_t rgb888to565(uint32_t pix) { return static_cast<uint16_t>((
 
 
 template <class PixReader, class PixWriter> inline
-void unscaledCopy(PixReader pixRead /* (int x, int y) -> uint32_t */,
-                  PixWriter pixWrite /* (uint32_t pix) */, int width, int height)
+void unscaledCopy(PixReader pixRead /* (int offs) -> uint32_t */,
+                  PixWriter pixWrite /* (uint32_t pix) */, const int width, const int height)
 {
-    for (int y = 0; y < height; ++y)
-        for (int x = 0; x < width; ++x)
-            pixWrite(pixRead(x, y));
+    for (int offs = 0; offs < width * height; ++offs)
+        pixWrite(pixRead(offs));
 }
 
 
 //nearest-neighbor (going over target image - slow for upscaling, since source is read multiple times missing out on cache! Fast for similar image sizes!)
 template <class PixReader, class PixWriter>
-void nearestNeighborScale(PixReader pixRead /* (int x, int y) -> uint32_t */, int srcWidth, int srcHeight,
-                          PixWriter pixWrite /* (uint32_t pix)            */, int trgWidth, int trgHeight,
+void nearestNeighborScale(PixReader pixRead /* (int offs) -> uint32_t */, const int srcWidth, const int srcHeight,
+                          PixWriter pixWrite /* (uint32_t pix)         */, const int trgWidth, const int trgHeight,
                           int yFirst, int yLast)
 {
     yFirst = std::max(yFirst, 0);
@@ -67,12 +66,12 @@ void nearestNeighborScale(PixReader pixRead /* (int x, int y) -> uint32_t */, in
 
     for (int y = yFirst; y < yLast; ++y)
     {
-        const int ySrc = srcHeight * y / trgHeight;
+        const int ySrcOff = (srcHeight * y / trgHeight) * srcWidth;
 
-        for (int x = 0; x < trgWidth; ++x)
+        for (int x = 0; x < trgWidth*srcWidth; x += srcWidth)
         {
-            const int xSrc = srcWidth * x / trgWidth;
-            pixWrite(pixRead(xSrc, ySrc));
+            const int xSrc = x / trgWidth;
+            pixWrite(pixRead(ySrcOff + xSrc));
         }
     }
 }
@@ -108,7 +107,7 @@ unsigned int uintDivRound(unsigned int num, unsigned int den)
 
 //caveat: treats alpha channel like regular color! => caller needs to pre/de-multiply alpha!
 template <class PixReader, class PixWriter>
-void bilinearScale(PixReader pixRead /* (int x, int y) -> Function<value(int channel)>       */, int srcWidth, int srcHeight,
+void bilinearScale(PixReader pixRead /* (int offs) -> Function<value(int channel)>       */, int srcWidth, int srcHeight,
                    PixWriter pixWrite /* ( const Function<value(int channel)>& interpolate ) */, int trgWidth, int trgHeight,
                    int yFirst, int yLast)
 {
@@ -154,6 +153,9 @@ void bilinearScale(PixReader pixRead /* (int x, int y) -> Function<value(int cha
         const float yy1 = y / scaleY - y1;
         const float y2y = 1.f - yy1;
 
+        const int y1Off = y1 * srcWidth;
+        const int y2Off = y2 * srcWidth;
+
         for (int x = 0; x < trgWidth; ++x)
         {
             //perf: do NOT "simplify" the variable layout without measurement!
@@ -168,18 +170,18 @@ void bilinearScale(PixReader pixRead /* (int x, int y) -> Function<value(int cha
             const float  x2xyy1 = x2x * yy1;
             const float  xx1yy1 = xx1 * yy1;
 
-            auto pix11 = pixRead(x1, y1);
-            auto pix21 = pixRead(x2, y1);
-            auto pix12 = pixRead(x1, y2);
-            auto pix22 = pixRead(x2, y2);
+            const auto pix11 = pixRead(y1Off + x1);
+            const auto pix21 = pixRead(y1Off + x2);
+            const auto pix12 = pixRead(y2Off + x1);
+            const auto pix22 = pixRead(y2Off + x2);
 
             auto interpolate = [&](int channel)
             {
                 /* https://en.wikipedia.org/wiki/Bilinear_interpolation
                      (c11(x2 - x) + c21(x - x1)) * (y2 - y ) +
                      (c12(x2 - x) + c22(x - x1)) * (y  - y1)      */
-                return pix11(channel) * x2xy2y + pix21(channel) * xx1y2y +
-                       pix12(channel) * x2xyy1 + pix22(channel) * xx1yy1;
+                return (float)pix11(channel) * x2xy2y + (float)pix21(channel) * xx1y2y +
+                       (float)pix12(channel) * x2xyy1 + (float)pix22(channel) * xx1yy1;
             };
             pixWrite(std::move(interpolate));
         }

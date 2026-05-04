@@ -17,7 +17,7 @@ protected:
 
     template <typename T> constexpr static inline T clamp(const T x, const T mn, const T mx) { return std::max(std::min(x, mx), mn); }
 
-    __forceinline ABGR8 src(int x, int y) const {
+    FORCE_INLINE ABGR8 src(int x, int y) const {
         // Clamp to border
         if (uint32_t(x) > uint32_t(m_srcMaxX) || uint32_t(y) > uint32_t(m_srcMaxY)) {
             x = clamp(x, 0, m_srcMaxX);
@@ -43,32 +43,32 @@ public:
 /* Algorithm by Morgan McGuire and Mara Gagiu. */
 class MMPXAlgorithm final : public Algorithm {
 public:
-    __forceinline static uint32_t luma(ABGR8 color) {
+    FORCE_INLINE static uint32_t luma(ABGR8 color) {
         const uint32_t alpha = (color & 0xFF000000u) >> 24;
         return (((color & 0x00FF0000u) >> 16) + ((color & 0x0000FF00u) >> 8) + (color & 0x000000FFu) + 1u) * (256u - alpha);
     }
 
-    __forceinline static bool all_eq2(ABGR8 B, ABGR8 A0, ABGR8 A1) {
+    FORCE_INLINE static bool all_eq2(ABGR8 B, ABGR8 A0, ABGR8 A1) {
         return ((B ^ A0) | (B ^ A1)) == 0;
     }
 
-    __forceinline static bool all_eq3(ABGR8 B, ABGR8 A0, ABGR8 A1, ABGR8 A2) {
+    FORCE_INLINE static bool all_eq3(ABGR8 B, ABGR8 A0, ABGR8 A1, ABGR8 A2) {
         return ((B ^ A0) | (B ^ A1) | (B ^ A2)) == 0;
     }
 
-    __forceinline static bool all_eq4(ABGR8 B, ABGR8 A0, ABGR8 A1, ABGR8 A2, ABGR8 A3) {
+    FORCE_INLINE static bool all_eq4(ABGR8 B, ABGR8 A0, ABGR8 A1, ABGR8 A2, ABGR8 A3) {
         return ((B ^ A0) | (B ^ A1) | (B ^ A2) | (B ^ A3)) == 0;
     }
 
-    __forceinline static bool any_eq3(ABGR8 B, ABGR8 A0, ABGR8 A1, ABGR8 A2) {
+    FORCE_INLINE static bool any_eq3(ABGR8 B, ABGR8 A0, ABGR8 A1, ABGR8 A2) {
         return B == A0 || B == A1 || B == A2;
     }
 
-    __forceinline static bool none_eq2(ABGR8 B, ABGR8 A0, ABGR8 A1) {
+    FORCE_INLINE static bool none_eq2(ABGR8 B, ABGR8 A0, ABGR8 A1) {
         return (B != A0) && (B != A1);
     }
 
-    __forceinline static bool none_eq4(ABGR8 B, ABGR8 A0, ABGR8 A1, ABGR8 A2, ABGR8 A3) {
+    FORCE_INLINE static bool none_eq4(ABGR8 B, ABGR8 A0, ABGR8 A1, ABGR8 A2, ABGR8 A3) {
         return B != A0 && B != A1 && B != A2 && B != A3;
     }
 

@@ -190,6 +190,8 @@
     <ClInclude Include="../../plugins/upscaledmd/xbrz/xbrz.h" />
     <ClInclude Include="../../plugins/upscaledmd/super-xbr/super-xbr.h" />
     <ClInclude Include="../../plugins/upscaledmd/scalefx/scalefx.h" />
+    <ClInclude Include="../../plugins/upscaledmd/mmpx/mmpx.h" />
+    <ClInclude Include="../../plugins/upscaledmd/xbrz/xbrz_tools.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="../../plugins/upscaledmd/plugin.cfg">
