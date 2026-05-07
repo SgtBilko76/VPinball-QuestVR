@@ -1240,11 +1240,11 @@ void Rubber::GenerateMesh(const int _accuracy, const bool createHitShape) //!! h
    else if (accuracy < 8)
       accuracy = 8;
    else
-      accuracy = (int)((float)accuracy * 1.3f); // see also below
+      accuracy = (int)((float)accuracy * 1.30000007152557373046875f); // see also below
 
    // as solid rubbers are rendered into the static buffer, always use maximum precision
    if (m_d.m_staticRendering)
-      accuracy = (int)(10.f*1.3f); // see also above
+      accuracy = (int)(10.f * 1.30000007152557373046875f); // see also above
 
    if (_accuracy != -1) // hit shapes and UI display have the same, static, precision
       accuracy = _accuracy;
