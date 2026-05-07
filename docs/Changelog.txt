@@ -208,6 +208,8 @@ FIXES:
 
 - fix 0-scaled rubber crash (like it can happen if invalid UI-inputs like 'Scale' are mapped to 0)
 
+- fix different maximum tessellation/detail levels for ramps & rubbers, dependent on static vs non-static rendering
+
 - improve 'resting' ball detection and better filtering for physics hit events
 
 - improve flipper latency reporting in the performance UI
