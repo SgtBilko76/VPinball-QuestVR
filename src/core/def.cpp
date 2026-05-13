@@ -262,7 +262,7 @@ static bool HelperConvertASCII(const char* const __restrict szcstr, const int le
       if (_mm_movemask_epi8(sz16) != 0) // test highest bit of each byte, so check for >=0x80 -> non-ASCII
          return false;
 #if (WCHAR_T_SIZE == 2) // UTF16
-      _mm_storeu_si128((__m128i*)(result + i    ), _mm_unpacklo_epi8(sz16, zero)); // zero-extend 16 bytes -> 2×8 uint16 and store
+      _mm_storeu_si128((__m128i*)(result + i    ), _mm_unpacklo_epi8(sz16, zero)); // zero-extend 16 bytes -> 2x8 uint16 and store
       _mm_storeu_si128((__m128i*)(result + i + 8), _mm_unpackhi_epi8(sz16, zero));
 #else // UTF32
       // zero-extend 16 bytes -> 4×4 uint32 and store

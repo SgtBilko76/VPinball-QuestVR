@@ -140,9 +140,9 @@ private:
    ankerl::unordered_dense::map<string, PUPLabel*> m_labelMap;
    ankerl::unordered_dense::map<string, PUPPlaylist*> m_playlistMap;
    ankerl::unordered_dense::map<string, vector<PUPTrigger*>> m_triggerMap;
-   PUPImage m_background;    // PuPFrames playlist — underlay behind video
-   PUPImage m_staticImage;   // Static PNG/JPG from Default function — renders on video layer, bypasses FFmpeg
-   PUPImage m_overlay;       // PuPOverlays/PuPAlphas playlist — overlay rendered above video
+   PUPImage m_background;    // PuPFrames playlist - underlay behind video
+   PUPImage m_staticImage;   // Static PNG/JPG from Default function - renders on video layer, bypasses FFmpeg
+   PUPImage m_overlay;       // PuPOverlays/PuPAlphas playlist - overlay rendered above video
    std::unique_ptr<PUPMediaManager> m_pMediaPlayerManager;
    bool m_labelInit = false;
    int m_pagenum = 0;

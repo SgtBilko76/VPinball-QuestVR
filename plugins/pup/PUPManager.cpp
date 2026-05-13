@@ -104,7 +104,7 @@ void PUPManager::SetGameDir(const string& szRomName)
    assert(!IsRunning());
 
    // Guard against empty rom names (can come from early B2S broadcasts before the B2S name is
-   // committed — see Monster Bash's pupvideos/mb_106b folder never being located otherwise).
+   // committed - see Monster Bash's pupvideos/mb_106b folder never being located otherwise).
    // With an empty component, `pupvideos` / "" resolves to the pupvideos parent directory which
    // then satisfies the directory-exists check in find_case_insensitive_directory_path and
    // wrongly becomes m_szPath.
@@ -144,7 +144,7 @@ void PUPManager::LoadConfig(const string& szRomName)
 {
    // Tables commonly call B2SInit multiple times, and some tables configure PuP
    // entirely from script (PuPlayer.Init / playlistadd) before B2SInit ever fires.
-   // In both cases, if we already have state for this ROM, keep it — just make
+   // In both cases, if we already have state for this ROM, keep it - just make
    // sure the manager is running and the initial DOF event has been queued.
    if (!m_szPath.empty() && lowerCase(szRomName) == lowerCase(m_szRomName))
    {
@@ -681,7 +681,7 @@ int PUPManager::Render(VPXRenderContext2D* const renderCtx, void* context)
       if (parent)
          screens.push_back(screen);
    }
-   // Render order — two tiers (non-topmost, topmost) mirroring Win32 HWND_TOPMOST behavior.
+   // Render order - two tiers (non-topmost, topmost) mirroring Win32 HWND_TOPMOST behavior.
    // Within each tier: non-popup video, non-popup overlay, popups.
    auto renderScreens = [&renderCtx, &screens](bool popup, bool topmost, int startPass, int endPass)
    {

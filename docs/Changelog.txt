@@ -91,6 +91,7 @@ FEATURES:
   . on the Windows platform, the Windows keys can now be used as a normal key input
   . a few hardware devices and generic layouts are automatically detected, when this happens, the user is supposed to apply the corresponding default mapping.
     Explicit support for some very old hardware has been removed (Microsoft's Sidewinder, UltraCade's UltraPin,...)
+    Explicit support for newer hardware has been added (Pinscape, Arcade2TV-XR)
   . the hardware acceleration filter may not be enabled anymore for keyboard nudge (as it is not supposed to be used for keyboard nudge)
   The new input setup is stored along the old one to allow to use older versions of VPX together with newers.
   This change requires users to redefine their input settings in the new UI.

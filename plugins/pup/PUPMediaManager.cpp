@@ -134,7 +134,7 @@ void PUPMediaManager::Resume()
    m_player.Pause(false);
 }
 
-// See pDMDBackLoopStart — mode=1 saves current file as background config and loops it.
+// See pDMDBackLoopStart - mode=1 saves current file as background config and loops it.
 // mode=0 clears only if set via SetBackGround (not trigger SetBG). Popup screens are excluded.
 void PUPMediaManager::SetAsBackGround(bool isBackground)
 {
@@ -179,7 +179,7 @@ void PUPMediaManager::SetVolume(float volume)
    m_player.SetVolume(volume);
 }
 
-// See pDMDStopBackLoop — stops main, starts background if configured
+// See pDMDStopBackLoop - stops main, starts background if configured
 void PUPMediaManager::Stop()
 {
    LOGD(std::format("STOP: screen={}, queueDepth={}, bgActive={}", m_pScreen->GetScreenNum(), m_queue.size(), m_bg.active));
