@@ -104,7 +104,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("$projectDir/vpinball.jks")
+            storeFile = file(System.getenv("ANDROID_KEYSTORE_FILE") ?: "$projectDir/vpinball.jks")
             storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
             keyAlias = System.getenv("ANDROID_KEY_ALIAS")
             keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
