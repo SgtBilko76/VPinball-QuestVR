@@ -133,14 +133,15 @@ public:
          map.MapAction(ButtonMapping::Create(m_joyId, 17, 0.3f), m_pininput.GetRightFlipperActionId());
          map.MapAction(ButtonMapping::Create(m_joyId, 16, 0.6f), m_pininput.GetStagedLeftFlipperActionId());
          map.MapAction(ButtonMapping::Create(m_joyId, 17, 0.6f), m_pininput.GetStagedRightFlipperActionId());
-         map.MapAction(ButtonMapping::Create(m_joyId, 12), m_pininput.GetVRControllerViewCenteringActionId()); // Left Thumbstick click
+         // Left Thumbstick click is left unmapped: controller view centering (table following the hands) is easily triggered by mistake
          map.MapAction(ButtonMapping::Create(m_joyId, 13), m_pininput.GetLaunchBallActionId()); // Right Thumbstick click
          map.MapAction(ButtonMapping::Create(m_joyId, 4), m_pininput.GetLeftMagnaActionId()); // Squeeze
          map.MapAction(ButtonMapping::Create(m_joyId, 5), m_pininput.GetRightMagnaActionId());
          map.MapAction(ButtonMapping::Create(m_joyId, 11), m_pininput.GetAddCreditActionId(0)); // Right buttons
          map.MapAction(ButtonMapping::Create(m_joyId, 10), m_pininput.GetStartActionId());
-         map.MapAction(ButtonMapping::Create(m_joyId, 8), m_pininput.GetOpenInGameUIActionId()); // Left buttons
-         map.MapAction(ButtonMapping::Create(m_joyId, 9), m_pininput.GetExitGameActionId());
+         map.MapAction(ButtonMapping::Create(m_joyId, 2), m_pininput.GetOpenInGameUIActionId()); // Left menu button
+         map.MapAction(ButtonMapping::Create(m_joyId, 9), m_pininput.GetVRViewCenterActionId()); // Left Y button
+         map.MapAction(ButtonMapping::Create(m_joyId, 8), m_pininput.GetVRViewAwayActionId()); // Left X button (no direct exit, quitting is done through the in-game UI)
          map.MapAction(ButtonMapping::Create(m_joyId, 21, -0.9f, true), m_pininput.GetUIDownActionId()); // Left vertical stick
          map.MapAction(ButtonMapping::Create(m_joyId, 21, 0.9f), m_pininput.GetUIUpActionId());
          map.MapAction(ButtonMapping::Create(m_joyId, 22, -0.9f, true), m_pininput.GetUILeftActionId()); // Right horizontal stick

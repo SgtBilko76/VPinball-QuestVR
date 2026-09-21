@@ -2412,6 +2412,10 @@ void Player::OnAudioUpdated(const unsigned int msgId, void *userData, void *msgD
    }
    else if (msg.buffer != nullptr)
    {
+      // A source without a valid sample rate can't be played (e.g. PinMAME with sound disabled due to missing sound ROMs):
+      // silently drop it instead of failing (and logging) the stream creation for every single buffer
+      if (msg.sampleRate <= 0.)
+         return;
       int nChannels;
       switch (msg.channelFormat)
       {

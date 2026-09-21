@@ -260,6 +260,7 @@ private:
    
    bool m_headsetViewCentering = false;
    bool m_controllerViewCentering = false;
+   bool m_lockbarSetByControllers = false; // Lockbar size/height were overriden by controller view centering (restored from settings on recentering)
    XrSpace m_leftControllerSpace = XR_NULL_HANDLE;
    XrSpace m_rightControllerSpace = XR_NULL_HANDLE;
 

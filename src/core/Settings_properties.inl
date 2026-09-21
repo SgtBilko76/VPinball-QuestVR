@@ -164,11 +164,11 @@ PropBool(Player, ForceAnisotropicFiltering, "Force Anisotropic Filtering"s, "For
 PropBool(Player, CompressTextures, "Compress Textures"s, "Automatically compress textures at game startup (slow) for better performance"s, false);
 PropBool(Player, UseNVidiaAPI, "Alternative Depth Buffer"s, "Use NVidia API to manage Depth Buffer on a DirectX 9 build. May solve some rendering issues"s, false);
 PropBool(Player, SoftwareVertexProcessing, "Software Vertex Processing"s, "Activate this on a DirectX 9 build, if you have issues using an old Intel graphics chip"s, false);
-PropBool(Player, DisableAO, "Disable Ambient Occlusion"s, ""s, false);
+PropBool(Player, DisableAO, "Disable Ambient Occlusion"s, ""s, g_isMobile); // Mobile/standalone headsets: AO is too costly at VR resolutions
 PropBool(Player, DynamicAO, "Dynamic Ambient Occlusion"s, ""s, true);
 PropEnum(Player, PFReflection, "Reflection Quality"s,
    "Limit the quality of reflections for better performance.\n'Dynamic' is recommended and will give the best results, but may harm performance.\n'Static Only' has no performance cost (except for VR rendering).\nOther options feature different trade-offs between quality and performance."s,
-   int, 5, "Disable Reflections"s, "Balls Only"s, "Static Only"s, "Static & Balls"s, "Static & Unsynced Dynamic"s, "Dynamic"s);
+   int, g_isMobile ? 1 : 5, "Disable Reflections"s, "Balls Only"s, "Static Only"s, "Static & Balls"s, "Static & Unsynced Dynamic"s, "Dynamic"s);
 PropInt(Player, MaxTexDimension, "Maximum texture dimension"s, "Images sized above this limit will be automatically scaled down on load"s, 512, 16384, g_isMobile ? 1536 : 16384);
 PropInt(Player, AlphaRampAccuracy, "Detail Level"s, "Level of detail for balls and ramps"s, 1, 10, 10);
 PropEnum(Player, BGSet, "View Mode"s, "Select between desktop, cabinet or 'full single screen' viewing mode configurations (if a table has set them up correctly)"s, int, 0, "Desktop / Full Single Screen"s, "Cabinet"s, "Full Single Screen"s);
@@ -183,7 +183,7 @@ PropFloat(Player, AAFactor, "Full Scene Anti Aliasing"s,
 PropEnum(Player, MSAASamples, "MSAA level"s,
    "Set the amount of MSAA samples.\nMSAA can help reduce geometry aliasing at the cost of performance and GPU memory.\nThis can improve image quality if not using supersampling"s, int,
    0, "Disabled"s, "4 Samples"s, "6 Samples"s, "8 Samples"s);
-PropEnum(Player, FXAA, "Post processed antialiasing"s, "Select between different antialiasing techniques that offer different quality vs performance balances"s, int, 0, "Disabled"s,
+PropEnum(Player, FXAA, "Post processed antialiasing"s, "Select between different antialiasing techniques that offer different quality vs performance balances"s, int, g_isMobile ? 1 : 0, "Disabled"s, // Mobile/standalone headsets: Fast FXAA (MSAA is too costly)
    "Fast FXAA"s, "Standard FXAA"s, "Quality FXAA"s, "Fast NFAA"s, "Standard DLAA"s, "Quality SMAA"s, "Quality FAAA"s);
 PropEnum(Player, Sharpen, "Post processed sharpening"s, "Select between different sharpening techniques that offer different quality vs performance balances"s, int, 0, "Disabled"s, "CAS"s,
    "Bilateral CAS"s);
@@ -262,7 +262,7 @@ PropBool(PlayerVR, ShrinkPreview, "Shrink preview"s, "Shrink VR preview"s, false
 PropBool(PlayerVR, AddBackglass, "Add Backglass"s, "Add a default backglass display to the scene"s, false);
 PropFloatDyn(PlayerVR, ControllerCabYOffset, "Cabinet Y Offset"s, "Y offset to apply when using controller view centering"s, -150.f, 50.f, 0.f);
 PropFloatDyn(PlayerVR, ControllerLockbarScale, "Lockbar size ratio"s, "Lockbar size ratio to apply when using controller view centering"s, 0.5f, 2.0f, 1.f);
-PropFloatUnbounded(PlayerVR, ResFactor, "ResFactor"s, ""s, -1.f);
+PropFloatUnbounded(PlayerVR, ResFactor, "ResFactor"s, ""s, g_isMobile ? 0.25f : -1.f); // Mobile/standalone headsets (Quest 3): 2048x2048 per eye to reach 72 FPS
 PropBool(PlayerVR, LockFeetToGround, "Lock Feet to Ground"s, "Lock cabinet feet to ground. This usually feels more natural (avoid floating cabinet) but may be deactivated for example for playing mini flipper seated at a desk."s, true);
 
 // Physics override profiles

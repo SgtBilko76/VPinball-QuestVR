@@ -62,6 +62,7 @@ public:
    unsigned int GetVRViewCenterActionId() const { return m_vrViewCenterActionId; }
    unsigned int GetVRViewUpActionId() const { return m_vrViewUpActionId; }
    unsigned int GetVRViewDownActionId() const { return m_vrViewDownActionId; }
+   unsigned int GetVRViewAwayActionId() const { return m_vrViewAwayActionId; }
    bool IsUINavigationActionId(unsigned int id) const;
    bool IsPressed(int actionId) const;
    int GetWindowVirtualKeyForAction(unsigned int actionId) const;
@@ -230,6 +231,7 @@ private:
    unsigned int m_vrViewCenterActionId;
    unsigned int m_vrViewUpActionId;
    unsigned int m_vrViewDownActionId;
+   unsigned int m_vrViewAwayActionId;
    unsigned int m_vrControllerViewCenteringActionId;
    ankerl::unordered_dense::map<uint32_t, vector<ButtonMapping*>> m_buttonMappings;
    vector<InputAction*> m_onUpdateActions;

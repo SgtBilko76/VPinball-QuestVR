@@ -490,6 +490,14 @@ void InputManager::ProcessInput()
             ApplyDefaultDeviceMapping(device.m_id);
             device.m_hasPendingLayoutApply = false;
          }
+#ifdef __ANDROID__
+         else if (m_player->IsVR())
+         {
+            // On standalone headsets (Meta Quest), the tracked controllers are also exposed by Android as generic gamepads.
+            // Input is already handled through OpenXR, so don't propose a layout for these duplicates on every table start.
+            device.m_hasPendingLayoutApply = false;
+         }
+#endif
          else
             m_hasPendingLayoutApply = true;
       }
@@ -685,6 +693,13 @@ void InputManager::CreateInputActions()
                      m_player->m_liveUI->m_inGameUI.OnUILeftAction();
                   else if (action.GetActionId() == m_uiRightActionId)
                      m_player->m_liveUI->m_inGameUI.OnUIRightAction();
+#ifdef __ANDROID__
+                  // On standalone headsets, Start/Credit (A/B buttons) act as select/back like other VR apps (save/undo stay available as menu items)
+                  else if (m_player->IsVR() && action.GetActionId() == m_startActionId)
+                     m_player->m_liveUI->m_inGameUI.OnUIRightAction();
+                  else if (m_player->IsVR() && action.GetActionId() == m_addCreditActionId[0])
+                     m_player->m_liveUI->m_inGameUI.OnUINavigateBack();
+#endif
                   // Somewhat hacky direct UI action mapping (inherited from legacy POV adjustment mode, could benefit from some additional cleanups)
                   else if (action.GetActionId() == m_launchBallActionId)
                      m_player->m_liveUI->m_inGameUI.OnUIResetToDefaults();
@@ -903,11 +918,12 @@ void InputManager::CreateInputActions()
    auto vrDown = addVRPositionAction("VRDown"s, "Move VR view down"s, SDL_SCANCODE_KP_2, vec3(0.f, 0.f, -1.f));
    auto vrFront = addVRPositionAction("VRFront"s, "Move VR view to the front"s, SDL_SCANCODE_UNKNOWN, vec3(0.f, 1.f, 0.f));
    auto vrBack = addVRPositionAction("VRBack"s, "Move VR view to the back"s, SDL_SCANCODE_UNKNOWN, vec3(0.f, -1.f, 0.f));
-   auto vrLeft = addVRPositionAction("VRFront"s, "Move VR view to the left"s, SDL_SCANCODE_UNKNOWN, vec3(-1.f, 0.f, 0.f));
-   auto vrRight = addVRPositionAction("VRBack"s, "Move VR view to the right"s, SDL_SCANCODE_UNKNOWN, vec3(1.f, -0.f, 0.f));
+   auto vrLeft = addVRPositionAction("VRLeft"s, "Move VR view to the left"s, SDL_SCANCODE_UNKNOWN, vec3(-1.f, 0.f, 0.f));
+   auto vrRight = addVRPositionAction("VRRight"s, "Move VR view to the right"s, SDL_SCANCODE_UNKNOWN, vec3(1.f, -0.f, 0.f));
    m_vrViewCenterActionId = vrCenter->GetActionId();
    m_vrViewUpActionId = vrUp;
    m_vrViewDownActionId = vrDown;
+   m_vrViewAwayActionId = vrFront; // Offsetting the table to the front moves the player away from it (VR controllers X button)
    #ifdef ENABLE_XR
    auto vrControllerCalibration = AddAction(std::make_unique<InputAction>(this, "VRControllerCalibration"s, "Align VR view using controllers"s, ""s,
       [this](InputAction& action, bool wasPressed, bool isPressed)

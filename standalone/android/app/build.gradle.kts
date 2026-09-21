@@ -93,6 +93,8 @@ android {
         create("quest") {
             dimension = "platform"
             buildConfigField("boolean", "IS_QUEST", "true")
+            // Optional display version for Quest builds (e.g. -PquestVersionName="Quest Beta 0.1"), versionCode is unchanged
+            project.findProperty("questVersionName")?.let { versionName = it.toString() }
         }
         create("mobile") {
             dimension = "platform"

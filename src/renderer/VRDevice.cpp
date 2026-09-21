@@ -566,8 +566,10 @@ void VRDevice::SetupHMD()
    }
 
    // Limit to a resolution, under the maximum texture size supported by the GPU
+   // (only if BGFX is already initialized: on Vulkan, this is called before BGFX init and caps are still zeroed)
    const bgfx::Caps* caps = bgfx::getCaps();
-   if ((static_cast<uint32_t>(m_eyeWidth) >= caps->limits.maxTextureSize) || (static_cast<uint32_t>(m_eyeHeight) >= caps->limits.maxTextureSize))
+   if (caps->limits.maxTextureSize > 0
+      && ((static_cast<uint32_t>(m_eyeWidth) >= caps->limits.maxTextureSize) || (static_cast<uint32_t>(m_eyeHeight) >= caps->limits.maxTextureSize)))
    {
       PLOGI << "Requested resolution exceed the GPU capability, defaulting to headset recommended resolution";
       m_eyeWidth = std::min(m_viewConfigurationViews[0].recommendedImageRectWidth, caps->limits.maxTextureSize);
@@ -1117,6 +1119,7 @@ void VRDevice::RenderFrame(RenderDevice* rd, const std::function<void(RenderTarg
                const vec3 lockbarAxis = rightPos - leftPos;
                const float lockbarAngle = atan2f(-lockbarAxis.z, lockbarAxis.x);
                m_headsetViewCentering = false;
+               m_lockbarSetByControllers = true;
                m_lockbarWidth = lockbarAxis.Length() * 100.f * table->m_settings.GetPlayerVR_ControllerLockbarScale();
                
                // Update fixed scaling, considering lockbar size to be the width of the playfield + 2"1/4
@@ -1434,6 +1437,14 @@ void VRDevice::RecenterTable()
 #if defined(ENABLE_XR)
    m_headsetViewCentering = true;
    m_controllerViewCentering = false;
+   // Controller view centering adapts the cabinet size to the controllers: get back to the user defined cabinet size
+   if (m_lockbarSetByControllers && g_pplayer)
+   {
+      m_lockbarSetByControllers = false;
+      m_lockbarWidth = g_pplayer->m_ptable->m_settings.GetPlayer_LockbarWidth();
+      m_lockbarHeight = g_pplayer->m_ptable->m_settings.GetPlayer_LockbarHeight();
+      m_worldDirty = true;
+   }
 #endif
 }
 

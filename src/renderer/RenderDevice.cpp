@@ -1,6 +1,7 @@
 // license:GPLv3+
 
 #include "core/stdafx.h"
+#include "core/VPApp.h"
 #include "renderer/Renderer.h"
 
 #include "parts/Collection.h"
@@ -12,6 +13,7 @@
 #endif
 
 #include <thread>
+#include <fstream>
 
 #ifdef __LIBVPINBALL__
 #ifdef __APPLE__
@@ -113,6 +115,45 @@ void RenderDevice::tBGFXCallback::traceVargs(const char* _filePath, uint16_t _li
       out[total - 1] = '\0';
    PLOGI << out;
 #endif
+}
+
+static std::filesystem::path GetBGFXCacheFilePath(uint64_t _id)
+{
+   return g_app->m_fileLocator.GetAppPath(FileLocator::AppSubFolder::Preferences, "shadercache"s) / std::format("{:016x}.bin", _id);
+}
+
+uint32_t RenderDevice::tBGFXCallback::cacheReadSize(uint64_t _id)
+{
+   std::error_code ec;
+   const auto size = std::filesystem::file_size(GetBGFXCacheFilePath(_id), ec);
+   return (ec || size > UINT32_MAX) ? 0 : static_cast<uint32_t>(size);
+}
+
+bool RenderDevice::tBGFXCallback::cacheRead(uint64_t _id, void* _data, uint32_t _size)
+{
+   std::ifstream file(GetBGFXCacheFilePath(_id), std::ios::binary);
+   return file && file.read(static_cast<char*>(_data), _size) && file.gcount() == static_cast<std::streamsize>(_size);
+}
+
+void RenderDevice::tBGFXCallback::cacheWrite(uint64_t _id, const void* _data, uint32_t _size)
+{
+   const std::filesystem::path path = GetBGFXCacheFilePath(_id);
+   std::error_code ec;
+   std::filesystem::create_directories(path.parent_path(), ec);
+   // Write to a temporary file then rename, to never leave a truncated cache entry behind
+   std::filesystem::path tmpPath = path;
+   tmpPath += ".tmp";
+   {
+      std::ofstream file(tmpPath, std::ios::binary | std::ios::trunc);
+      if (!file || !file.write(static_cast<const char*>(_data), _size))
+      {
+         PLOGW << "Failed to write shader cache entry " << path;
+         return;
+      }
+   }
+   std::filesystem::rename(tmpPath, path, ec);
+   if (ec)
+      PLOGW << "Failed to write shader cache entry " << path << ": " << ec.message();
 }
 
 void RenderDevice::tBGFXCallback::screenShot(
