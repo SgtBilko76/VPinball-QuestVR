@@ -1448,6 +1448,41 @@ void VRDevice::RecenterTable()
 #endif
 }
 
+#if defined(ENABLE_XR)
+bool VRDevice::ToggleViewAdjustMode()
+{
+   m_viewAdjustMode = !m_viewAdjustMode;
+   if (m_viewAdjustMode)
+   {
+      m_controllerViewCentering = false;
+      if (m_xrInputHandler)
+         m_xrInputHandler->SetViewAdjustHandler(
+            [this](float leftY, float rightY, float dt)
+            {
+               constexpr float deadZone = 0.15f;
+               // Left stick: pushing forward moves the table closer (the view offset moves the table away for positive values), up to 50 cm/s
+               if (fabsf(leftY) > deadZone)
+                  OffsetTable(0.f, -leftY * 50.f * dt, 0.f);
+               // Right stick: pushing forward makes the table bigger, up to 50% per second
+               if (fabsf(rightY) > deadZone)
+               {
+                  m_lockbarWidth = clamp(m_lockbarWidth * (1.f + rightY * 0.5f * dt), 10.f, 500.f);
+                  m_lockbarSetByControllers = false; // Size is now user defined, keep it on recentering
+                  m_worldDirty = true;
+               }
+            });
+   }
+   else
+   {
+      if (m_xrInputHandler)
+         m_xrInputHandler->SetViewAdjustHandler(nullptr);
+      // Persist the adjusted size for all tables (the view offset is persisted when the player is closed)
+      g_app->m_settings.SetPlayer_LockbarWidth(m_lockbarWidth, false);
+   }
+   return m_viewAdjustMode;
+}
+#endif
+
 void VRDevice::SaveVRSettings(Settings& settings) const
 {
    settings.SetPlayerVR_Orientation(m_orientation, false);

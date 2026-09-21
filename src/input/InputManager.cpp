@@ -832,6 +832,14 @@ void InputManager::CreateInputActions()
          {
             if (isPressed && !m_player->m_liveUI->IsOpened())
             {
+               #ifdef ENABLE_XR
+               // The sticks are needed to navigate the UI: leave the view adjust mode (keeping the adjustments)
+               if (m_player->IsVR() && m_player->m_vrDevice->IsViewAdjustMode())
+               {
+                  m_player->m_vrDevice->ToggleViewAdjustMode();
+                  m_vrViewAdjustNotificationId = m_player->m_liveUI->PushNotification("Table size and distance saved"s, 2000, m_vrViewAdjustNotificationId);
+               }
+               #endif
                m_player->m_liveUI->OpenInGameUI();
             }
             else if (isPressed && m_player->m_liveUI->IsInGameUIOpened())
@@ -932,6 +940,16 @@ void InputManager::CreateInputActions()
             m_player->m_vrDevice->EnableControllerViewCentering(!m_player->m_vrDevice->IsControllerViewCenteringEnabled());
       }));
    m_vrControllerViewCenteringActionId = vrControllerCalibration->GetActionId();
+   m_vrViewAdjustActionId = AddAction(std::make_unique<InputAction>(this, "VRViewAdjust"s, "Adjust VR table size and distance"s, ""s,
+      [this](InputAction& action, bool wasPressed, bool isPressed)
+      {
+         if (!isPressed || !m_player->IsVR() || m_player->m_liveUI->IsInGameUIOpened())
+            return;
+         const bool enabled = m_player->m_vrDevice->ToggleViewAdjustMode();
+         m_vrViewAdjustNotificationId = m_player->m_liveUI->PushNotification(enabled
+               ? "Adjust mode: left stick = distance, right stick = size. Press again to finish"s
+               : "Table size and distance saved"s, enabled ? 600000 : 2000, m_vrViewAdjustNotificationId);
+      }))->GetActionId();
    #endif
 
    AddAction(std::make_unique<InputAction>(this, "GenTournament"s, "Create Tournament File"s, keyMapping(SDL_SCANCODE_LALT) + " & " + keyMapping(SDL_SCANCODE_1),

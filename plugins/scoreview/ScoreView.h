@@ -73,6 +73,7 @@ public:
 private:
    void Parse(const std::filesystem::path& path);
    void Select(const float scoreW, const float scoreH);
+   bool BuildAutoLayout();
 
    enum Fit
    {
@@ -131,6 +132,7 @@ private:
    vector<Layout> m_layouts;
    bool m_invalidBestLayout = true;
    Layout* m_bestLayout = nullptr;
+   Layout m_autoLayout; // Generated layout, used when no provided layout matches the segment displays of the running machine
 
    PinballPlugin::ResURIResolver m_resURIResolver;
 

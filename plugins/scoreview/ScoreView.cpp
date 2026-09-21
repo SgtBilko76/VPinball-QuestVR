@@ -554,7 +554,84 @@ void ScoreView::Select(const float scoreW, const float scoreH)
       });
 
    if (m_bestLayout->unmatchedVisuals > 0)
-      m_bestLayout = nullptr;
+      m_bestLayout = BuildAutoLayout() ? &m_autoLayout : nullptr;
+}
+
+// When no provided layout matches the segment displays of the running machine (each manufacturer/hardware generation has its own display arrangement),
+// build a generic one: the large (score) displays on a 2 columns grid, the small ones (ball, credit, match,...) centered on a row below.
+bool ScoreView::BuildAutoLayout()
+{
+   vector<int> elements;
+   for (int i = 0; i < 32; i++)
+   {
+      const PinballPlugin::ResURIResolver::SegDisplayState segDisplay = m_resURIResolver.GetSegDisplayState("ctrl://default/seg?id=" + std::to_string(i));
+      if (segDisplay.source == nullptr || segDisplay.source->nElements == 0)
+         break;
+      elements.push_back(static_cast<int>(segDisplay.source->nElements));
+   }
+   if (elements.empty())
+      return false;
+
+   const int maxElements = *std::max_element(elements.begin(), elements.end());
+   const int largeThreshold = std::max(3, maxElements / 2);
+   vector<int> large, small;
+   for (int i = 0; i < static_cast<int>(elements.size()); i++)
+      (elements[i] >= largeThreshold ? large : small).push_back(i);
+
+   constexpr float digitW = 20.f, digitH = 32.f, gap = 8.f, smallScale = 0.75f;
+   const int columns = large.size() >= 3 ? 2 : 1;
+   const int rows = static_cast<int>((large.size() + columns - 1) / columns);
+   const float columnW = static_cast<float>(maxElements) * digitW;
+   float smallRowW = 0.f;
+   for (const int i : small)
+      smallRowW += (smallRowW > 0.f ? gap * 2.f : 0.f) + static_cast<float>(elements[i]) * digitW * smallScale;
+   const float largeW = static_cast<float>(columns) * columnW + static_cast<float>(columns - 1) * gap * 3.f;
+   const float width = std::max(largeW, smallRowW);
+   const float largeH = static_cast<float>(rows) * digitH + static_cast<float>(std::max(rows - 1, 0)) * gap;
+   const float height = largeH + (small.empty() ? 0.f : (large.empty() ? 0.f : gap) + digitH * smallScale);
+
+   m_autoLayout = Layout {};
+   m_autoLayout.fit = ScoreView::Contain;
+   m_autoLayout.width = width;
+   m_autoLayout.height = height;
+   auto addVisual = [this, height](int id, int nElements, float x, float top, float w, float h)
+   {
+      Visual visual { VisualType::SegDisplay };
+      visual.srcUri = "ctrl://default/seg?id=" + std::to_string(id);
+      visual.liveStyle = -1;
+      visual.tint = vec3(1.f, 1.f, 1.f);
+      visual.glassTint = vec3(1.f, 1.f, 1.f);
+      visual.glassAmbient = vec3(1.f, 1.f, 1.f);
+      visual.glassPad = vec4(0.f, 0.f, 0.f, 0.f);
+      visual.glassArea = vec4(0.f, 0.f, 0.f, 0.f);
+      visual.segFamilyHint = VPXSegDisplayHint::Generic;
+      visual.nElements = nElements;
+      visual.x = x;
+      visual.y = height - top - h; // Same convention as parsed layouts (origin at the bottom)
+      visual.w = w;
+      visual.h = h;
+      for (int i = 0; i < nElements; i++)
+         visual.xOffsets.push_back(w * static_cast<float>(i) / static_cast<float>(nElements));
+      m_autoLayout.visuals.push_back(visual);
+   };
+   for (int k = 0; k < static_cast<int>(large.size()); k++)
+   {
+      const int n = elements[large[k]];
+      const float w = static_cast<float>(n) * digitW;
+      const float columnX = 0.5f * (width - largeW) + static_cast<float>(k % columns) * (columnW + gap * 3.f);
+      addVisual(large[k], n, columnX + columnW - w, static_cast<float>(k / columns) * (digitH + gap), w, digitH); // Right aligned, like scores
+   }
+   float x = 0.5f * (width - smallRowW);
+   for (const int i : small)
+   {
+      const float w = static_cast<float>(elements[i]) * digitW * smallScale;
+      addVisual(i, elements[i], x, large.empty() ? 0.f : largeH + gap, w, digitH * smallScale);
+      x += w + gap * 2.f;
+   }
+   m_autoLayout.matchedVisuals = static_cast<unsigned int>(m_autoLayout.visuals.size());
+   m_autoLayout.unmatchedVisuals = 0;
+   LOGI(std::format("No score view layout matches the {} segment displays of this machine, using a generated layout", elements.size()));
+   return true;
 }
 
 bool ScoreView::Render(VPXRenderContext2D* ctx)

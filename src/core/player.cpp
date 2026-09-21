@@ -471,6 +471,22 @@ Player::Player(PinTable *const table, const PlayMode playMode)
          m_ptable->AddPart(m_implicitVRDMD);
          m_implicitVRDMD->Release();
          PLOGI << "Table has no 3D display, adding a standard VR DMD";
+
+         // Same place, rendered by the ScoreView layouts (4:1, like the DMD), for older machines with segment displays. Visibility is updated each frame, see PrepareFrame
+         m_implicitVRScoreView = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
+         if (m_implicitVRScoreView)
+         {
+            m_implicitVRScoreView->SetName(m_ptable->GetUniqueName(L"vr_scoreview"s));
+            m_implicitVRScoreView->Scale(dmdWidth / flasherWidth, dmdHeight / flasherHeight, Vertex2D {}, true);
+            m_implicitVRScoreView->m_d.m_rotX = -90.f;
+            m_implicitVRScoreView->m_d.m_height = m_implicitVRDMD->m_d.m_height;
+            m_implicitVRScoreView->m_d.m_renderMode = FlasherData::EXT_RENDER;
+            m_implicitVRScoreView->m_d.m_renderStyle = VPXWindowId::VPXWINDOW_ScoreView;
+            m_implicitVRScoreView->m_d.m_depthBias = 10000.0f; // Draw before other objects
+            m_implicitVRScoreView->m_d.m_isVisible = false;
+            m_ptable->AddPart(m_implicitVRScoreView);
+            m_implicitVRScoreView->Release();
+         }
       }
 
       m_implicitVRBackglass = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
@@ -1064,6 +1080,12 @@ Player::~Player()
    {
       m_ptable->RemovePart(m_implicitVRDMD);
       m_implicitVRDMD = nullptr;
+   }
+
+   if (m_implicitVRScoreView && FindIndexOf(m_ptable->GetParts(), (IEditable *)m_implicitVRScoreView) != -1)
+   {
+      m_ptable->RemovePart(m_implicitVRScoreView);
+      m_implicitVRScoreView = nullptr;
    }
 
    m_renderer->m_renderDevice->m_DMDShader->SetTextureNull(ShaderUniform::tex_dmd);
@@ -2142,6 +2164,14 @@ void Player::PrepareFrame()
    m_startFrameTick = usec();
 
    m_pluginAPI.BroadcastVPXMsg(m_onPrepareFrameMsgId, nullptr);
+
+   // The standard VR score display is only shown for machines with segment displays and no DMD (the standard VR DMD is used otherwise)
+   if (m_implicitVRScoreView)
+   {
+      static const string dmdLink = "ctrl://default/display?dmd_only=1"s;
+      static const string segLink = "ctrl://default/seg?id=0"s;
+      m_implicitVRScoreView->m_d.m_isVisible = m_resURIResolver.GetDisplayState(dmdLink).state.frame == nullptr && m_resURIResolver.GetSegDisplayState(segLink).state.frame != nullptr;
+   }
 
    // Update visually animated parts (e.g. primitives, reels, gates, lights, bumper-skirts, hittargets, etc)
    if (IsPlaying())

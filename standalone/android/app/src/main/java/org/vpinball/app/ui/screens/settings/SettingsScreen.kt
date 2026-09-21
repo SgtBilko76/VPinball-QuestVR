@@ -356,10 +356,11 @@ fun SettingsScreen(
                     SectionHeader(title = "Credits")
 
                     RoundedCard {
-                        Credit.entries.forEachIndexed { index, credit ->
+                        val credits = Credit.entries.filter { it != Credit.QUEST_PORT || BuildConfig.IS_QUEST }
+                        credits.forEachIndexed { index, credit ->
                             CreditRow(credit = credit, context = LocalContext.current)
 
-                            if (index < Credit.entries.size - 1) {
+                            if (index < credits.size - 1) {
                                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                             }
                         }

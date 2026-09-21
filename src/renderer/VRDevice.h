@@ -211,6 +211,10 @@ public:
    void EnableControllerViewCentering(bool enable) { m_controllerViewCentering = enable; }
    bool IsControllerViewCenteringEnabled() const { return m_controllerViewCentering; }
 
+   // View adjust mode: while enabled, the controller sticks adjust the table distance (left stick) and size (right stick) instead of being sent to the game
+   bool ToggleViewAdjustMode();
+   bool IsViewAdjustMode() const { return m_viewAdjustMode; }
+
    enum class SwapchainType : uint8_t
    {
       COLOR,
@@ -261,6 +265,7 @@ private:
    bool m_headsetViewCentering = false;
    bool m_controllerViewCentering = false;
    bool m_lockbarSetByControllers = false; // Lockbar size/height were overriden by controller view centering (restored from settings on recentering)
+   bool m_viewAdjustMode = false;
    XrSpace m_leftControllerSpace = XR_NULL_HANDLE;
    XrSpace m_rightControllerSpace = XR_NULL_HANDLE;
 
