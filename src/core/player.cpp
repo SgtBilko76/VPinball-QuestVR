@@ -441,18 +441,48 @@ Player::Player(PinTable *const table, const PlayMode playMode)
 
    if (IsVR())
    {
+      constexpr float flasherWidth = 100.f; // We should gather this from the object instead of guessing the default size
+      constexpr float flasherHeight = 100.f;
+
+      // Tables without their own 3D display (a display flasher which is not part of the desktop backdrop, which is never rendered in VR) are not designed for VR
+      // and would have no visible DMD: add one at the standard cabinet position (speaker panel, just under the backglass)
+      bool hasOwnDisplay = false;
+      for (IEditable *const part : m_ptable->GetParts())
+         if (part->GetItemType() == ItemTypeEnum::eItemFlasher && !part->m_desktopBackdrop && static_cast<Flasher *>(part)->m_d.m_renderMode != FlasherData::FLASHER)
+         {
+            hasOwnDisplay = true;
+            break;
+         }
+      float dmdPanelHeight = 0.f;
+      if (!hasOwnDisplay)
+         m_implicitVRDMD = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
+      if (m_implicitVRDMD)
+      {
+         m_implicitVRDMD->SetName(m_ptable->GetUniqueName(L"vr_dmd"s));
+         const float dmdWidth = 0.7f * (m_ptable->m_right - m_ptable->m_left); // Roughly the size of a real 128x32 DMD compared to a standard playfield width
+         const float dmdHeight = dmdWidth * 0.25f;
+         dmdPanelHeight = dmdHeight * 1.3f;
+         m_implicitVRDMD->Scale(dmdWidth / flasherWidth, dmdHeight / flasherHeight, Vertex2D {}, true);
+         m_implicitVRDMD->m_d.m_rotX = -90.f;
+         m_implicitVRDMD->m_d.m_height = dmdPanelHeight * 0.5f + m_ptable->m_glassTopHeight;
+         m_implicitVRDMD->m_d.m_renderMode = FlasherData::DMD; // Without link nor script frame, the DMD mode displays the default controller DMD
+         m_implicitVRDMD->m_d.m_color = RGB(255, 255, 255); // Let the selected DMD profile define the dot color
+         m_implicitVRDMD->m_d.m_isVisible = true;
+         m_ptable->AddPart(m_implicitVRDMD);
+         m_implicitVRDMD->Release();
+         PLOGI << "Table has no 3D display, adding a standard VR DMD";
+      }
+
       m_implicitVRBackglass = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
       if (m_implicitVRBackglass)
       {
          m_implicitVRBackglass->SetName(m_ptable->GetUniqueName(L"vr_backglass"s));
-         constexpr float flasherWidth = 100.f; // We should gather this from the object instead of guessing the default size
-         constexpr float flasherHeight = 100.f;
          constexpr float backglassScale = 1.2f;
          const float backglassWidth = backglassScale * (m_ptable->m_right - m_ptable->m_left);
          const float backglassHeight = backglassWidth * (float)(3. / 4.);
          m_implicitVRBackglass->Scale(backglassWidth / flasherWidth, backglassHeight / flasherHeight, Vertex2D {}, true);
          m_implicitVRBackglass->m_d.m_rotX = -90.f;
-         m_implicitVRBackglass->m_d.m_height = backglassHeight * 0.5f + m_ptable->m_glassTopHeight;
+         m_implicitVRBackglass->m_d.m_height = backglassHeight * 0.5f + m_ptable->m_glassTopHeight + dmdPanelHeight; // Above the standard DMD if any, like on a real cabinet
          m_implicitVRBackglass->m_d.m_renderMode = FlasherData::EXT_RENDER;
          m_implicitVRBackglass->m_d.m_renderStyle = VPXWindowId::VPXWINDOW_Backglass;
          m_implicitVRBackglass->m_d.m_depthBias = 10000.0f; // Draw before other objects
@@ -1028,6 +1058,12 @@ Player::~Player()
    {
       m_ptable->RemovePart(m_implicitVRBackglass);
       m_implicitVRBackglass = nullptr;
+   }
+
+   if (m_implicitVRDMD && FindIndexOf(m_ptable->GetParts(), (IEditable *)m_implicitVRDMD) != -1)
+   {
+      m_ptable->RemovePart(m_implicitVRDMD);
+      m_implicitVRDMD = nullptr;
    }
 
    m_renderer->m_renderDevice->m_DMDShader->SetTextureNull(ShaderUniform::tex_dmd);

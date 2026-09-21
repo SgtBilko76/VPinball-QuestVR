@@ -300,6 +300,7 @@ public:
 
    Primitive *m_implicitPlayfieldMesh = nullptr;
    Flasher *m_implicitVRBackglass = nullptr;
+   Flasher *m_implicitVRDMD = nullptr; // Standard VR DMD for tables without their own 3D display
 
    // External DMD and displays, defined from script or captured
    int2 m_dmdSize = int2(0, 0); // DMD defined through VPX API DMDWidth/DMDHeight/DMDPixels/DMDColoredPixels, dmd size is actually commited when pixels are commited
