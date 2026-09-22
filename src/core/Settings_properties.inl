@@ -255,6 +255,8 @@ PropFloatDyn(PlayerVR, Orientation, "View orientation"s, "VR view orientation"s,
 PropFloatDyn(PlayerVR, TableX, "View Offset X"s, "VR view X offset"s, -100.f, 100.f, 0.f);
 PropFloatDyn(PlayerVR, TableY, "View Offset Y"s, "VR view Y offset"s, -100.f, 100.f, 0.f);
 PropFloatDyn(PlayerVR, TableZ, "View Offset Z"s, "VR view Z offset"s, -100.f, 100.f, 0.f);
+PropFloatDyn(PlayerVR, TablePitch, "Table Vertical Angle"s, "VR table tilt around the lockbar"s, -45.f, 45.f, 0.f);
+PropFloatDyn(PlayerVR, TableYaw, "Table Horizontal Angle"s, "VR table rotation around its center"s, -180.f, 180.f, 0.f);
 PropBool(
    PlayerVR, UsePassthroughColor, "Color Keyed Passthrough"s, "Replace VR background by full black to allow color keyed passthrough (for example using Virtual Desktop, setting passthrough to sharp full black)"s, false);
 PropEnum(Player, VRPreview, "Preview mode"s, "Select VR preview mode"s, int, 1, "Disabled"s, "Left Eye"s, "Right Eye"s, "Both Eyes"s);

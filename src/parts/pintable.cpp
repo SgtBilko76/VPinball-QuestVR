@@ -5282,6 +5282,56 @@ void PinTable::SetOptionLiveValue(VPX::Properties::PropertyRegistry::PropId prop
    }
 }
 
+const PinTable::TableOption* PinTable::GetVRRoomOption() const
+{
+   for (const TableOption& option : m_tableOptions)
+   {
+      const VPX::Properties::PropertyDef* const prop = Settings::GetRegistry().GetProperty(option.id);
+      if (prop && lowerCase(prop->m_label).starts_with("vr room")
+         && (prop->m_type == VPX::Properties::PropertyDef::Type::Enum || prop->m_type == VPX::Properties::PropertyDef::Type::Int))
+         return &option;
+   }
+   return nullptr;
+}
+
+string PinTable::GetVRRoomName() const
+{
+   const TableOption* const option = GetVRRoomOption();
+   if (option == nullptr)
+      return ""s;
+   const int value = static_cast<int>(option->value);
+   if (const VPX::Properties::EnumPropertyDef* const prop = Settings::GetRegistry().GetEnumProperty(option->id); prop && prop->IsValid(value))
+      return prop->m_values[value - prop->m_min];
+   return std::to_string(value);
+}
+
+string PinTable::CycleVRRoom()
+{
+   const TableOption* const option = GetVRRoomOption();
+   if (option == nullptr)
+      return ""s;
+   int minValue, maxValue;
+   if (const VPX::Properties::EnumPropertyDef* const prop = Settings::GetRegistry().GetEnumProperty(option->id))
+   {
+      minValue = prop->m_min;
+      maxValue = prop->m_min + static_cast<int>(prop->m_values.size()) - 1;
+   }
+   else
+   {
+      const VPX::Properties::IntPropertyDef* const intProp = Settings::GetRegistry().GetIntProperty(option->id);
+      minValue = intProp->m_min;
+      maxValue = intProp->m_max;
+   }
+   const int value = static_cast<int>(option->value) >= maxValue ? minValue : static_cast<int>(option->value) + 1;
+   const VPX::Properties::PropertyRegistry::PropId id = option->id;
+   // Persist as a table override (like the table options page), then apply live (fires the table option event, used by the script to update the room)
+   m_settings.Set(id, value, true);
+   if (FileExists(m_filename))
+      m_settings.Save();
+   SetOptionLiveValue(id, static_cast<float>(value));
+   return GetVRRoomName();
+}
+
 STDMETHODIMP PinTable::get_Option(BSTR optionName, float minValue, float maxValue, float step, float defaultValue, int unit, /*[optional][in]*/ VARIANT values, /*[out, retval]*/ float* param)
 {
    auto prop = RegisterOption(optionName, minValue, maxValue, step, defaultValue, unit, values);

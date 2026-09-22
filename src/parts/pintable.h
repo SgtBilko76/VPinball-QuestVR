@@ -287,6 +287,11 @@ public:
    };
    const vector<TableOption>& GetOptions() const;
    void SetOptionLiveValue(VPX::Properties::PropertyRegistry::PropId id, float value); // Live value (not persisted unlike the script API put_Option which directly persist the option value)
+   // VR room selection through the table option named "VR Room..." (as defined by most VR tables), nullptr if the table does not have one
+   const TableOption* GetVRRoomOption() const;
+   string GetVRRoomName() const;
+   // Select the next VR room (wrapping around), apply it live and persist it for this table. Returns the new room name, or an empty string if the table has no VR room option.
+   string CycleVRRoom();
    STDMETHOD(get_Option)(BSTR optionName, float minValue, float maxValue, float step, float defaultValue, int unit, /*[optional][in]*/ VARIANT values, /*[out, retval]*/ float *param);
    STDMETHOD(put_Option)(BSTR optionName, float minValue, float maxValue, float step, float defaultValue, int unit, /*[optional][in]*/ VARIANT values, /*[in]*/ float val);
 

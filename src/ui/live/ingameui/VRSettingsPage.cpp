@@ -56,6 +56,16 @@ void VRSettingsPage::BuildPage()
          m_player->m_vrDevice->SetSceneOffset(offset);
       }));
 
+   AddItem(std::make_unique<InGameUIItem>( //
+      Settings::m_propPlayerVR_TablePitch, 1.f, "%4.1f deg"s, //
+      [this]() { return m_player->m_vrDevice->GetTablePitch(); }, //
+      [this](float, float v) { m_player->m_vrDevice->SetTablePitch(v); }));
+
+   AddItem(std::make_unique<InGameUIItem>( //
+      Settings::m_propPlayerVR_TableYaw, 1.f, "%4.1f deg"s, //
+      [this]() { return m_player->m_vrDevice->GetTableYaw(); }, //
+      [this](float, float v) { m_player->m_vrDevice->SetTableYaw(v); }));
+
    AddItem(std::make_unique<InGameUIItem>(InGameUIItem::LabelType::Header, "Cabinet Layout"s));
 
    AddItem(std::make_unique<InGameUIItem>( //

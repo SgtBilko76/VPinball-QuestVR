@@ -22,6 +22,15 @@ void HomePage::BuildPage()
    constexpr bool hasKeyboard = !(g_isAndroid || g_isIOS);
    constexpr bool isTouch = g_isAndroid || g_isIOS;
 
+   // Quick VR room switch, first item of the menu (tables with a VR Room option)
+   if (m_player->m_vrDevice && m_player->m_ptable->GetVRRoomOption())
+      AddItem(std::make_unique<InGameUIItem>("VR Room: "s + m_player->m_ptable->GetVRRoomName(), "Select to switch to the next VR room of this table (also with a long press on the menu button)"s,
+         [this]()
+         {
+            m_player->m_ptable->CycleVRRoom();
+            RequestRebuild();
+         }));
+
    ////////////////////////////////////////////////////////////////////////////////////////////////
    AddItem(std::make_unique<InGameUIItem>(InGameUIItem::LabelType::Header, "Table options"s));
 

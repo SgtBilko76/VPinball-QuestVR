@@ -827,17 +827,41 @@ void InputManager::CreateInputActions()
          }))->GetActionId();
 
    m_openInGameUIActionId = AddAction(
-      std::make_unique<InputAction>(this, "InGameUI"s, "Toggle InGame UI"s, keyMapping(SDL_SCANCODE_F12),
-         [this](const InputAction&, bool, bool isPressed)
+      std::make_unique<InputAction>(this, "InGameUI"s, "Toggle InGame UI (VR: long press to change VR room)"s, keyMapping(SDL_SCANCODE_F12),
+         [this](InputAction& action, bool wasPressed, bool isPressed)
          {
+            #ifdef ENABLE_XR
+            // In VR, a long press changes the VR room (for tables with a VR Room option), so the UI is opened on release of a short press
+            if (m_player->IsVR() && !m_player->m_liveUI->IsInGameUIOpened() && (m_inGameUILongPressPending || (isPressed && !m_player->m_liveUI->IsOpened())))
+            {
+               if (isPressed && !wasPressed)
+               {
+                  m_inGameUILongPressPending = true;
+                  action.SetRepeatPeriod(700); // Called back while still pressed after the long press delay
+                  return;
+               }
+               action.SetRepeatPeriod(-1);
+               if (!std::exchange(m_inGameUILongPressPending, false))
+                  return; // Long press already handled, wait for release
+               if (isPressed)
+               {
+                  // Long press: keep the flag cleared so that the release does not open the UI
+                  const string room = m_player->m_ptable->CycleVRRoom();
+                  m_vrViewAdjustNotificationId = m_player->m_liveUI->PushNotification(room.empty() ? "This table has no VR room option"s : "VR Room: " + room, 2000, m_vrViewAdjustNotificationId);
+                  return;
+               }
+               // Short press released: open the UI below
+               isPressed = true;
+            }
+            #endif
             if (isPressed && !m_player->m_liveUI->IsOpened())
             {
                #ifdef ENABLE_XR
                // The sticks are needed to navigate the UI: leave the view adjust mode (keeping the adjustments)
                if (m_player->IsVR() && m_player->m_vrDevice->IsViewAdjustMode())
                {
-                  m_player->m_vrDevice->ToggleViewAdjustMode();
-                  m_vrViewAdjustNotificationId = m_player->m_liveUI->PushNotification("Table size and distance saved"s, 2000, m_vrViewAdjustNotificationId);
+                  m_player->m_vrDevice->ToggleViewAdjustMode(m_player->m_vrDevice->GetViewAdjustMode());
+                  m_vrViewAdjustNotificationId = m_player->m_liveUI->PushNotification("View adjustments saved"s, 2000, m_vrViewAdjustNotificationId);
                }
                #endif
                m_player->m_liveUI->OpenInGameUI();
@@ -945,10 +969,50 @@ void InputManager::CreateInputActions()
       {
          if (!isPressed || !m_player->IsVR() || m_player->m_liveUI->IsInGameUIOpened())
             return;
-         const bool enabled = m_player->m_vrDevice->ToggleViewAdjustMode();
+         const bool enabled = m_player->m_vrDevice->ToggleViewAdjustMode(VRDevice::ViewAdjustMode::SizeDistance) != VRDevice::ViewAdjustMode::None;
          m_vrViewAdjustNotificationId = m_player->m_liveUI->PushNotification(enabled
                ? "Adjust mode: left stick = distance, right stick = size. Press again to finish"s
                : "Table size and distance saved"s, enabled ? 600000 : 2000, m_vrViewAdjustNotificationId);
+      }))->GetActionId();
+   m_vrRoomActionId = AddAction(std::make_unique<InputAction>(this, "VRRoom"s, "Change VR room"s, ""s,
+      [this](InputAction& action, bool wasPressed, bool isPressed)
+      {
+         if (!isPressed || wasPressed || !m_player->IsVR() || m_player->m_liveUI->IsInGameUIOpened())
+            return;
+         const string room = m_player->m_ptable->CycleVRRoom();
+         m_vrViewAdjustNotificationId = m_player->m_liveUI->PushNotification(room.empty() ? "This table has no VR room option"s : "VR Room: " + room, 2000, m_vrViewAdjustNotificationId);
+      }))->GetActionId();
+   m_vrChangeViewActionId = AddAction(std::make_unique<InputAction>(this, "VRChangeView"s, "Adjust VR table position and angle (long press to reset)"s, ""s,
+      [this](InputAction& action, bool wasPressed, bool isPressed)
+      {
+         // Short press toggles the adjust mode (on release), long press resets the view to the defaults (while still pressed)
+         if (!m_player->IsVR() || m_player->m_liveUI->IsInGameUIOpened())
+         {
+            action.SetRepeatPeriod(-1);
+            m_vrChangeViewLongPressed = false;
+            return;
+         }
+         if (isPressed && !wasPressed)
+         {
+            m_vrChangeViewLongPressed = false;
+            action.SetRepeatPeriod(700); // Called back while still pressed after the long press delay
+            return;
+         }
+         if (isPressed)
+         {
+            action.SetRepeatPeriod(-1);
+            m_vrChangeViewLongPressed = true;
+            m_player->m_vrDevice->ResetView();
+            m_vrViewAdjustNotificationId = m_player->m_liveUI->PushNotification("View reset to defaults"s, 2000, m_vrViewAdjustNotificationId);
+            return;
+         }
+         action.SetRepeatPeriod(-1);
+         if (!wasPressed || std::exchange(m_vrChangeViewLongPressed, false))
+            return;
+         const bool enabled = m_player->m_vrDevice->ToggleViewAdjustMode(VRDevice::ViewAdjustMode::PositionAngle) != VRDevice::ViewAdjustMode::None;
+         m_vrViewAdjustNotificationId = m_player->m_liveUI->PushNotification(enabled
+               ? "View mode: left stick = move left/right & up/down, right stick = horizontal & vertical angle. Press again to finish"s
+               : "Table position and angle saved"s, enabled ? 600000 : 2000, m_vrViewAdjustNotificationId);
       }))->GetActionId();
    #endif
 

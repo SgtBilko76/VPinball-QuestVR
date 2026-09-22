@@ -153,6 +153,10 @@ public:
    const Vertex3Ds& GetSceneOffset() const { return m_tablePos; }
    void SetSceneOrientation(float orientation) { m_orientation = orientation; m_worldDirty = true; }
    void SetSceneOffset(const Vertex3Ds& pos) { m_tablePos = pos; m_worldDirty = true; }
+   float GetTablePitch() const { return m_tablePitch; }
+   void SetTablePitch(float pitch) { m_tablePitch = pitch; m_worldDirty = true; }
+   float GetTableYaw() const { return m_tableYaw; }
+   void SetTableYaw(float yaw) { m_tableYaw = yaw; m_worldDirty = true; }
    void SaveVRSettings(Settings& settings) const;
 
    void UpdateVRPosition(PartGroupData::SpaceReference spaceRef, ModelViewProj& mvp);
@@ -169,6 +173,8 @@ private:
    bool m_lockFeetToGround = true;
    float m_orientation = 0.0f;
    Vertex3Ds m_tablePos;
+   float m_tablePitch = 0.0f; // Table tilt around the lockbar in degrees (does not apply to the room)
+   float m_tableYaw = 0.0f; // Table rotation around its center in degrees
    float m_slope = 0.0f;
 
    float m_predictedDisplayTimestamp = 0.f;
@@ -211,9 +217,19 @@ public:
    void EnableControllerViewCentering(bool enable) { m_controllerViewCentering = enable; }
    bool IsControllerViewCenteringEnabled() const { return m_controllerViewCentering; }
 
-   // View adjust mode: while enabled, the controller sticks adjust the table distance (left stick) and size (right stick) instead of being sent to the game
-   bool ToggleViewAdjustMode();
-   bool IsViewAdjustMode() const { return m_viewAdjustMode; }
+   // View adjust modes: while enabled, the controller sticks adjust the view instead of being sent to the game
+   enum class ViewAdjustMode : uint8_t
+   {
+      None,
+      SizeDistance, // Left stick Y: table distance, right stick Y: table size
+      PositionAngle // Left stick: table left/right & up/down, right stick: table horizontal & vertical angle
+   };
+   // Enable the given mode, or disable it if it is already enabled. Returns the new mode.
+   ViewAdjustMode ToggleViewAdjustMode(ViewAdjustMode mode);
+   ViewAdjustMode GetViewAdjustMode() const { return m_viewAdjustMode; }
+   bool IsViewAdjustMode() const { return m_viewAdjustMode != ViewAdjustMode::None; }
+   // Leave any view adjust mode and restore the default table position, orientation, angles and size (persisted for all tables)
+   void ResetView();
 
    enum class SwapchainType : uint8_t
    {
@@ -265,7 +281,7 @@ private:
    bool m_headsetViewCentering = false;
    bool m_controllerViewCentering = false;
    bool m_lockbarSetByControllers = false; // Lockbar size/height were overriden by controller view centering (restored from settings on recentering)
-   bool m_viewAdjustMode = false;
+   ViewAdjustMode m_viewAdjustMode = ViewAdjustMode::None;
    XrSpace m_leftControllerSpace = XR_NULL_HANDLE;
    XrSpace m_rightControllerSpace = XR_NULL_HANDLE;
 

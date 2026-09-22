@@ -466,7 +466,7 @@ Player::Player(PinTable *const table, const PlayMode playMode)
          m_implicitVRDMD->m_d.m_rotX = -90.f;
          m_implicitVRDMD->m_d.m_height = dmdPanelHeight * 0.5f + m_ptable->m_glassTopHeight;
          m_implicitVRDMD->m_d.m_renderMode = FlasherData::DMD; // Without link nor script frame, the DMD mode displays the default controller DMD
-         m_implicitVRDMD->m_d.m_color = RGB(255, 255, 255); // Let the selected DMD profile define the dot color
+         m_implicitVRDMD->m_d.m_color = RGB(255, 255, 255); // Let the selected DMD profile define the dot color (applied to the flasher color for the legacy renderer, see PrepareFrame)
          m_implicitVRDMD->m_d.m_isVisible = true;
          m_ptable->AddPart(m_implicitVRDMD);
          m_implicitVRDMD->Release();
@@ -486,6 +486,68 @@ Player::Player(PinTable *const table, const PlayMode playMode)
             m_implicitVRScoreView->m_d.m_isVisible = false;
             m_ptable->AddPart(m_implicitVRScoreView);
             m_implicitVRScoreView->Release();
+         }
+      }
+
+      // Tables not designed for VR often place art flashers beyond the playfield top edge for cabinet (full screen) views, typically the backglass
+      // art (lit by switching flasher visibility from the script). In VR they would lie behind the playfield, so move them to the standard
+      // backglass position (vertical panel above the standard display), keeping their relative layout.
+      // Tables with their own VR cabinet/backglass must be left untouched: they are detected by the usual VR part names (VR..., PinCab...) or
+      // VR room switches in their script, and only flashers lying low (under the glass, not already standing at backglass height) are moved.
+      bool isVRTable = hasOwnDisplay;
+      if (!isVRTable)
+      {
+         const string script = lowerCase(m_ptable->m_script_text);
+         isVRTable = script.find("vrroom") != string::npos || script.find("vr_room") != string::npos;
+      }
+      for (IEditable *const part : m_ptable->GetParts())
+      {
+         if (isVRTable)
+            break;
+         if (part == m_implicitVRDMD || part == m_implicitVRScoreView) // Our own implicit parts are named vr_...
+            continue;
+         const string name = lowerCase(part->GetName());
+         isVRTable = name.starts_with("vr") || name.starts_with("pincab");
+      }
+      if (!isVRTable)
+      {
+         vector<Flasher *> backglassFlashers;
+         Vertex2D minBound { FLT_MAX, FLT_MAX }, maxBound { -FLT_MAX, -FLT_MAX };
+         for (IEditable *const part : m_ptable->GetParts())
+         {
+            if (part->GetItemType() != ItemTypeEnum::eItemFlasher || part->m_desktopBackdrop)
+               continue;
+            Flasher *const flasher = static_cast<Flasher *>(part);
+            if (flasher->m_d.m_renderMode != FlasherData::FLASHER || flasher == m_implicitVRDMD || flasher->m_curve.GetMaxBound().y >= m_ptable->m_top
+               || flasher->m_d.m_height >= m_ptable->m_glassTopHeight
+               || flasher->m_curve.GetMaxBound().x - flasher->m_curve.GetMinBound().x < 0.5f * (m_ptable->m_right - m_ptable->m_left)) // Only large art panels, not light glows or reflections
+               continue;
+            backglassFlashers.push_back(flasher);
+            minBound.x = min(minBound.x, flasher->m_curve.GetMinBound().x);
+            minBound.y = min(minBound.y, flasher->m_curve.GetMinBound().y);
+            maxBound.x = max(maxBound.x, flasher->m_curve.GetMaxBound().x);
+            maxBound.y = max(maxBound.y, flasher->m_curve.GetMaxBound().y);
+         }
+         if (!backglassFlashers.empty() && maxBound.x > minBound.x && maxBound.y > minBound.y)
+         {
+            // Same size as the implicit backglass (1.2 x playfield width, at most 3:4)
+            const float tableWidth = m_ptable->m_right - m_ptable->m_left;
+            const float scale = min(1.2f * tableWidth / (maxBound.x - minBound.x), 0.9f * tableWidth / (maxBound.y - minBound.y));
+            const Vertex2D groupCenter = 0.5f * (minBound + maxBound);
+            const float panelBottom = m_ptable->m_glassTopHeight + dmdPanelHeight;
+            const float panelHeight = scale * (maxBound.y - minBound.y);
+            for (Flasher *const flasher : backglassFlashers)
+            {
+               flasher->Scale(scale, scale, groupCenter, false);
+               const Vertex2D center = flasher->m_curve.GetCenter();
+               // The flasher is stood up around its center: its y position in the group becomes its height on the panel (top of the image up)
+               flasher->m_d.m_height = panelBottom + 0.5f * panelHeight - (center.y - groupCenter.y);
+               flasher->Translate(Vertex2D { 0.5f * (m_ptable->m_left + m_ptable->m_right) - groupCenter.x, m_ptable->m_top - center.y });
+               flasher->m_d.m_rotX = -90.f;
+               flasher->m_d.m_rotY = 0.f;
+               flasher->m_d.m_rotZ = 0.f;
+            }
+            PLOGI << "Moved " << backglassFlashers.size() << " flashers from beyond the playfield top edge to the VR backglass position";
          }
       }
 
@@ -2164,6 +2226,14 @@ void Player::PrepareFrame()
    m_startFrameTick = usec();
 
    m_pluginAPI.BroadcastVPXMsg(m_onPrepareFrameMsgId, nullptr);
+
+   // The legacy DMD renderer does not apply the profile dot tint but the flasher color (defined by the table author for its own DMDs),
+   // so for the standard VR DMD, use the tint of its profile as the flasher color (the other renderers apply the profile tint to a white flasher)
+   if (m_implicitVRDMD)
+   {
+      const int profile = clamp(m_implicitVRDMD->m_d.m_renderStyle, 0, 6);
+      m_implicitVRDMD->m_d.m_color = m_renderer->IsLegacyDMDRenderer(profile) ? m_ptable->m_settings.GetDMD_ProfileDotTint(profile) : RGB(255, 255, 255);
+   }
 
    // The standard VR score display is only shown for machines with segment displays and no DMD (the standard VR DMD is used otherwise)
    if (m_implicitVRScoreView)

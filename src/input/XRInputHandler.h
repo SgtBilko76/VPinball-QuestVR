@@ -26,7 +26,7 @@ private:
       XrActionType type;
       bool isActive = false;
       uint16_t pinInputId;
-      int viewAdjustAxis = 0; // 1 for left stick Y, 2 for right stick Y (used by the view adjust mode)
+      int viewAdjustAxis = -1; // Index in m_viewAdjustAxes (left X, left Y, right X, right Y) for the sticks (used by the view adjust modes)
    };
 
    template <size_t N> void CopyToXrBuffer(char (&dest)[N], const std::string_view& src)
@@ -85,7 +85,11 @@ public:
          tracker.path = path;
          tracker.type = type;
          tracker.pinInputId = actionId;
-         tracker.viewAdjustAxis = path == "/user/hand/left/input/thumbstick/y" ? 1 : path == "/user/hand/right/input/thumbstick/y" ? 2 : 0;
+         tracker.viewAdjustAxis = path == "/user/hand/left/input/thumbstick/x" ? 0
+            : path == "/user/hand/left/input/thumbstick/y"                   ? 1
+            : path == "/user/hand/right/input/thumbstick/x"                  ? 2
+            : path == "/user/hand/right/input/thumbstick/y"                  ? 3
+                                                                             : -1;
          actionId++;
 
          XrActionCreateInfo actionInfo { XR_TYPE_ACTION_CREATE_INFO };
@@ -136,14 +140,14 @@ public:
          map.MapAction(ButtonMapping::Create(m_joyId, 17, 0.3f), m_pininput.GetRightFlipperActionId());
          map.MapAction(ButtonMapping::Create(m_joyId, 16, 0.6f), m_pininput.GetStagedLeftFlipperActionId());
          map.MapAction(ButtonMapping::Create(m_joyId, 17, 0.6f), m_pininput.GetStagedRightFlipperActionId());
-         map.MapAction(ButtonMapping::Create(m_joyId, 12), m_pininput.GetVRViewCenterActionId()); // Left Thumbstick click (controller view centering is not mapped: easily triggered by mistake)
+         map.MapAction(ButtonMapping::Create(m_joyId, 12), m_pininput.GetVRViewAdjustActionId()); // Left Thumbstick click (toggle table size & distance adjustment with the sticks; view recentering and controller view centering are not mapped)
          map.MapAction(ButtonMapping::Create(m_joyId, 13), m_pininput.GetLaunchBallActionId()); // Right Thumbstick click
          map.MapAction(ButtonMapping::Create(m_joyId, 4), m_pininput.GetLeftMagnaActionId()); // Squeeze
          map.MapAction(ButtonMapping::Create(m_joyId, 5), m_pininput.GetRightMagnaActionId());
          map.MapAction(ButtonMapping::Create(m_joyId, 11), m_pininput.GetAddCreditActionId(0)); // Right buttons
          map.MapAction(ButtonMapping::Create(m_joyId, 10), m_pininput.GetStartActionId());
-         map.MapAction(ButtonMapping::Create(m_joyId, 2), m_pininput.GetOpenInGameUIActionId()); // Left menu button
-         map.MapAction(ButtonMapping::Create(m_joyId, 9), m_pininput.GetVRViewAdjustActionId()); // Left Y button (toggle table size & distance adjustment with the sticks)
+         map.MapAction(ButtonMapping::Create(m_joyId, 2), m_pininput.GetOpenInGameUIActionId()); // Left menu button (long press changes the VR room)
+         map.MapAction(ButtonMapping::Create(m_joyId, 9), m_pininput.GetVRChangeViewActionId()); // Left Y button (toggle table position & angle adjustment with the sticks)
          map.MapAction(ButtonMapping::Create(m_joyId, 8), m_pininput.GetVRViewAwayActionId()); // Left X button (no direct exit, quitting is done through the in-game UI)
          map.MapAction(ButtonMapping::Create(m_joyId, 21, -0.9f, true), m_pininput.GetUIDownActionId()); // Left vertical stick
          map.MapAction(ButtonMapping::Create(m_joyId, 21, 0.9f), m_pininput.GetUIUpActionId());
@@ -197,13 +201,13 @@ public:
             xrGetActionStateFloat(m_session, &getInfo, &state);
 
             float value = state.currentState;
-            if (m_viewAdjustHandler && t.viewAdjustAxis != 0)
+            if (m_viewAdjustHandler && t.viewAdjustAxis >= 0)
             {
                // In view adjust mode, the stick is used to adjust the view: report it as centered to the game (no nudge, plunger or UI navigation)
-               (t.viewAdjustAxis == 1 ? m_viewAdjustLeftY : m_viewAdjustRightY) = state.isActive ? value : 0.f;
+               m_viewAdjustAxes[t.viewAdjustAxis] = state.isActive ? value : 0.f;
                value = 0.f;
             }
-            if (state.isActive && (state.changedSinceLastSync || (m_viewAdjustModeChanged && t.viewAdjustAxis != 0)))
+            if (state.isActive && (state.changedSinceLastSync || (m_viewAdjustModeChanged && t.viewAdjustAxis >= 0)))
             {
                // -1 .. 1 for sticks / 0 (unpressed) .. 1 (pressed) for triggers
                //PLOGI << "[ANA] " << t.path << " -> " << value;
@@ -215,15 +219,15 @@ public:
       m_viewAdjustModeChanged = false;
       const uint64_t now = usec();
       if (m_viewAdjustHandler && m_lastUpdateUs != 0)
-         m_viewAdjustHandler(m_viewAdjustLeftY, m_viewAdjustRightY, std::min(static_cast<float>(now - m_lastUpdateUs) * 1e-6f, 0.1f));
+         m_viewAdjustHandler(m_viewAdjustAxes[0], m_viewAdjustAxes[1], m_viewAdjustAxes[2], m_viewAdjustAxes[3], std::min(static_cast<float>(now - m_lastUpdateUs) * 1e-6f, 0.1f));
       m_lastUpdateUs = now;
    }
 
-   // While a handler is set, left & right stick Y are sent to it (with the time elapsed since last update) instead of the game
-   void SetViewAdjustHandler(const std::function<void(float leftY, float rightY, float dt)>& handler)
+   // While a handler is set, left & right sticks are sent to it (with the time elapsed since last update) instead of the game
+   void SetViewAdjustHandler(const std::function<void(float leftX, float leftY, float rightX, float rightY, float dt)>& handler)
    {
       m_viewAdjustHandler = handler;
-      m_viewAdjustLeftY = m_viewAdjustRightY = 0.f;
+      m_viewAdjustAxes = {};
       m_viewAdjustModeChanged = true; // Resend the stick positions to the game (centered when entering, actual position when leaving)
    }
 
@@ -304,9 +308,8 @@ private:
    std::vector<ActionTracker> m_trackers;
    std::vector<XrAction> m_hapticActions;
 
-   std::function<void(float, float, float)> m_viewAdjustHandler;
-   float m_viewAdjustLeftY = 0.f;
-   float m_viewAdjustRightY = 0.f;
+   std::function<void(float, float, float, float, float)> m_viewAdjustHandler;
+   std::array<float, 4> m_viewAdjustAxes {};
    bool m_viewAdjustModeChanged = false;
    uint64_t m_lastUpdateUs = 0;
 
