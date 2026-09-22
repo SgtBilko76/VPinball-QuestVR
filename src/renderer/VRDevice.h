@@ -196,6 +196,10 @@ private:
 public:
    int GetDisplayRefreshRateMode() const { return m_displayRefreshRateMode; }
    void SetDisplayRefreshRateMode(int mode);
+   // Mixed reality (Meta Quest passthrough behind the rendered scene, the scene background being transparent)
+   bool IsPassthroughSupported() const { return m_passthrough != XR_NULL_HANDLE; }
+   bool IsPassthroughEnabled() const { return m_passthroughEnabled; }
+   bool SetPassthroughEnabled(bool enable); // Returns false if passthrough is not available or could not be started
    bool IsOpenXRReady() const { return m_xrInstance != XR_NULL_HANDLE; }
    void SetupHMD();
    bool IsOpenXRHMDReady() const { return m_systemID != XR_NULL_SYSTEM_ID; }

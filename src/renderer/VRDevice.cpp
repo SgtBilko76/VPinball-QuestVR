@@ -606,6 +606,38 @@ void VRDevice::SetupHMD()
    assert(m_backend != nullptr);
 }
 
+bool VRDevice::SetPassthroughEnabled(bool enable)
+{
+   if (m_passthrough == XR_NULL_HANDLE || m_passthroughLayer == XR_NULL_HANDLE)
+      return false;
+   if (enable == m_passthroughEnabled)
+      return true;
+   if (enable)
+   {
+      PFN_xrPassthroughStartFB xrPassthroughStartFB;
+      PFN_xrPassthroughLayerResumeFB xrPassthroughLayerResumeFB;
+      OPENXR_CHECK(xrGetInstanceProcAddr(m_xrInstance, "xrPassthroughStartFB", (PFN_xrVoidFunction*)&xrPassthroughStartFB), "Failed to get xrPassthroughStartFB.");
+      OPENXR_CHECK(xrGetInstanceProcAddr(m_xrInstance, "xrPassthroughLayerResumeFB", (PFN_xrVoidFunction*)&xrPassthroughLayerResumeFB), "Failed to get xrPassthroughLayerResumeFB.");
+      if (xrPassthroughStartFB(m_passthrough) != XR_SUCCESS || xrPassthroughLayerResumeFB(m_passthroughLayer) != XR_SUCCESS)
+      {
+         PLOGE << "Failed to start passthrough";
+         return false;
+      }
+   }
+   else
+   {
+      PFN_xrPassthroughPauseFB xrPassthroughPauseFB;
+      PFN_xrPassthroughLayerPauseFB xrPassthroughLayerPauseFB;
+      OPENXR_CHECK(xrGetInstanceProcAddr(m_xrInstance, "xrPassthroughPauseFB", (PFN_xrVoidFunction*)&xrPassthroughPauseFB), "Failed to get xrPassthroughPauseFB.");
+      OPENXR_CHECK(xrGetInstanceProcAddr(m_xrInstance, "xrPassthroughLayerPauseFB", (PFN_xrVoidFunction*)&xrPassthroughLayerPauseFB), "Failed to get xrPassthroughLayerPauseFB.");
+      xrPassthroughLayerPauseFB(m_passthroughLayer);
+      xrPassthroughPauseFB(m_passthrough);
+   }
+   m_passthroughEnabled = enable;
+   PLOGI << "Meta Quest passthrough " << (enable ? "started" : "paused");
+   return true;
+}
+
 void VRDevice::SetDisplayRefreshRateMode(int mode)
 {
    m_displayRefreshRateMode = mode;
@@ -678,14 +710,16 @@ void VRDevice::CreateSession()
    OPENXR_CHECK(xrCreateSession(m_xrInstance, &sessionCI, &m_session), "Failed to create Session.");
    assert(m_session);
 
-   // Initialize passthrough if supported (Meta Quest MR feature)
-   if (m_passthroughExtensionSupported && g_pplayer && g_pplayer->m_ptable->m_settings.GetPlayerVR_UsePassthroughColor())
+   // Initialize passthrough if supported (Meta Quest MR feature). It is always created (to allow switching mixed reality on/off while playing),
+   // but only running when enabled (no camera processing otherwise), see SetPassthroughEnabled
+   if (m_passthroughExtensionSupported && g_pplayer)
    {
+      const bool enabled = g_pplayer->m_ptable->m_settings.GetPlayerVR_UsePassthroughColor();
       PFN_xrCreatePassthroughFB xrCreatePassthroughFB;
       OPENXR_CHECK(xrGetInstanceProcAddr(m_xrInstance, "xrCreatePassthroughFB", (PFN_xrVoidFunction*)&xrCreatePassthroughFB), "Failed to get xrCreatePassthroughFB.");
 
       XrPassthroughCreateInfoFB passthroughCI { XR_TYPE_PASSTHROUGH_CREATE_INFO_FB };
-      passthroughCI.flags = XR_PASSTHROUGH_IS_RUNNING_AT_CREATION_BIT_FB;
+      passthroughCI.flags = enabled ? XR_PASSTHROUGH_IS_RUNNING_AT_CREATION_BIT_FB : 0;
       OPENXR_CHECK(xrCreatePassthroughFB(m_session, &passthroughCI, &m_passthrough), "Failed to create passthrough.");
 
       PFN_xrCreatePassthroughLayerFB xrCreatePassthroughLayerFB;
@@ -694,11 +728,11 @@ void VRDevice::CreateSession()
       XrPassthroughLayerCreateInfoFB passthroughLayerCI { XR_TYPE_PASSTHROUGH_LAYER_CREATE_INFO_FB };
       passthroughLayerCI.passthrough = m_passthrough;
       passthroughLayerCI.purpose = XR_PASSTHROUGH_LAYER_PURPOSE_RECONSTRUCTION_FB;
-      passthroughLayerCI.flags = XR_PASSTHROUGH_IS_RUNNING_AT_CREATION_BIT_FB;
+      passthroughLayerCI.flags = enabled ? XR_PASSTHROUGH_IS_RUNNING_AT_CREATION_BIT_FB : 0;
       OPENXR_CHECK(xrCreatePassthroughLayerFB(m_session, &passthroughLayerCI, &m_passthroughLayer), "Failed to create passthrough layer.");
 
-      m_passthroughEnabled = true;
-      PLOGI << "Meta Quest passthrough initialized successfully";
+      m_passthroughEnabled = enabled;
+      PLOGI << "Meta Quest passthrough initialized successfully (" << (enabled ? "running" : "paused") << ')';
    }
 
    // Fill out an XrReferenceSpaceCreateInfo structure and create a reference XrSpace, specifying an identity pose as the origin and a stage space, defaulting to a local space.

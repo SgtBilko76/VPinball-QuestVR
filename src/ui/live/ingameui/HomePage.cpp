@@ -6,6 +6,7 @@
 #include "core/TournamentFile.h"
 #include "core/VPApp.h"
 #include "renderer/Renderer.h"
+#include "renderer/VRDevice.h"
 #include "ui/live/LiveUI.h"
 
 
@@ -21,6 +22,23 @@ void HomePage::BuildPage()
 {
    constexpr bool hasKeyboard = !(g_isAndroid || g_isIOS);
    constexpr bool isTouch = g_isAndroid || g_isIOS;
+
+   #ifdef ENABLE_XR
+   // Quick mixed reality switch, first item of the menu (headsets with passthrough): the real room is seen behind the table
+   if (m_player->m_vrDevice && m_player->m_vrDevice->IsPassthroughSupported())
+      AddItem(std::make_unique<InGameUIItem>(m_player->m_vrDevice->IsPassthroughEnabled() ? "Mixed Reality: On"s : "Mixed Reality: Off"s,
+         "Select to show the real room around the table (passthrough) or the virtual one"s,
+         [this]()
+         {
+            const bool enable = !m_player->m_vrDevice->IsPassthroughEnabled();
+            if (m_player->m_vrDevice->SetPassthroughEnabled(enable))
+            {
+               m_player->m_renderer->m_vrApplyColorKey = enable; // Transparent background and mixed reality part visibility
+               g_app->m_settings.SetPlayerVR_UsePassthroughColor(enable, false);
+            }
+            RequestRebuild();
+         }));
+   #endif
 
    // Quick VR room switch, first item of the menu (tables with a VR Room option)
    if (m_player->m_vrDevice && m_player->m_ptable->GetVRRoomOption())
