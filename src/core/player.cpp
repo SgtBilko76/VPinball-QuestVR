@@ -445,32 +445,32 @@ Player::Player(PinTable *const table, const PlayMode playMode)
       constexpr float flasherHeight = 100.f;
 
       // Tables without their own 3D display (a display flasher which is not part of the desktop backdrop, which is never rendered in VR) are not designed for VR
-      // and would have no visible DMD: add one at the standard cabinet position (speaker panel, just under the backglass)
-      bool hasOwnDisplay = false;
+      // and would have no visible DMD: add one at the standard cabinet position (speaker panel, just under the backglass).
+      // Tables with their own 3D display may still hide it (for example when their VR room is disabled in the script): the standard display is then
+      // only shown while none of the table displays is visible (see PrepareFrame).
       for (IEditable *const part : m_ptable->GetParts())
          if (part->GetItemType() == ItemTypeEnum::eItemFlasher && !part->m_desktopBackdrop && static_cast<Flasher *>(part)->m_d.m_renderMode != FlasherData::FLASHER)
-         {
-            hasOwnDisplay = true;
-            break;
-         }
+            m_tableVRDisplays.push_back(static_cast<Flasher *>(part));
+      const bool hasOwnDisplay = !m_tableVRDisplays.empty();
       float dmdPanelHeight = 0.f;
-      if (!hasOwnDisplay)
-         m_implicitVRDMD = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
+      m_implicitVRDMD = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
       if (m_implicitVRDMD)
       {
          m_implicitVRDMD->SetName(m_ptable->GetUniqueName(L"vr_dmd"s));
          const float dmdWidth = 0.7f * (m_ptable->m_right - m_ptable->m_left); // Roughly the size of a real 128x32 DMD compared to a standard playfield width
          const float dmdHeight = dmdWidth * 0.25f;
-         dmdPanelHeight = dmdHeight * 1.3f;
+         const float panelHeight = dmdHeight * 1.3f;
+         if (!hasOwnDisplay)
+            dmdPanelHeight = panelHeight; // Keep the backglass position of tables with their own display, as the standard display is only a fallback there
          m_implicitVRDMD->Scale(dmdWidth / flasherWidth, dmdHeight / flasherHeight, Vertex2D {}, true);
          m_implicitVRDMD->m_d.m_rotX = -90.f;
-         m_implicitVRDMD->m_d.m_height = dmdPanelHeight * 0.5f + m_ptable->m_glassTopHeight;
+         m_implicitVRDMD->m_d.m_height = panelHeight * 0.5f + m_ptable->m_glassTopHeight;
          m_implicitVRDMD->m_d.m_renderMode = FlasherData::DMD; // Without link nor script frame, the DMD mode displays the default controller DMD
          m_implicitVRDMD->m_d.m_color = RGB(255, 255, 255); // Let the selected DMD profile define the dot color (applied to the flasher color for the legacy renderer, see PrepareFrame)
-         m_implicitVRDMD->m_d.m_isVisible = true;
+         m_implicitVRDMD->m_d.m_isVisible = !hasOwnDisplay; // Visibility is updated each frame, see PrepareFrame
          m_ptable->AddPart(m_implicitVRDMD);
          m_implicitVRDMD->Release();
-         PLOGI << "Table has no 3D display, adding a standard VR DMD";
+         PLOGI << (hasOwnDisplay ? "Adding a standard VR DMD, shown when none of the table 3D displays is visible" : "Table has no 3D display, adding a standard VR DMD");
 
          // Same place, rendered by the ScoreView layouts (4:1, like the DMD), for older machines with segment displays. Visibility is updated each frame, see PrepareFrame
          m_implicitVRScoreView = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
@@ -1138,6 +1138,7 @@ Player::~Player()
       m_implicitVRBackglass = nullptr;
    }
 
+   m_tableVRDisplays.clear();
    if (m_implicitVRDMD && FindIndexOf(m_ptable->GetParts(), (IEditable *)m_implicitVRDMD) != -1)
    {
       m_ptable->RemovePart(m_implicitVRDMD);
@@ -2229,10 +2230,13 @@ void Player::PrepareFrame()
 
    // The legacy DMD renderer does not apply the profile dot tint but the flasher color (defined by the table author for its own DMDs),
    // so for the standard VR DMD, use the tint of its profile as the flasher color (the other renderers apply the profile tint to a white flasher)
+   // The standard VR displays are only shown while none of the table own 3D displays is visible (they may be hidden by the script, for example with the VR room disabled)
+   const bool tableDisplayVisible = std::ranges::any_of(m_tableVRDisplays, [](const Flasher *display) { return display->m_d.m_isVisible; });
    if (m_implicitVRDMD)
    {
       const int profile = clamp(m_implicitVRDMD->m_d.m_renderStyle, 0, 6);
       m_implicitVRDMD->m_d.m_color = m_renderer->IsLegacyDMDRenderer(profile) ? m_ptable->m_settings.GetDMD_ProfileDotTint(profile) : RGB(255, 255, 255);
+      m_implicitVRDMD->m_d.m_isVisible = !tableDisplayVisible;
    }
 
    // The standard VR score display is only shown for machines with segment displays and no DMD (the standard VR DMD is used otherwise)
@@ -2240,7 +2244,7 @@ void Player::PrepareFrame()
    {
       static const string dmdLink = "ctrl://default/display?dmd_only=1"s;
       static const string segLink = "ctrl://default/seg?id=0"s;
-      m_implicitVRScoreView->m_d.m_isVisible = m_resURIResolver.GetDisplayState(dmdLink).state.frame == nullptr && m_resURIResolver.GetSegDisplayState(segLink).state.frame != nullptr;
+      m_implicitVRScoreView->m_d.m_isVisible = !tableDisplayVisible && m_resURIResolver.GetDisplayState(dmdLink).state.frame == nullptr && m_resURIResolver.GetSegDisplayState(segLink).state.frame != nullptr;
    }
 
    // Update visually animated parts (e.g. primitives, reels, gates, lights, bumper-skirts, hittargets, etc)

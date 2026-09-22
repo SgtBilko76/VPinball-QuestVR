@@ -300,7 +300,8 @@ public:
 
    Primitive *m_implicitPlayfieldMesh = nullptr;
    Flasher *m_implicitVRBackglass = nullptr;
-   Flasher *m_implicitVRDMD = nullptr; // Standard VR DMD for tables without their own 3D display
+   Flasher *m_implicitVRDMD = nullptr; // Standard VR DMD for tables without their own 3D display (or with all of them hidden)
+   vector<Flasher *> m_tableVRDisplays; // Table own 3D displays (display flashers not part of the desktop backdrop)
    Flasher *m_implicitVRScoreView = nullptr; // Standard VR score display (ScoreView layouts) at the same place, for machines with segment displays and no DMD
 
    // External DMD and displays, defined from script or captured
