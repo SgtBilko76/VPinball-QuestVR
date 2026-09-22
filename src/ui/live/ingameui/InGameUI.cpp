@@ -145,21 +145,22 @@ void InGameUI::Update()
 
    if (const InGameUIPage *const activePage = GetActivePage(); activePage && activePage->IsActive())
    {
-      // Only pause player if balls are moving to keep attract mode if possible
+      // Only pause player if balls are moving to keep attract mode if possible.
+      // In VR, always pause: the controller sticks used to navigate the UI are also mapped to nudge and plunger, and timers would keep running.
       if (m_player->IsPlaying(false))
       {
          if (activePage->IsPlayerPauseAllowed())
          {
-            bool ballMoving = false;
+            bool pause = m_player->IsVR();
             for (const auto &ball : m_player->m_vball)
             {
                if (ball->GetVelocity().LengthSquared() > 0.25f)
                {
-                  ballMoving = true;
+                  pause = true;
                   break;
                }
             }
-            if (ballMoving)
+            if (pause)
             {
                m_player->SetPlayState(false);
             }
