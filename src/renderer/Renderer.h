@@ -352,6 +352,10 @@ public:
    vec4 m_segColor[8]; // Base seg color and brightness
    vec4 m_segUnlitColor[8]; // unlit color and back glow
 
+   // Draw a table image in an ancillary render context (same as the plugin API DrawImage, but for table images with normalized texture coordinates)
+   static void DrawTableImage(VPXRenderContext2D* ctx, ITexManCacheable* const tex, const float u0, const float v0, const float u1, const float v1, const float srcX, const float srcY,
+      const float srcW, const float srcH);
+
    // DMD rendering
    bool m_dmdUseLegacyRenderer[7];
    // The legacy DMD renderer is the only one available outside of BGFX, whatever the profile setting says

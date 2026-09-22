@@ -3179,6 +3179,42 @@ void Renderer::DrawImage(VPXRenderContext2D* ctx, VPXTexture texture, const floa
       rdl->m_basicShader->SetVector(ShaderUniform::staticColor_Alpha, 1.f, 1.f, 1.f, 1.f);
 }
 
+void Renderer::DrawTableImage(VPXRenderContext2D* ctx, ITexManCacheable* const tex, const float u0, const float v0, const float u1, const float v1, const float srcX, const float srcY,
+   const float srcW, const float srcH)
+{
+   assert(g_pplayer && g_pplayer->m_renderer && ctx->rendererData == &g_pplayer->m_renderer->m_ancillaryRenderSetup);
+   const bool isLinearOutput = g_pplayer->m_renderer->m_ancillaryRenderSetup.isOutputLinear;
+   RenderDevice* const rdl = g_pplayer->m_renderer->m_renderDevice;
+   rdl->ResetRenderState();
+   rdl->SetRenderState(RenderState::ZWRITEENABLE, RenderState::RS_FALSE);
+   rdl->SetRenderState(RenderState::ZENABLE, ctx->is2D ? RenderState::RS_FALSE : RenderState::RS_TRUE);
+   rdl->SetRenderState(RenderState::SRCBLEND, RenderState::SRC_ALPHA);
+   rdl->SetRenderState(RenderState::DESTBLEND, RenderState::INVSRC_ALPHA);
+   rdl->SetRenderState(RenderState::BLENDOP, RenderState::BLENDOP_ADD);
+   rdl->SetRenderState(RenderState::ALPHABLENDENABLE, tex->IsOpaque() ? RenderState::RS_FALSE : RenderState::RS_TRUE);
+   rdl->m_basicShader->SetVector(ShaderUniform::staticColor_Alpha, 1.f, 1.f, 1.f, 1.f);
+   // Same as DrawImage: force linear (no sRGB decoding) when rendering in sRGB colorspace
+   rdl->m_basicShader->SetTexture(ShaderUniform::tex_base_color, tex, !isLinearOutput);
+   const float vx1 = srcX / ctx->srcWidth;
+   const float vy1 = srcY / ctx->srcHeight;
+   const float vx2 = vx1 + srcW / ctx->srcWidth;
+   const float vy2 = vy1 + srcH / ctx->srcHeight;
+   // Unlike DrawImage (which mirrors the texture area vertically, only correct for full images), map the area directly: top of the area to the top of the quad
+   const float tx1 = u0;
+   const float ty1 = v1;
+   const float tx2 = u1;
+   const float ty2 = v0;
+   Vertex3D_NoTex2 vertices[4] = { //
+      { vx2, vy1, 0.f, 0.f, 0.f, 1.f, tx2, ty2 }, //
+      { vx2, vy2, 0.f, 0.f, 0.f, 1.f, tx2, ty1 }, //
+      { vx1, vy1, 0.f, 0.f, 0.f, 1.f, tx1, ty2 }, //
+      { vx1, vy2, 0.f, 0.f, 0.f, 1.f, tx1, ty1 }
+   };
+   static_cast<AncillaryRenderSetup*>(ctx->rendererData)->displayTransform.TransformVertices(vertices, vertices, 4);
+   rdl->m_basicShader->SetTechnique(ShaderTechnique::unshaded_with_texture);
+   rdl->DrawTexturedQuad(rdl->m_basicShader, vertices, true, g_pplayer->m_renderer->m_ancillaryRenderSetup.depthbias);
+}
+
 void Renderer::DrawMatrixDisplay(VPXRenderContext2D* ctx, VPXDisplayRenderStyle style, VPXTexture glassTex, const float glassTintR, const float glassTintG, const float glassTintB,
    const float glassRoughness, const float glassAreaX, const float glassAreaY, const float glassAreaW, const float glassAreaH, const float glassAmbientR, const float glassAmbientG,
    const float glassAmbientB, VPXTexture dispTex, const float dispTintR, const float dispTintG, const float dispTintB, const float brightness, const float alpha, const float dispPadL,

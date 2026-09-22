@@ -213,6 +213,7 @@ private:
    void FinishFrame();
 
    static void OnAuxRendererChanged(const unsigned int msgId, void *userData, void *msgData);
+   static int MSGPIAPI RenderDesktopBackdrop(VPXRenderContext2D *ctx, void *context); // Built-in backglass renderer showing the desktop backdrop image and EM reels
    unsigned int m_getAuxRendererId = 0, m_onAuxRendererChgId = 0;
    // Live (unsaved) renderer priorities, seeded from settings when renderers are collected
    std::map<string, int, std::less<>> m_ancillaryWndRendererPriorities[VPXWindowId::VPXWINDOW_Topper + 1];
@@ -300,6 +301,20 @@ public:
 
    Primitive *m_implicitPlayfieldMesh = nullptr;
    Flasher *m_implicitVRBackglass = nullptr;
+   float m_implicitVRBackglassBaseHeight = 0.f; // Height of the implicit VR backglass center without a display under it
+   float m_implicitVRDMDPanelHeight = 0.f; // Height of the standard display panel under the implicit VR backglass
+   bool m_vrDesktopBackdropBackglass = false; // The table can show its desktop backdrop (image & EM reels) on the implicit VR backglass (table not designed for VR)
+   bool m_vrDesktopBackdropBackglassEnabled = true; // User setting (PlayerVR.DesktopBackdropBackglass), live
+   struct DesktopBackdropLayout
+   {
+      bool analyzed = false;
+      float width = (float)EDITOR_BG_WIDTH, height = (float)EDITOR_BG_HEIGHT; // Backdrop image size in pixels (or backdrop units without image)
+      float gapStart = 0.f, gapEnd = 0.f; // Empty vertical band (where the playfield is seen on desktop) removed to join the left and right parts, in pixels
+      float overlapShift = -1.f; // When the left and right parts are overlapping crops of the same backglass, position of the right part in the left one (in pixels), negative otherwise
+      float duplicateWidth = 0.f; // Without empty band, when the image holds 2 copies of the backglass side by side, offset of the second copy (only the first one is shown)
+      float top = 0.f, bottom = 0.f; // Rows with content, in pixels
+   };
+   DesktopBackdropLayout m_vrBackdropLayout; // Layout of the desktop backdrop image, analyzed on first use
    Flasher *m_implicitVRDMD = nullptr; // Standard VR DMD for tables without their own 3D display (or with all of them hidden)
    vector<Flasher *> m_tableVRDisplays; // Table own 3D displays (display flashers not part of the desktop backdrop)
    Flasher *m_implicitVRScoreView = nullptr; // Standard VR score display (ScoreView layouts) at the same place, for machines with segment displays and no DMD

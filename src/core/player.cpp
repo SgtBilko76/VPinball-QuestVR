@@ -13,6 +13,7 @@
 #include "core/VPApp.h"
 #include "core/VPXPluginAPIImpl.h"
 #include "parts/ball.h"
+#include "parts/dispreel.h"
 #include "parts/flasher.h"
 #include "parts/light.h"
 #include "parts/primitive.h"
@@ -549,6 +550,15 @@ Player::Player(PinTable *const table, const PlayMode playMode)
             }
             PLOGI << "Moved " << backglassFlashers.size() << " flashers from beyond the playfield top edge to the VR backglass position";
          }
+
+         // The desktop backdrop (backglass art, EM score reels) is never rendered in VR: rebuild a backglass from it (image and reels) on the implicit
+         // VR backglass, through a built-in backglass renderer used as a fallback after the plugin ones (see OnAuxRendererChanged).
+         // Not done when art flashers were already moved to the backglass position above.
+         const bool hasReels = m_ptable->GetEMReelsEnabled()
+            && std::ranges::any_of(m_ptable->GetParts(), [](const IEditable *part) { return part->GetItemType() == ItemTypeEnum::eItemDispReel; });
+         m_vrDesktopBackdropBackglass = backglassFlashers.empty() && (hasReels || m_ptable->GetImage(m_ptable->m_BG_image[BG_DESKTOP]) != nullptr);
+         if (m_vrDesktopBackdropBackglass)
+            PLOGI << "Table not designed for VR, showing its desktop backdrop on the VR backglass";
       }
 
       m_implicitVRBackglass = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
@@ -561,10 +571,13 @@ Player::Player(PinTable *const table, const PlayMode playMode)
          m_implicitVRBackglass->Scale(backglassWidth / flasherWidth, backglassHeight / flasherHeight, Vertex2D {}, true);
          m_implicitVRBackglass->m_d.m_rotX = -90.f;
          m_implicitVRBackglass->m_d.m_height = backglassHeight * 0.5f + m_ptable->m_glassTopHeight + dmdPanelHeight; // Above the standard DMD if any, like on a real cabinet
+         m_implicitVRBackglassBaseHeight = backglassHeight * 0.5f + m_ptable->m_glassTopHeight;
+         m_implicitVRDMDPanelHeight = dmdPanelHeight;
          m_implicitVRBackglass->m_d.m_renderMode = FlasherData::EXT_RENDER;
          m_implicitVRBackglass->m_d.m_renderStyle = VPXWindowId::VPXWINDOW_Backglass;
          m_implicitVRBackglass->m_d.m_depthBias = 10000.0f; // Draw before other objects
-         m_implicitVRBackglass->m_d.m_isVisible = m_ptable->m_settings.GetPlayerVR_AddBackglass();
+         m_vrDesktopBackdropBackglassEnabled = m_ptable->m_settings.GetPlayerVR_DesktopBackdropBackglass();
+         m_implicitVRBackglass->m_d.m_isVisible = m_ptable->m_settings.GetPlayerVR_AddBackglass() || (m_vrDesktopBackdropBackglass && m_vrDesktopBackdropBackglassEnabled);
          m_ptable->AddPart(m_implicitVRBackglass);
          m_implicitVRBackglass->Release();
       }
@@ -2247,6 +2260,15 @@ void Player::PrepareFrame()
       m_implicitVRScoreView->m_d.m_isVisible = !tableDisplayVisible && m_resURIResolver.GetDisplayState(dmdLink).state.frame == nullptr && m_resURIResolver.GetSegDisplayState(segLink).state.frame != nullptr;
    }
 
+   // The backglass rebuilt from the desktop backdrop sits directly on the cabinet when there is no display under it (EM machines), above the display otherwise
+   if (m_vrDesktopBackdropBackglass && m_implicitVRBackglass)
+   {
+      static const string dmdLink = "ctrl://default/display?dmd_only=1"s;
+      static const string segLink = "ctrl://default/seg?id=0"s;
+      const bool hasDisplay = tableDisplayVisible || m_resURIResolver.GetDisplayState(dmdLink).state.frame != nullptr || m_resURIResolver.GetSegDisplayState(segLink).state.frame != nullptr;
+      m_implicitVRBackglass->m_d.m_height = m_implicitVRBackglassBaseHeight + (hasDisplay ? m_implicitVRDMDPanelHeight : 0.f);
+   }
+
    // Update visually animated parts (e.g. primitives, reels, gates, lights, bumper-skirts, hittargets, etc)
    if (IsPlaying())
    {
@@ -2457,6 +2479,212 @@ void Player::OnAuxRendererChanged(const unsigned int msgId, void* userData, void
       std::erase_if(me->m_ancillaryWndRenderers[window],
          [&priorities](const AncillaryRendererDef &a) { return priorities[a.id] < 0; });
    }
+
+   // Built-in fallback backglass renderer (after the plugin ones, used when none of them renders), see constructor
+   if (me->m_vrDesktopBackdropBackglass)
+      me->m_ancillaryWndRenderers[VPXWindowId::VPXWINDOW_Backglass].push_back(
+         { "VPX.DesktopBackdrop", "Desktop Backdrop", "Desktop backdrop image and EM reels of tables not designed for VR", me, RenderDesktopBackdrop });
+}
+
+// Desktop backdrops are screen overlays, often with the backglass split in a left and a right part along the screen borders, the middle being
+// left empty for the playfield view. Find this empty vertical band and the rows with content, to rebuild a backglass from them.
+static Player::DesktopBackdropLayout AnalyzeDesktopBackdrop(const Texture *const backdrop)
+{
+   Player::DesktopBackdropLayout layout;
+   layout.analyzed = true;
+   layout.bottom = layout.height;
+   if (backdrop == nullptr)
+      return layout;
+   const std::shared_ptr<const BaseTexture> bitmap = backdrop->GetRawBitmap(false, 0);
+   if (bitmap == nullptr || bitmap->width() == 0 || bitmap->height() == 0)
+      return layout;
+   const unsigned int w = bitmap->width(), h = bitmap->height();
+   layout.width = static_cast<float>(w);
+   layout.height = static_cast<float>(h);
+   layout.bottom = layout.height;
+   const bool is8bits = bitmap->m_format == BaseTexture::SRGB || bitmap->m_format == BaseTexture::SRGBA || bitmap->m_format == BaseTexture::RGB || bitmap->m_format == BaseTexture::RGBA;
+   if (!is8bits)
+      return layout;
+   const unsigned int bpp = bitmap->pitch() / w;
+   const uint8_t *const data = static_cast<const uint8_t *>(bitmap->datac());
+   const auto luminance = [&](unsigned int x, unsigned int y)
+   {
+      const uint8_t *const p = data + (size_t)y * bitmap->pitch() + (size_t)x * bpp;
+      return (static_cast<int>(p[0]) + static_cast<int>(p[1]) + static_cast<int>(p[2])) / 3;
+   };
+   // A column (or row) is empty when it is transparent or of uniform color (low luminance deviation), like the band left for the playfield view
+   const auto isEmpty = [&](bool isColumn, unsigned int index)
+   {
+      double sum = 0., sum2 = 0.;
+      unsigned int n = 0;
+      for (unsigned int i = 0; i < (isColumn ? h : w); i += 4) // Sampled for speed
+      {
+         const unsigned int x = isColumn ? index : i, y = isColumn ? i : index;
+         if (bpp >= 4 && data[(size_t)y * bitmap->pitch() + (size_t)x * bpp + 3] <= 24)
+            continue;
+         const double l = luminance(x, y);
+         sum += l;
+         sum2 += l * l;
+         n++;
+      }
+      if (n == 0)
+         return true;
+      const double mean = sum / n;
+      return sum2 / n - mean * mean < 36.; // Standard deviation under 6
+   };
+   constexpr unsigned int step = 2;
+   // Longest run of empty columns, which must be inside the image (content on both sides) and at least 10% of its width
+   unsigned int bestStart = 0, bestLength = 0;
+   for (unsigned int x = 0; x < w; x += step)
+   {
+      if (!isEmpty(true, x))
+         continue;
+      const unsigned int start = x;
+      while (x < w && isEmpty(true, x))
+         x += step;
+      if (start > 0 && x < w && x - start > bestLength)
+      {
+         bestStart = start;
+         bestLength = x - start;
+      }
+   }
+   if (bestLength >= w / 10)
+   {
+      layout.gapStart = static_cast<float>(bestStart);
+      layout.gapEnd = static_cast<float>(bestStart + bestLength);
+   }
+   // Rows with content
+   unsigned int top = 0, bottom = h;
+   while (top < h && isEmpty(false, top))
+      top += step;
+   while (bottom > top + step && isEmpty(false, bottom - step))
+      bottom -= step;
+   if (top < bottom)
+   {
+      layout.top = static_cast<float>(top);
+      layout.bottom = static_cast<float>(bottom);
+   }
+   // Some backdrops show 2 overlapping crops of the same backglass (each with the score reel windows of its side): find the position of
+   // the right part in the left one that best matches (mean luminance difference), to merge them back into the full backglass
+   if (layout.gapEnd > layout.gapStart && top < bottom)
+   {
+      const unsigned int leftW = bestStart, rightStart = bestStart + bestLength, rightW = w - rightStart;
+      float bestDiff = FLT_MAX;
+      unsigned int bestShift = 0;
+      for (unsigned int shift = 0; shift + leftW / 5 <= leftW; shift += 4) // At least 20% of overlap
+      {
+         const unsigned int overlap = min(leftW - shift, rightW);
+         if (overlap < min(leftW, rightW) / 5)
+            continue;
+         uint64_t diff = 0, count = 0;
+         for (unsigned int y = top; y < bottom; y += 16)
+            for (unsigned int x = 0; x < overlap; x += 12)
+            {
+               diff += abs(luminance(shift + x, y) - luminance(rightStart + x, y));
+               count++;
+            }
+         if (count > 0 && static_cast<float>(diff) / static_cast<float>(count) < bestDiff)
+         {
+            bestDiff = static_cast<float>(diff) / static_cast<float>(count);
+            bestShift = shift;
+         }
+      }
+      if (bestDiff < 35.f) // Matching crops are around 20, unrelated images around 65 or more
+         layout.overlapShift = static_cast<float>(bestShift);
+      PLOGI << "VR backglass from desktop backdrop: best overlap of right part at " << bestShift << " (mean difference " << bestDiff << ')';
+   }
+   // Without empty band, some backdrops show 2 copies of the backglass side by side: find the offset of the second copy to only show the first one
+   else if (top < bottom)
+   {
+      float bestDiff = FLT_MAX;
+      unsigned int bestOffset = 0;
+      for (unsigned int offset = (w * 3) / 10; offset < (w * 7) / 10; offset += 4)
+      {
+         uint64_t diff = 0, count = 0;
+         for (unsigned int y = top; y < bottom; y += 16)
+            for (unsigned int x = 0; x + offset < w; x += 12)
+            {
+               diff += abs(luminance(x, y) - luminance(x + offset, y));
+               count++;
+            }
+         if (count > 0 && static_cast<float>(diff) / static_cast<float>(count) < bestDiff)
+         {
+            bestDiff = static_cast<float>(diff) / static_cast<float>(count);
+            bestOffset = offset;
+         }
+      }
+      if (bestDiff < 35.f)
+         layout.duplicateWidth = static_cast<float>(bestOffset);
+   }
+   PLOGI << "VR backglass from desktop backdrop: " << w << 'x' << h << ", empty band " << layout.gapStart << ".." << layout.gapEnd << ", content rows " << layout.top << ".."
+         << layout.bottom << ", overlap " << layout.overlapShift << ", duplicate " << layout.duplicateWidth;
+   return layout;
+}
+
+int MSGPIAPI Player::RenderDesktopBackdrop(VPXRenderContext2D *ctx, void *context)
+{
+   Player *const me = static_cast<Player *>(context);
+   if (!me->m_vrDesktopBackdropBackglassEnabled)
+      return 0;
+   Texture *const backdrop = me->m_ptable->GetImage(me->m_ptable->m_BG_image[BG_DESKTOP]);
+   if (!me->m_vrBackdropLayout.analyzed)
+      me->m_vrBackdropLayout = AnalyzeDesktopBackdrop(backdrop);
+   const DesktopBackdropLayout &layout = me->m_vrBackdropLayout;
+
+   // The rebuilt backglass (content rows, empty band removed) is centered on the render surface, keeping its aspect ratio (in image pixels).
+   // Overlapping crops are merged: the left part is drawn fully, then the part of the right one which is not overlapping.
+   const float gap = layout.gapEnd - layout.gapStart;
+   const bool isOverlap = gap > 0.f && layout.overlapShift >= 0.f;
+   const float rightW = layout.width - layout.gapEnd;
+   const float rightSkip = isOverlap ? max(0.f, layout.gapStart - layout.overlapShift) : 0.f; // Part of the right image already shown by the left one
+   const float contentW = gap > 0.f ? layout.gapStart + max(0.f, rightW - rightSkip) : layout.duplicateWidth > 0.f ? layout.duplicateWidth : layout.width;
+   const float contentH = layout.bottom - layout.top;
+   const float outAR = ctx->outHeight > 0.f ? ctx->outWidth / ctx->outHeight : 4.f / 3.f;
+   ctx->srcWidth = max(contentW, contentH * outAR);
+   ctx->srcHeight = ctx->srcWidth / outAR;
+   const float offsetX = 0.5f * (ctx->srcWidth - contentW);
+   const float offsetY = 0.5f * (ctx->srcHeight - contentH);
+
+   bool rendered = false;
+   if (backdrop)
+   {
+      const float v0 = layout.top / layout.height, v1 = layout.bottom / layout.height;
+      if (gap > 0.f)
+      {
+         Renderer::DrawTableImage(ctx, backdrop, 0.f, v0, layout.gapStart / layout.width, v1, offsetX, offsetY, layout.gapStart, contentH);
+         if (rightW > rightSkip)
+            Renderer::DrawTableImage(ctx, backdrop, (layout.gapEnd + rightSkip) / layout.width, v0, 1.f, v1, offsetX + layout.gapStart, offsetY, rightW - rightSkip, contentH);
+      }
+      else
+         Renderer::DrawTableImage(ctx, backdrop, 0.f, v0, contentW / layout.width, v1, offsetX, offsetY, contentW, contentH);
+      rendered = true;
+   }
+
+   // Reels are defined in backdrop units (the backdrop image covering 0..EDITOR_BG_WIDTH x 0..EDITOR_BG_HEIGHT), moved like the image part they are on
+   const float sx = layout.width / static_cast<float>(EDITOR_BG_WIDTH);
+   const float sy = layout.height / static_cast<float>(EDITOR_BG_HEIGHT);
+   for (IEditable *const part : me->m_ptable->GetParts())
+   {
+      if (part->GetItemType() != ItemTypeEnum::eItemDispReel || !me->m_ptable->GetEMReelsEnabled())
+         continue;
+      const DispReel *const reel = static_cast<DispReel *>(part);
+      Texture *const image = me->m_ptable->GetImage(reel->m_d.m_szImage);
+      if (image == nullptr)
+         continue;
+      reel->ForEachReel([&](float x, float y, float w, float h, float u0, float v0, float u1, float v1)
+         {
+            float px = x * sx;
+            if (gap > 0.f && px >= layout.gapEnd)
+               px = isOverlap ? (px - layout.gapEnd + layout.overlapShift) : (px - gap); // Right part: at its place in the merged/joined backglass
+            else if (gap > 0.f && px >= layout.gapStart)
+               return; // In the removed band
+            else if (layout.duplicateWidth > 0.f && px >= layout.duplicateWidth)
+               px -= layout.duplicateWidth; // Second copy: at its place on the first one
+            Renderer::DrawTableImage(ctx, image, u0, v0, u1, v1, offsetX + px, offsetY + y * sy - layout.top, w * sx, h * sy);
+            rendered = true;
+         });
+   }
+   return rendered ? 1 : 0;
 }
 
 int Player::GetAncillaryRendererPriority(VPXWindowId window, const string& id) const

@@ -262,6 +262,7 @@ PropBool(
 PropEnum(Player, VRPreview, "Preview mode"s, "Select VR preview mode"s, int, 1, "Disabled"s, "Left Eye"s, "Right Eye"s, "Both Eyes"s);
 PropBool(PlayerVR, ShrinkPreview, "Shrink preview"s, "Shrink VR preview"s, false);
 PropBool(PlayerVR, AddBackglass, "Add Backglass"s, "Add a default backglass display to the scene"s, false);
+PropBool(PlayerVR, DesktopBackdropBackglass, "Backglass from Desktop Backdrop"s, "For tables not designed for VR, show a backglass rebuilt from the desktop backdrop (art and EM score reels)"s, true);
 PropFloatDyn(PlayerVR, ControllerCabYOffset, "Cabinet Y Offset"s, "Y offset to apply when using controller view centering"s, -150.f, 50.f, 0.f);
 PropFloatDyn(PlayerVR, ControllerLockbarScale, "Lockbar size ratio"s, "Lockbar size ratio to apply when using controller view centering"s, 0.5f, 2.0f, 1.f);
 PropFloatUnbounded(PlayerVR, ResFactor, "ResFactor"s, ""s, g_isMobile ? 0.25f : -1.f); // Mobile/standalone headsets (Quest 3): 2048x2048 per eye to reach 72 FPS

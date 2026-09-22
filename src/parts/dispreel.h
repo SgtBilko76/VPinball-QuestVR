@@ -149,6 +149,10 @@ public:
 
    DispReelData m_d;
 
+   // Visit each reel as a quad in desktop backdrop coordinates (0..EDITOR_BG_WIDTH, 0..EDITOR_BG_HEIGHT) with the area of its current digit
+   // in normalized texture coordinates (used to render the desktop backdrop on the VR backglass, as backdrop parts are not rendered in VR)
+   void ForEachReel(const std::function<void(float x, float y, float w, float h, float u0, float v0, float u1, float v1)>& visitor) const;
+
 private:
    float   getBoxWidth() const;
    float   getBoxHeight() const;

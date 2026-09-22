@@ -117,6 +117,16 @@ void VRSettingsPage::BuildPage()
       [this]() { return m_player->m_implicitVRBackglass->m_d.m_isVisible; }, //
       [this](bool v) { m_player->m_implicitVRBackglass->m_d.m_isVisible = v; }));
 
+   if (m_player->m_vrDesktopBackdropBackglass)
+      AddItem(std::make_unique<InGameUIItem>( //
+         Settings::m_propPlayerVR_DesktopBackdropBackglass, //
+         [this]() { return m_player->m_vrDesktopBackdropBackglassEnabled; }, //
+         [this](bool v)
+         {
+            m_player->m_vrDesktopBackdropBackglassEnabled = v;
+            m_player->m_implicitVRBackglass->m_d.m_isVisible = v;
+         }));
+
 #ifdef ENABLE_XR
    AddItem(std::make_unique<InGameUIItem>( //
       Settings::m_propPlayerVR_DisplayRefreshRate, //

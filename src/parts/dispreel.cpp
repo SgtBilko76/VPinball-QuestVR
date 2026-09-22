@@ -367,6 +367,24 @@ void DispReel::Render(const unsigned int renderMask)
    m_renderer->m_renderDevice->m_DMDShader->SetFloat(ShaderUniform::alphaTestValue, 1.0f);
 }
 
+void DispReel::ForEachReel(const std::function<void(float x, float y, float w, float h, float u0, float v0, float u1, float v1)>& visitor) const
+{
+   if (!m_d.m_visible || m_digitTexCoords.empty())
+      return;
+   // Same layout as Render
+   const float spacing = max(0.0f, m_d.m_reelspacing);
+   const float width = max(0.0f, m_d.m_width);
+   const float height = max(0.0f, m_d.m_height);
+   float x = m_d.m_v1.x + spacing;
+   const float y = m_d.m_v1.y + spacing;
+   for (int r = 0; r < m_d.m_reelcount; ++r)
+   {
+      const TexCoordRect &uv = m_digitTexCoords[clamp(m_reelInfo[r].currentValue, 0, (int)m_digitTexCoords.size() - 1)];
+      visitor(x, y, width, height, uv.u_min, uv.v_min, uv.u_max, uv.v_max);
+      x += spacing + width;
+   }
+}
+
 #pragma endregion
 
 
