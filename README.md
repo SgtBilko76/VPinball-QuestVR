@@ -1,5 +1,8 @@
 # Visual Pinball
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-SgtBilko76-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/SgtBilko76)
+
+
 *An open source pinball table editor and simulator.*
 
 This project was started by Randy Davis, open sourced in 2010 and continued by the Visual Pinball development team. This is the official repository.
