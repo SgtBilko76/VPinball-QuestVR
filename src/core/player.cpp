@@ -454,6 +454,37 @@ Player::Player(PinTable *const table, const PlayMode playMode)
             m_tableVRDisplays.push_back(static_cast<Flasher *>(part));
       const bool hasOwnDisplay = !m_tableVRDisplays.empty();
       float dmdPanelHeight = 0.f;
+
+      // The standard displays and backglass stand on the cabinet head, usually at the glass height, but the back panel along the playfield top edge
+      // (with its lamps and screws) may rise above it: use the highest visible part lying in the top area of the playfield. VR cabinet parts are
+      // skipped, and the height is limited so that a backbox is never taken into account.
+      float displayBase = m_ptable->m_glassTopHeight;
+      {
+         const float topArea = m_ptable->m_top + 0.08f * (m_ptable->m_bottom - m_ptable->m_top);
+         vector<Vertex3Ds> bounds;
+         for (IEditable *const part : m_ptable->GetParts())
+         {
+            if (part->m_desktopBackdrop)
+               continue;
+            const string name = lowerCase(part->GetName());
+            if (name.starts_with("vr") || name.starts_with("pincab"))
+               continue;
+            bounds.clear();
+            part->GetBoundingVertices(bounds, nullptr);
+            if (bounds.empty())
+               continue;
+            float maxY = -FLT_MAX, maxZ = -FLT_MAX;
+            for (const Vertex3Ds &v : bounds)
+            {
+               maxY = max(maxY, v.y);
+               maxZ = max(maxZ, v.z);
+            }
+            if (maxY <= topArea && maxZ <= 2.f * m_ptable->m_glassTopHeight)
+               displayBase = max(displayBase, maxZ);
+         }
+         if (displayBase > m_ptable->m_glassTopHeight)
+            PLOGI << "VR standard displays raised above the playfield back panel: " << displayBase << " (glass height " << m_ptable->m_glassTopHeight << ')';
+      }
       m_implicitVRDMD = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
       if (m_implicitVRDMD)
       {
@@ -465,7 +496,7 @@ Player::Player(PinTable *const table, const PlayMode playMode)
             dmdPanelHeight = panelHeight; // Keep the backglass position of tables with their own display, as the standard display is only a fallback there
          m_implicitVRDMD->Scale(dmdWidth / flasherWidth, dmdHeight / flasherHeight, Vertex2D {}, true);
          m_implicitVRDMD->m_d.m_rotX = -90.f;
-         m_implicitVRDMD->m_d.m_height = panelHeight * 0.5f + m_ptable->m_glassTopHeight;
+         m_implicitVRDMD->m_d.m_height = panelHeight * 0.5f + displayBase;
          m_implicitVRDMD->m_d.m_renderMode = FlasherData::DMD; // Without link nor script frame, the DMD mode displays the default controller DMD
          m_implicitVRDMD->m_d.m_color = RGB(255, 255, 255); // Let the selected DMD profile define the dot color (applied to the flasher color for the legacy renderer, see PrepareFrame)
          m_implicitVRDMD->m_d.m_isVisible = !hasOwnDisplay; // Visibility is updated each frame, see PrepareFrame
@@ -508,7 +539,8 @@ Player::Player(PinTable *const table, const PlayMode playMode)
          if (part == m_implicitVRDMD || part == m_implicitVRScoreView) // Our own implicit parts are named vr_...
             continue;
          const string name = lowerCase(part->GetName());
-         isVRTable = name.starts_with("vr") || name.starts_with("pincab");
+         isVRTable = name.starts_with("vr") // VR cabinet parts (PinCab_Rails or PinCab_Blades are also used by desktop tables)
+            || (name.starts_with("pincab") && (name.find("backbox") != string::npos || name.find("backglass") != string::npos || name.find("cabinet") != string::npos));
       }
       if (!isVRTable)
       {
@@ -535,7 +567,7 @@ Player::Player(PinTable *const table, const PlayMode playMode)
             const float tableWidth = m_ptable->m_right - m_ptable->m_left;
             const float scale = min(1.2f * tableWidth / (maxBound.x - minBound.x), 0.9f * tableWidth / (maxBound.y - minBound.y));
             const Vertex2D groupCenter = 0.5f * (minBound + maxBound);
-            const float panelBottom = m_ptable->m_glassTopHeight + dmdPanelHeight;
+            const float panelBottom = displayBase + dmdPanelHeight;
             const float panelHeight = scale * (maxBound.y - minBound.y);
             for (Flasher *const flasher : backglassFlashers)
             {
@@ -570,8 +602,8 @@ Player::Player(PinTable *const table, const PlayMode playMode)
          const float backglassHeight = backglassWidth * (float)(3. / 4.);
          m_implicitVRBackglass->Scale(backglassWidth / flasherWidth, backglassHeight / flasherHeight, Vertex2D {}, true);
          m_implicitVRBackglass->m_d.m_rotX = -90.f;
-         m_implicitVRBackglass->m_d.m_height = backglassHeight * 0.5f + m_ptable->m_glassTopHeight + dmdPanelHeight; // Above the standard DMD if any, like on a real cabinet
-         m_implicitVRBackglassBaseHeight = backglassHeight * 0.5f + m_ptable->m_glassTopHeight;
+         m_implicitVRBackglass->m_d.m_height = backglassHeight * 0.5f + displayBase + dmdPanelHeight; // Above the standard DMD if any, like on a real cabinet
+         m_implicitVRBackglassBaseHeight = backglassHeight * 0.5f + displayBase;
          m_implicitVRDMDPanelHeight = dmdPanelHeight;
          m_implicitVRBackglass->m_d.m_renderMode = FlasherData::EXT_RENDER;
          m_implicitVRBackglass->m_d.m_renderStyle = VPXWindowId::VPXWINDOW_Backglass;
