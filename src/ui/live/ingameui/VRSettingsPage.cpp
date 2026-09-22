@@ -117,6 +117,11 @@ void VRSettingsPage::BuildPage()
       [this]() { return m_player->m_implicitVRBackglass->m_d.m_isVisible; }, //
       [this](bool v) { m_player->m_implicitVRBackglass->m_d.m_isVisible = v; }));
 
+   AddItem(std::make_unique<InGameUIItem>( //
+      Settings::m_propPlayerVR_BlockStartDuringPlay, //
+      [this]() { return m_player->m_pininput.m_vrBlockStartDuringPlay; }, //
+      [this](bool v) { m_player->m_pininput.m_vrBlockStartDuringPlay = v; }));
+
    if (m_player->m_vrDesktopBackdropBackglass)
       AddItem(std::make_unique<InGameUIItem>( //
          Settings::m_propPlayerVR_DesktopBackdropBackglass, //

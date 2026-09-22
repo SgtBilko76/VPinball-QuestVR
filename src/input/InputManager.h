@@ -295,6 +295,13 @@ private:
    void Autostart(const uint32_t initialDelayMs, const uint32_t retryDelayMs);
    uint32_t m_autoStartTimestamp = 0;
    bool m_gameStartedOnce = false;
+public:
+   // VR: ignore Start while a ball is moving (and a few seconds after), to avoid adding players by pressing the controller button by accident
+   bool m_vrBlockStartDuringPlay = false;
+private:
+   uint32_t m_lastBallMovingMs = 0;
+   bool m_startPressBlocked = false;
+   unsigned int m_startBlockedNotificationId = 0;
    bool m_autoStartPressed = false;
    bool m_autoStartDoneOnce = false;
    int m_autoStartDirectStateSlot = -1;

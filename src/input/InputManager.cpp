@@ -8,6 +8,7 @@
 #include "core/VPApp.h"
 #include "core/VPXPluginAPIImpl.h"
 #include "input/PlungerHandler.h"
+#include "parts/ball.h"
 #include "physics/cabinet/NudgeHandler.h"
 #include "renderer/VRDevice.h"
 #include "ui/live/LiveUI.h"
@@ -35,6 +36,7 @@ InputManager::InputManager(Player* player)
 
    m_inputDevices[m_keyboardDeviceId].m_connected = true;
    m_inputDevices[m_mouseDeviceId].m_connected = true;
+   m_vrBlockStartDuringPlay = m_player->m_ptable->m_settings.GetPlayerVR_BlockStartDuringPlay();
 
    CreateInputActions();
 
@@ -416,6 +418,15 @@ void InputManager::ProcessInput()
       return; // only if player is running
    m_player->m_logicProfiler.OnProcessInput();
 
+   // Track when a ball was last moving, to block accidental Start presses during play in VR (see CreateInputActions)
+   if (m_vrBlockStartDuringPlay && m_player->IsVR() && m_player->IsPlaying(false))
+      for (const auto &ball : m_player->m_vball)
+         if (ball->GetVelocity().LengthSquared() > 0.25f)
+         {
+            m_lastBallMovingMs = msec();
+            break;
+         }
+
    // Gather input from all handlers
    for (const auto& handler : m_inputHandlers)
       handler->Update();
@@ -679,7 +690,7 @@ void InputManager::CreateInputActions()
    auto addKeyAction = [this, keyMapping](const string& settingId, const string& label, const SDL_Scancode sdlScancode)
    {
       auto newAction = AddAction(std::make_unique<InputAction>(this, settingId, label, sdlScancode == SDL_SCANCODE_UNKNOWN ? ""s : keyMapping(sdlScancode),
-         [this](const InputAction& action, bool, bool isPressed)
+         [this](InputAction& action, bool wasPressed, bool isPressed)
          {
             if (m_player->m_liveUI->IsInGameUIOpened())
             {
@@ -711,6 +722,33 @@ void InputManager::CreateInputActions()
             }
             else
             {
+               // In VR, ignore short Start presses while a ball is moving (and 1 second after): the controller button is easily pressed by accident
+               // while playing, adding players to the game. Starting a game, entering high score initials or answering in game questions with the
+               // ball held in a kicker (balls at rest) are not affected, and holding Start for 1 second always passes it to the game.
+               if (action.GetActionId() == m_startActionId && m_vrBlockStartDuringPlay && m_player->IsVR())
+               {
+                  if (isPressed && !wasPressed && m_lastBallMovingMs != 0 && msec() - m_lastBallMovingMs < 1000)
+                  {
+                     m_startPressBlocked = true;
+                     action.SetRepeatPeriod(1000); // Called back while still pressed after 1 second
+                     m_startBlockedNotificationId = m_player->m_liveUI->PushNotification("Start ignored during play (hold to confirm)"s, 1500, m_startBlockedNotificationId);
+                     return;
+                  }
+                  if (isPressed && wasPressed)
+                  {
+                     // Still pressed after 1 second: deliberate press, pass it to the game (only once)
+                     action.SetRepeatPeriod(-1);
+                     if (!std::exchange(m_startPressBlocked, false))
+                        return;
+                     m_startBlockedNotificationId = m_player->m_liveUI->PushNotification("Start"s, 1000, m_startBlockedNotificationId);
+                  }
+                  else if (!isPressed)
+                  {
+                     action.SetRepeatPeriod(-1);
+                     if (std::exchange(m_startPressBlocked, false))
+                        return; // Release of an ignored press
+                  }
+               }
                CComVariant rgvar[1] = { CComVariant(0x10000 | static_cast<int>(action.GetActionId())) };
                DISPPARAMS dispparams = { rgvar, nullptr, 1, 0 };
                m_player->m_ptable->FireDispID(isPressed ? DISPID_GameEvents_KeyDown : DISPID_GameEvents_KeyUp, &dispparams);
