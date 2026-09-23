@@ -344,6 +344,7 @@ Player::Player(PinTable *const table, const PlayMode playMode)
 
    m_backglassVolume = dequantizeUnsignedPercent(m_ptable->m_settings.GetPlayer_MusicVolume());
    m_playfieldVolume = dequantizeUnsignedPercent(m_ptable->m_settings.GetPlayer_SoundVolume());
+   m_audioPlayer->SetStreamAutoGain(m_ptable->m_settings.GetPlayer_BackglassAutoVolume());
    UpdateVolume();
 
    //
@@ -2888,7 +2889,7 @@ void Player::OnAudioSrcChanged(const unsigned int msgId, void *userData, void *m
          const string endpointName = audioSrc.name ? audioSrc.name : info.name ? info.name : endpointId;
          const string propId = std::format("AudioSource.{}.Gain", endpointId);
          const auto propPropId = Settings::GetRegistry().Register(std::make_unique<VPX::Properties::FloatPropertyDef>(
-            "Player"s, propId, std::format("{} Gain", endpointName), std::format("Volume gain applied to audio from '{}'.", endpointName), true, 0.f, 2.f, 0.f, 1.f));
+            "Player"s, propId, std::format("{} Gain", endpointName), std::format("Volume gain applied to audio from '{}'.", endpointName), true, 0.f, 4.f, 0.f, 1.f));
          const float persistedVolume = me->m_ptable->m_settings.GetFloat(propPropId);
          me->m_audioLanes[audioSrc.id.id] = { audioSrc, false, persistedVolume };
       }

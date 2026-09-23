@@ -12,6 +12,7 @@ PropBool(Editor, DisableHash, "Disable File Validation"s, "Disable file integrit
 // Audio settings
 PropInt(Player, MusicVolume, "Backglass Volume"s, "Main volume for music and sound played from the backglass speakers"s, 0, 100, 100);
 PropInt(Player, SoundVolume, "Playfield Volume"s, "Main volume for mechanical sounds coming from the playfield"s, 0, 100, 100);
+PropBool(Player, BackglassAutoVolume, "Backglass Auto Volume"s, "Automatically raise the volume of quiet ROM audio, which is often drowned out by the playfield sounds"s, true);
 PropStringDyn(Player, SoundDeviceBG, "Backglass Sound Device"s, "Select backglass sound device"s, ""s);
 PropStringDyn(Player, SoundDevice, "Playfield Sound Device"s, "Select playfield sound device"s, ""s);
 PropEnum(Player, Sound3D, "Playfield Output Mode"s, "Select how playfield sound is output to a speaker configuration"s, int /* VPX::SoundConfigTypes*/, 0 /* VPX::SoundConfigTypes::SNDCFG_SND3D2CH */,

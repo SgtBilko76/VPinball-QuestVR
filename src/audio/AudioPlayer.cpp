@@ -381,6 +381,13 @@ void AudioPlayer::SetMainVolume(float backglassVolume, float playfieldVolume)
       player->SetMainVolume(backglassVolume);
 }
 
+void AudioPlayer::SetStreamAutoGain(bool enable)
+{
+   m_streamAutoGain = enable;
+   for (const auto& player : m_audioStreams)
+      player->SetAutoGain(enable);
+}
+
 AudioPlayer::AudioStreamID AudioPlayer::OpenAudioStream(const string& name, int frequency, int channels, bool isFloat)
 {
    if (m_backglassSDLDevice == 0)
@@ -394,6 +401,7 @@ AudioPlayer::AudioStreamID AudioPlayer::OpenAudioStream(const string& name, int 
       return nullptr;
    AudioStreamID stream = std::move(audioStream);
    stream->SetMainVolume(m_backglassVolume);
+   stream->SetAutoGain(m_streamAutoGain);
    stream->SetName(name);
    m_audioStreams.push_back(stream);
    return stream;

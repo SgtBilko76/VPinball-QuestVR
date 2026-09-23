@@ -62,6 +62,10 @@ void AudioStreamPlayer::Enqueue(const uint8_t* buffer, int length)
       m_resync = false;
       PLOGI << "Audio stream sync was lost and reseted";
    }
+   // Adjust the gain applied to quiet sources (ROM audio is usually far below the level of the table samples) before enqueueing the data it was computed from
+   if (m_autoGain)
+      UpdateAutoGain(buffer, length);
+
    // Just enqueue, syncing and compensation is done on a regular basis when data is requested for playing
    SDL_PutAudioStreamData(m_stream, buffer, length);
    m_streamedTotal += length;
@@ -82,7 +86,7 @@ void AudioStreamPlayer::SetStreamVolume(const float volume)
    if (m_streamVolume != volume)
    {
       m_streamVolume = volume;
-      SDL_SetAudioStreamGain(m_stream, m_streamVolume * m_mainVolume);
+      ApplyGain();
    }
 }
 
@@ -91,7 +95,64 @@ void AudioStreamPlayer::SetMainVolume(const float volume)
    if (m_mainVolume != volume)
    {
       m_mainVolume = volume;
-      SDL_SetAudioStreamGain(m_stream, m_streamVolume * m_mainVolume);
+      ApplyGain();
+   }
+}
+
+void AudioStreamPlayer::SetAutoGain(const bool enable)
+{
+   if (m_autoGain != enable)
+   {
+      m_autoGain = enable;
+      m_autoGainValue = 1.f;
+      m_autoGainPeak = 0.f;
+      ApplyGain();
+   }
+}
+
+void AudioStreamPlayer::ApplyGain()
+{
+   SDL_SetAudioStreamGain(m_stream, m_streamVolume * m_mainVolume * m_autoGainValue);
+}
+
+// Level the stream to a target peak, only boosting (never attenuating below the source level), to compensate for the
+// very low output level of some ROMs which would otherwise be drowned out by the table samples.
+void AudioStreamPlayer::UpdateAutoGain(const uint8_t* buffer, int length)
+{
+   constexpr float targetPeak = 0.89f; // Leave a little headroom below saturation
+   constexpr float maxGain = 4.f; // Up to +12dB
+   constexpr float silenceThreshold = 0.02f; // Below this, the source is considered silent and the gain is kept as is
+   constexpr float peakReleaseTimeConstant = 3.f; // Peak envelope decay in seconds (the level is evaluated over the last few seconds)
+   constexpr float riseDbPerSecond = 3.f; // Slowly boost to avoid audible pumping
+   constexpr float fallDbPerSecond = 40.f; // Quickly back off to avoid saturating on a sudden loud part
+
+   const int frameSize = SDL_AUDIO_FRAMESIZE(m_audioSpec);
+   const int nFrames = (frameSize > 0) ? (length / frameSize) : 0;
+   if (nFrames <= 0)
+      return;
+
+   float peak = 0.f;
+   if (SDL_AUDIO_ISFLOAT(m_audioSpec.format))
+   {
+      const float* const samples = reinterpret_cast<const float*>(buffer);
+      for (int i = 0; i < nFrames * m_audioSpec.channels; ++i)
+         peak = max(peak, fabsf(samples[i]));
+   }
+   else
+   {
+      const int16_t* const samples = reinterpret_cast<const int16_t*>(buffer);
+      for (int i = 0; i < nFrames * m_audioSpec.channels; ++i)
+         peak = max(peak, static_cast<float>(abs(samples[i])) * (float)(1.0 / 32768.0));
+   }
+
+   const float elapsed = static_cast<float>(nFrames) / static_cast<float>(m_audioSpec.freq);
+   m_autoGainPeak = max(peak, m_autoGainPeak * expf(-elapsed / peakReleaseTimeConstant));
+   if (m_autoGainPeak > silenceThreshold)
+   {
+      const float target = clamp(targetPeak / m_autoGainPeak, 1.f, maxGain);
+      m_autoGainValue = (target > m_autoGainValue) ? min(target, m_autoGainValue * powf(10.f, riseDbPerSecond * elapsed / 20.f))
+                                                   : max(target, m_autoGainValue * powf(10.f, -fallDbPerSecond * elapsed / 20.f));
+      ApplyGain();
    }
 }
 

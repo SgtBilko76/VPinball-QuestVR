@@ -21,14 +21,20 @@ public:
    void SetName(string name) { m_name = std::move(name); }
    void SetStreamVolume(const float volume);
    void SetMainVolume(const float volume);
+   void SetAutoGain(const bool enable);
 
 private:
    static void AudioStreamCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
+   void UpdateAutoGain(const uint8_t* buffer, int length);
+   void ApplyGain();
 
    SDL_AudioStream* const m_stream = nullptr;
    SDL_AudioSpec m_audioSpec;
    float m_mainVolume = 1.f;
    float m_streamVolume = 1.f;
+   bool m_autoGain = false;
+   float m_autoGainValue = 1.f;
+   float m_autoGainPeak = 0.f;
    float m_throttling = 1.f;
    uint64_t m_streamedTotal = 0;
    uint64_t m_startTimestamp = 0;

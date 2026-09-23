@@ -51,6 +51,11 @@ void AudioSettingsPage::BuildPage()
          m_player->UpdateVolume();
       }));
 
+   AddItem(std::make_unique<InGameUIItem>( //
+      Settings::m_propPlayer_BackglassAutoVolume, //
+      [this]() { return m_player->m_audioPlayer->IsStreamAutoGain(); }, //
+      [this](bool v) { m_player->m_audioPlayer->SetStreamAutoGain(v); }));
+
    AddItem(std::make_unique<InGameUIItem>(InGameUIItem::LabelType::Header, "Audio Source Levels"s));
 
    unsigned int getAudioSrcMsgId = m_player->m_pluginManager.GetMsgAPI().GetMsgID(CTLPI_NAMESPACE, CTLPI_AUDIO_GET_SRC_MSG);
@@ -62,7 +67,7 @@ void AudioSettingsPage::BuildPage()
       const string endpointName = audioSrc.name ? audioSrc.name : info.name ? info.name : endpointId;
       const string propId = std::format("AudioSource.{}.Gain", endpointId);
       const auto propPropId = Settings::GetRegistry().Register(std::make_unique<VPX::Properties::FloatPropertyDef>(
-         "Player"s, propId, std::format("{} Gain", endpointName), std::format("Volume gain applied to audio from '{}'.", endpointName), true, 0.f, 2.f, 0.f, 1.f));
+         "Player"s, propId, std::format("{} Gain", endpointName), std::format("Volume gain applied to audio from '{}'.", endpointName), true, 0.f, 4.f, 0.f, 1.f));
       const uint64_t laneId = audioSrc.id.id;
       AddItem(std::make_unique<InGameUIItem>(
          *Settings::GetRegistry().GetFloatProperty(propPropId), 100.f, "%3.0f %%"s,
@@ -94,6 +99,7 @@ void AudioSettingsPage::BuildPage()
                     m_devices[v], //
                     m_player->m_ptable->m_settings.GetPlayer_SoundDevice(), //
                     static_cast<VPX::SoundConfigTypes>(m_player->m_ptable->m_settings.GetPlayer_Sound3D()));
+                 m_player->m_audioPlayer->SetStreamAutoGain(m_player->m_ptable->m_settings.GetPlayer_BackglassAutoVolume());
               }, //
               [](Settings& settings) { settings.ResetPlayer_SoundDeviceBG(); }, //
               [this](int v, Settings& settings, bool isTableOverride) { settings.SetPlayer_SoundDeviceBG(m_devices[v], isTableOverride); }))
@@ -117,6 +123,7 @@ void AudioSettingsPage::BuildPage()
             m_player->m_ptable->m_settings.GetPlayer_SoundDeviceBG(), //
             m_devices[v], //
             static_cast<VPX::SoundConfigTypes>(m_player->m_ptable->m_settings.GetPlayer_Sound3D()));
+         m_player->m_audioPlayer->SetStreamAutoGain(m_player->m_ptable->m_settings.GetPlayer_BackglassAutoVolume());
       }, //
       [](Settings& settings) { settings.ResetPlayer_SoundDevice(); }, //
       [this](int v, Settings& settings, bool isTableOverride) { settings.SetPlayer_SoundDevice(m_devices[v], isTableOverride); })).m_excludeFromDefault = true;
@@ -129,6 +136,7 @@ void AudioSettingsPage::BuildPage()
             m_player->m_ptable->m_settings.GetPlayer_SoundDeviceBG(), //
             m_player->m_ptable->m_settings.GetPlayer_SoundDevice(), //
             static_cast<VPX::SoundConfigTypes>(v));
+         m_player->m_audioPlayer->SetStreamAutoGain(m_player->m_ptable->m_settings.GetPlayer_BackglassAutoVolume());
       }));
 }
 }

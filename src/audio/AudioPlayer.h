@@ -71,6 +71,8 @@ public:
    ~AudioPlayer();
 
    void SetMainVolume(float backglassVolume, float playfieldVolume); // Overall gain, directly applied to all sounds, including the ones being played
+   void SetStreamAutoGain(bool enable); // Automatically level backglass streams (ROM audio) which are often way quieter than the table samples
+   bool IsStreamAutoGain() const { return m_streamAutoGain; }
    void SetMirrored(bool mirrored) { m_mirrored = mirrored; } // Whether the table is mirrored, affects sound panning
 
    // Audio stream, directly forwarded to audio device, respecting channel assignment, applying backglass global volume
@@ -113,6 +115,7 @@ private:
    float m_playfieldVolume = 1.f;
    float m_backglassVolume = 1.f;
    float m_musicVolume = 1.f;
+   bool m_streamAutoGain = false;
    bool m_mirrored = false;
 
    int m_playfieldAudioDevice = SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
