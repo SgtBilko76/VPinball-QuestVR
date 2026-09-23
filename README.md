@@ -7,7 +7,7 @@
 
 This fork builds Visual Pinball X as a **standalone VR app** for **Meta Quest** (tested on Quest 3) and **PICO** headsets (OpenXR, Vulkan). No PC, no streaming: tables and ROMs live on the headset.
 
-**[Download the latest release](https://github.com/SgtBilko76/VPinball-QuestVR/releases)** - more ports at **[portroyale.online](https://portroyale.online)**.
+**[Download the latest release](https://github.com/SgtBilko76/VPinball-VR/releases)** - more ports at **[portroyale.online](https://portroyale.online)**.
 
 - Mixed reality (passthrough) switchable from the in-game menu
 - Backglass rebuilt from the desktop backdrop for tables not designed for VR, including EM score reels
