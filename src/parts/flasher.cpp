@@ -1288,14 +1288,18 @@ void Flasher::Render(const unsigned int renderMask)
             const float width = m_curve.GetMaxBound().x - m_curve.GetMinBound().x;
             const float height = m_curve.GetMaxBound().y - m_curve.GetMinBound().y;
             m_renderer->m_renderDevice->SetRenderState(RenderState::ALPHABLENDENABLE, RenderState::RS_FALSE);
-            // Draw a solid black background using the common flasher mesh and transform
-            // In mixed reality, displays must write depth: their panel is opaque, whatever the rendered content is (the color key uses the depth buffer)
-            m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, m_renderer->m_vrApplyColorKey ? RenderState::RS_TRUE : RenderState::RS_FALSE);
-            m_renderer->m_renderDevice->m_basicShader->SetTechnique(ShaderTechnique::unshaded_without_texture);
-            m_renderer->m_renderDevice->m_basicShader->SetVector(ShaderUniform::staticColor_Alpha, 0.f, 0.f, 0.f, 1.f);
-            m_renderer->m_renderDevice->DrawMesh(
-               m_renderer->m_renderDevice->m_basicShader, true, pos, m_d.m_depthBias, m_meshBuffer, RenderDevice::TRIANGLELIST, 0, m_numPolys * 3);
-            m_renderer->m_renderDevice->m_basicShader->SetVector(ShaderUniform::staticColor_Alpha, 1.f, 1.f, 1.f, 1.f);
+            // Draw a solid black background using the common flasher mesh and transform, but only if a renderer claimed this window on the previous
+            // frame: an empty display (no B2S backglass, no plugin content,...) would otherwise be an opaque black rectangle in the scene
+            if (g_pplayer->m_ancillarySceneContent[m_d.m_renderStyle])
+            {
+               // In mixed reality, displays must write depth: their panel is opaque, whatever the rendered content is (the color key uses the depth buffer)
+               m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, m_renderer->m_vrApplyColorKey ? RenderState::RS_TRUE : RenderState::RS_FALSE);
+               m_renderer->m_renderDevice->m_basicShader->SetTechnique(ShaderTechnique::unshaded_without_texture);
+               m_renderer->m_renderDevice->m_basicShader->SetVector(ShaderUniform::staticColor_Alpha, 0.f, 0.f, 0.f, 1.f);
+               m_renderer->m_renderDevice->DrawMesh(
+                  m_renderer->m_renderDevice->m_basicShader, true, pos, m_d.m_depthBias, m_meshBuffer, RenderDevice::TRIANGLELIST, 0, m_numPolys * 3);
+               m_renderer->m_renderDevice->m_basicShader->SetVector(ShaderUniform::staticColor_Alpha, 1.f, 1.f, 1.f, 1.f);
+            }
             // Vertices are emitted in (0,0) -> (1,1). We must scale & rotate around center then translate to fit flasher's position
             Matrix3D transform;
             VPXRenderContext2D *context;
@@ -1321,9 +1325,14 @@ void Flasher::Render(const unsigned int renderMask)
                context->outWidth = width;
                context->outHeight = height;
             }
+            bool rendered = false;
             for (auto &renderer : g_pplayer->m_ancillaryWndRenderers[m_d.m_renderStyle])
                if (renderer.Render(context, renderer.context))
+               {
+                  rendered = true;
                   break;
+               }
+            g_pplayer->m_ancillarySceneContent[m_d.m_renderStyle] = rendered;
          }
          break;
       }

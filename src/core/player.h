@@ -197,10 +197,17 @@ public:
    std::unique_ptr<Renderer> m_renderer;
    VRDevice *m_vrDevice = nullptr;
    vector<AncillaryRendererDef> m_ancillaryWndRenderers[VPXWindowId::VPXWINDOW_Topper + 1];
+   // Whether a renderer claimed the window when rendered in the scene (EXT_RENDER flasher). Used to skip the opaque panel of empty displays,
+   // which would otherwise be a black rectangle hiding what is behind (for example the backglass of a table which has its own).
+   bool m_ancillarySceneContent[VPXWindowId::VPXWINDOW_Topper + 1] = {};
    int GetAncillaryRendererPriority(VPXWindowId window, const string& id) const;
    void SetAncillaryRendererPriority(VPXWindowId window, const string& id, int priority);
 
    bool IsVR() const { return m_vrDevice != nullptr; }
+
+   // Mixed reality: only the machine is shown, the VR room of the table (room space parts, or parts lying outside of the machine) is hidden
+   // to let the real room be seen. Computed on demand since tables build their room when their script starts.
+   bool IsVRRoomPart(const IEditable *editable);
 
    int GetCabinetAutoFitMode() const { return m_cabinetAutoFitMode; }
    void SetCabinetAutoFitMode(int mode);
@@ -305,6 +312,10 @@ public:
    float m_implicitVRBackglassBaseHeight = 0.f; // Height of the implicit VR backglass center without a display under it
    float m_implicitVRDMDPanelHeight = 0.f; // Height of the standard display panel under the implicit VR backglass
    int m_vrRoomBeforeMixedReality = INT_MIN; // Table VR room to restore when leaving mixed reality (INT_MIN if unchanged)
+   ankerl::unordered_dense::set<const IEditable *> m_vrRoomParts; // Parts hidden in mixed reality, see IsVRRoomPart
+   bool m_vrRoomPartsValid = false;
+   bool m_vrHideRoom = false; // User setting (PlayerVR.HideRoom): show only the machine, without the VR room of the table
+   bool m_implicitVRBackglassUserEnabled = false; // User setting (PlayerVR.AddBackglass): show the standard VR backglass, if something renders in it
    bool m_vrDesktopBackdropBackglass = false; // The table can show its desktop backdrop (image & EM reels) on the implicit VR backglass (table not designed for VR)
    bool m_vrDesktopBackdropBackglassEnabled = true; // User setting (PlayerVR.DesktopBackdropBackglass), live
    struct DesktopBackdropLayout

@@ -695,7 +695,9 @@ Player::Player(PinTable *const table, const PlayMode playMode)
          m_implicitVRBackglass->m_d.m_renderStyle = VPXWindowId::VPXWINDOW_Backglass;
          m_implicitVRBackglass->m_d.m_depthBias = 10000.0f; // Draw before other objects
          m_vrDesktopBackdropBackglassEnabled = m_ptable->m_settings.GetPlayerVR_DesktopBackdropBackglass();
-         m_implicitVRBackglass->m_d.m_isVisible = m_ptable->m_settings.GetPlayerVR_AddBackglass() || (m_vrDesktopBackdropBackglass && m_vrDesktopBackdropBackglassEnabled);
+         m_vrHideRoom = m_ptable->m_settings.GetPlayerVR_HideRoom();
+         m_implicitVRBackglassUserEnabled = m_ptable->m_settings.GetPlayerVR_AddBackglass();
+         m_implicitVRBackglass->m_d.m_isVisible = m_vrDesktopBackdropBackglass ? m_vrDesktopBackdropBackglassEnabled : m_implicitVRBackglassUserEnabled;
          m_ptable->AddPart(m_implicitVRBackglass);
          m_implicitVRBackglass->Release();
       }
@@ -2382,6 +2384,11 @@ void Player::PrepareFrame()
       m_implicitVRScoreView->m_d.m_isVisible = !tableDisplayVisible && m_resURIResolver.GetDisplayState(dmdLink).state.frame == nullptr && m_resURIResolver.GetSegDisplayState(segLink).state.frame != nullptr;
    }
 
+   // The standard VR backglass would be an opaque black panel when nothing renders in it (no B2S backglass, table not using the desktop backdrop one),
+   // hiding the backglass of the tables which have their own: only show it when something will be rendered
+   if (m_implicitVRBackglass)
+      m_implicitVRBackglass->m_d.m_isVisible = m_vrDesktopBackdropBackglass ? m_vrDesktopBackdropBackglassEnabled : m_implicitVRBackglassUserEnabled;
+
    // The backglass rebuilt from the desktop backdrop sits directly on the cabinet when there is no display under it (EM machines), above the display otherwise
    if (m_vrDesktopBackdropBackglass && m_implicitVRBackglass)
    {
@@ -2741,6 +2748,42 @@ static Player::DesktopBackdropLayout AnalyzeDesktopBackdrop(const Texture *const
    PLOGI << "VR backglass from desktop backdrop: " << w << 'x' << h << ", empty band " << layout.gapStart << ".." << layout.gapEnd << ", content rows " << layout.top << ".."
          << layout.bottom << ", overlap " << layout.overlapShift << ", duplicate " << layout.duplicateWidth;
    return layout;
+}
+
+// Mixed reality only shows the machine: a part belongs to the VR room when it is placed in the room space reference, or when it lies entirely
+// outside of the machine (walls, floor, ceiling, furniture of the tables which build their room from plain playfield space parts).
+bool Player::IsVRRoomPart(const IEditable *editable)
+{
+   if (!m_vrRoomPartsValid)
+   {
+      m_vrRoomPartsValid = true;
+      m_vrRoomParts.clear();
+      const float width = m_ptable->m_right - m_ptable->m_left;
+      // Volume of the machine: playfield, its cabinet (a bit wider), the backbox behind the playfield head and the backglass above it
+      const float minX = m_ptable->m_left - 0.6f * width, maxX = m_ptable->m_right + 0.6f * width;
+      const float minY = m_ptable->m_top - 1.2f * width, maxY = m_ptable->m_bottom + 0.6f * width;
+      const float minZ = -1.5f * m_ptable->m_groundToLockbarHeight, maxZ = m_ptable->m_glassTopHeight + 1.6f * width;
+      vector<Vertex3Ds> bounds;
+      for (IEditable *const part : m_ptable->GetParts())
+      {
+         if (part->GetPartGroup() && part->GetPartGroup()->GetReferenceSpace() == PartGroupData::SpaceReference::SR_ROOM)
+         {
+            m_vrRoomParts.insert(part);
+            continue;
+         }
+         bounds.clear();
+         part->GetBoundingVertices(bounds, nullptr);
+         if (bounds.empty())
+            continue;
+         bool inside = false;
+         for (const Vertex3Ds &v : bounds)
+            inside |= (minX <= v.x) && (v.x <= maxX) && (minY <= v.y) && (v.y <= maxY) && (minZ <= v.z) && (v.z <= maxZ);
+         if (!inside)
+            m_vrRoomParts.insert(part);
+      }
+      PLOGI << "Mixed reality: hiding " << m_vrRoomParts.size() << " VR room parts";
+   }
+   return m_vrRoomParts.contains(editable);
 }
 
 int MSGPIAPI Player::RenderDesktopBackdrop(VPXRenderContext2D *ctx, void *context)

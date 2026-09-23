@@ -55,14 +55,29 @@ void HomePage::BuildPage()
          }));
    #endif
 
-   // Quick VR room switch, first item of the menu (tables with a VR Room option)
+   // Quick VR room switches, at the top of the menu: show/hide the room of the table (any table), then its room choices (tables with a VR Room option)
+   if (m_player->m_vrDevice)
+      AddItem(std::make_unique<InGameUIItem>(m_player->m_vrHideRoom ? "VR Room: Hidden"s : "VR Room: Shown"s,
+         "Select to show or hide the VR room of this table, keeping only the machine (always hidden in mixed reality)"s,
+         [this]()
+         {
+            m_player->m_vrHideRoom = !m_player->m_vrHideRoom;
+            g_app->m_settings.SetPlayerVR_HideRoom(m_player->m_vrHideRoom, false);
+            RequestRebuild();
+         }));
+
    if (m_player->m_vrDevice && m_player->m_ptable->GetVRRoomOption())
-      AddItem(std::make_unique<InGameUIItem>("VR Room: "s + m_player->m_ptable->GetVRRoomName(), "Select to switch to the next VR room of this table (also with a long press on the menu button)"s,
+      AddItem(std::make_unique<InGameUIItem>("VR Room Style: "s + m_player->m_ptable->GetVRRoomName(), "Select to switch to the next VR room of this table (also with a long press on the menu button)"s,
          [this]()
          {
             m_player->m_ptable->CycleVRRoom();
             RequestRebuild();
          }));
+
+   // Quit the table, at the top of the menu (with the quick switches) as it is the most used action on standalone devices
+   if (g_isMobile)
+      AddItem(std::make_unique<InGameUIItem>("Quit Table"s, "Select to leave this table and go back to the table list"s,
+         [this]() { m_player->m_ptable->QuitPlayer(Player::CS_CLOSE_CAPTURE_SCREENSHOT); }));
 
    ////////////////////////////////////////////////////////////////////////////////////////////////
    AddItem(std::make_unique<InGameUIItem>(InGameUIItem::LabelType::Header, "Table options"s));
@@ -129,11 +144,6 @@ void HomePage::BuildPage()
             ImGui::GetIO().MousePos.y = 0;
             RequestRebuild();
          }));
-
-   if (g_isMobile)
-      AddItem(std::make_unique<InGameUIItem>("Quit"s, ""s, [this]() {
-         m_player->m_ptable->QuitPlayer(Player::CS_CLOSE_CAPTURE_SCREENSHOT);
-      }));
 
    ////////////////////////////////////////////////////////////////////////////////////////////////
    AddItem(std::make_unique<InGameUIItem>(InGameUIItem::LabelType::Header, "Settings"s));

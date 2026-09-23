@@ -1718,6 +1718,10 @@ void Renderer::RenderItem(IEditable* const editable, bool isNoBackdrop)
       || (editable->GetPartGroup() != nullptr && ((editable->GetPartGroup()->GetPlayerModeVisibilityMask() & m_visibilityMask) == 0))) // Apply player mode visibility mask
       return;
 
+   // The VR room of the table is not rendered when hidden by the user, and in mixed reality where it would hide the real room
+   if ((m_vrApplyColorKey || g_pplayer->m_vrHideRoom) && g_pplayer->IsVRRoomPart(editable))
+      return;
+
    const PartGroupData::SpaceReference spaceReference = editable->GetPartGroup() ? editable->GetPartGroup()->GetReferenceSpace() : PartGroupData::SpaceReference::SR_PLAYFIELD;
    SetSpaceReference(spaceReference, false);
    editable->GetIRenderable()->Render(m_render_mask);

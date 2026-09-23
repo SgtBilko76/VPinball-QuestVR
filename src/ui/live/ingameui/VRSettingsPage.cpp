@@ -114,8 +114,8 @@ void VRSettingsPage::BuildPage()
 
    AddItem(std::make_unique<InGameUIItem>( //
       Settings::m_propPlayerVR_AddBackglass, //
-      [this]() { return m_player->m_implicitVRBackglass->m_d.m_isVisible; }, //
-      [this](bool v) { m_player->m_implicitVRBackglass->m_d.m_isVisible = v; }));
+      [this]() { return m_player->m_implicitVRBackglassUserEnabled; }, //
+      [this](bool v) { m_player->m_implicitVRBackglassUserEnabled = v; }));
 
    AddItem(std::make_unique<InGameUIItem>( //
       Settings::m_propPlayerVR_BlockStartDuringPlay, //
@@ -126,11 +126,7 @@ void VRSettingsPage::BuildPage()
       AddItem(std::make_unique<InGameUIItem>( //
          Settings::m_propPlayerVR_DesktopBackdropBackglass, //
          [this]() { return m_player->m_vrDesktopBackdropBackglassEnabled; }, //
-         [this](bool v)
-         {
-            m_player->m_vrDesktopBackdropBackglassEnabled = v;
-            m_player->m_implicitVRBackglass->m_d.m_isVisible = v;
-         }));
+         [this](bool v) { m_player->m_vrDesktopBackdropBackglassEnabled = v; }));
 
 #ifdef ENABLE_XR
    AddItem(std::make_unique<InGameUIItem>( //
