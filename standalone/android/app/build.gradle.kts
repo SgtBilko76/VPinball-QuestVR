@@ -93,12 +93,21 @@ android {
         create("quest") {
             dimension = "platform"
             buildConfigField("boolean", "IS_QUEST", "true")
+            buildConfigField("boolean", "IS_VR", "true")
             // Optional display version for Quest builds (e.g. -PquestVersionName="Quest Beta 0.1"), versionCode is unchanged
             project.findProperty("questVersionName")?.let { versionName = it.toString() }
+        }
+        create("pico") {
+            dimension = "platform"
+            buildConfigField("boolean", "IS_QUEST", "false")
+            buildConfigField("boolean", "IS_VR", "true")
+            // Optional display version for PICO builds (e.g. -PpicoVersionName="PICO Beta 0.1"), versionCode is unchanged
+            project.findProperty("picoVersionName")?.let { versionName = it.toString() }
         }
         create("mobile") {
             dimension = "platform"
             buildConfigField("boolean", "IS_QUEST", "false")
+            buildConfigField("boolean", "IS_VR", "false")
         }
     }
 

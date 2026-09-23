@@ -3,6 +3,21 @@
 [![Sponsor](https://img.shields.io/badge/Sponsor-SgtBilko76-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/SgtBilko76)
 
 
+## Standalone VR port for Meta Quest and PICO
+
+This fork builds Visual Pinball X as a **standalone VR app** for **Meta Quest** (tested on Quest 3) and **PICO** headsets (OpenXR, Vulkan). No PC, no streaming: tables and ROMs live on the headset.
+
+**[Download the latest release](https://github.com/SgtBilko76/VPinball-QuestVR/releases)** - more ports at **[portroyale.online](https://portroyale.online)**.
+
+- Mixed reality (passthrough) switchable from the in-game menu
+- Backglass rebuilt from the desktop backdrop for tables not designed for VR, including EM score reels
+- VR room switching, adjustable table position, angle, size and distance
+- Standard DMD and segment score displays for tables without their own 3D display
+
+Table script overrides that switch on the VR room of tables shipping with it disabled are in [quest-overrides](quest-overrides).
+
+Everything below is the upstream Visual Pinball documentation.
+
 *An open source pinball table editor and simulator.*
 
 This project was started by Randy Davis, open sourced in 2010 and continued by the Visual Pinball development team. This is the official repository.

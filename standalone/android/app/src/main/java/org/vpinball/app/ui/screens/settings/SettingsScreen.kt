@@ -125,7 +125,7 @@ fun SettingsScreen(
                     SectionHeader(title = "General")
 
                     RoundedCard {
-                        if (!BuildConfig.IS_QUEST) {
+                        if (!BuildConfig.IS_VR) {
                             EnumMenuRow(
                                 label = "Graphics Backend",
                                 options = VPinballGfxBackend.entries.toList(),
@@ -283,7 +283,7 @@ fun SettingsScreen(
                     }
                 }
 
-                if (!BuildConfig.IS_QUEST) {
+                if (!BuildConfig.IS_VR) {
                     item {
                         SectionHeader(title = "Miscellaneous")
 
@@ -356,7 +356,7 @@ fun SettingsScreen(
                     SectionHeader(title = "Credits")
 
                     RoundedCard {
-                        val credits = Credit.entries.filter { it != Credit.QUEST_PORT || BuildConfig.IS_QUEST }
+                        val credits = Credit.entries.filter { it != Credit.VR_PORT || BuildConfig.IS_VR }
                         credits.forEachIndexed { index, credit ->
                             CreditRow(credit = credit, context = LocalContext.current)
 

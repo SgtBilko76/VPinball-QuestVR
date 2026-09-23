@@ -112,7 +112,7 @@ jobs:
               {"platform":"windows","arch":"x64","config":"Release"},
               {"platform":"windows","arch":"x86","config":"Release"}
             ]}'
-            ANDROID_FLAVORS='["quest","mobile"]'
+            ANDROID_FLAVORS='["quest","pico","mobile"]'
           else
             DESKTOP='{"include":[
               {"os":"windows-2025-vs2026","type":"BGFX","platform":"windows","arch":"x64","config":"Release"},
@@ -604,7 +604,7 @@ jobs:
           perl -i -pe"s/unknown/${{ needs.version.outputs.sha_short }}/g" src/core/git_version.h
       - name: Build libvpinball
         run: |
-          if [[ "${{ matrix.flavor }}" == "quest" ]]; then
+          if [[ "${{ matrix.flavor }}" == "quest" || "${{ matrix.flavor }}" == "pico" ]]; then
             cmake \
                   -DPLATFORM=android \
                   -DARCH=arm64-v8a \

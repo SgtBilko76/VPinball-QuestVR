@@ -117,13 +117,16 @@ public:
       }
 
       // Register these bindings for major profiles
-      static const std::array<const char*, 6> profiles { //
+      static const std::array<const char*, 9> profiles { //
          "/interaction_profiles/khr/simple_controller", //
          "/interaction_profiles/oculus/touch_controller", //
          "/interaction_profiles/valve/index_controller", //
          "/interaction_profiles/htc/vive_controller", //
          "/interaction_profiles/microsoft/motion_controller", //
-         "/interaction_profiles/google/daydream_controller" };
+         "/interaction_profiles/google/daydream_controller", //
+         "/interaction_profiles/bytedance/pico_neo3_controller", // PICO Neo 3
+         "/interaction_profiles/bytedance/pico4_controller", // PICO 4
+         "/interaction_profiles/bytedance/pico_g3_controller" }; // PICO G3 (single controller)
       for (const char* p : profiles)
       {
          SuggestBindings(p, bindings);

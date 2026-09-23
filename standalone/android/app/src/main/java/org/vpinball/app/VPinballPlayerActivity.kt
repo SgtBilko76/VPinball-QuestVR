@@ -11,7 +11,7 @@ class VPinballPlayerActivity : SDLActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (BuildConfig.IS_QUEST) {
+        if (BuildConfig.IS_VR) {
             VPinballManager.vpinballJNI.VPinballInitOpenXR(this)
         }
 
