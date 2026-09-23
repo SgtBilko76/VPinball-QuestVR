@@ -593,6 +593,92 @@ Player::Player(PinTable *const table, const PlayMode playMode)
             PLOGI << "Table not designed for VR, showing its desktop backdrop on the VR backglass";
       }
 
+      // Tables not designed for VR have no cabinet at all: the playfield would float in the room (visible in mixed reality, where the real room is seen
+      // around it). Add a standard cabinet: a body under the playfield and a backbox behind the backglass, sized from the table.
+      // Tables which draw their own cabinet body (for example side blades) are left alone
+      bool hasCabinetGeometry = false;
+      {
+         vector<Vertex3Ds> bounds;
+         for (IEditable *const part : m_ptable->GetParts())
+         {
+            if (part->m_desktopBackdrop || hasCabinetGeometry)
+               continue;
+            bounds.clear();
+            part->GetBoundingVertices(bounds, nullptr);
+            float minZ = FLT_MAX, minX = FLT_MAX, maxX = -FLT_MAX;
+            for (const Vertex3Ds &v : bounds)
+            {
+               minZ = min(minZ, v.z);
+               minX = min(minX, v.x);
+               maxX = max(maxX, v.x);
+            }
+            // Something large going well under the playfield level
+            hasCabinetGeometry = !bounds.empty() && minZ < -0.25f * (m_ptable->m_right - m_ptable->m_left) && (maxX - minX) > 0.5f * (m_ptable->m_right - m_ptable->m_left);
+         }
+      }
+      if (!isVRTable && !hasCabinetGeometry)
+      {
+         const float tableWidth = m_ptable->m_right - m_ptable->m_left;
+         const float tableLength = m_ptable->m_bottom - m_ptable->m_top;
+         const float bodyHeight = max(100.f, m_ptable->m_groundToLockbarHeight - m_ptable->m_glassBottomHeight); // Playfield to ground
+         constexpr float sideThickness = 25.f; // Roughly 1/2" of wood on each side
+         // Dark cabinet material (primitives are shaded from their material, the default one being the editor's purple)
+         Material *const cabinetMaterial = new Material();
+         cabinetMaterial->m_name = "vr_cabinet"s;
+         cabinetMaterial->m_cBase = RGB(0, 0, 0); // Black cabinet
+         cabinetMaterial->m_cGlossy = RGB(20, 20, 20); // Slight sheen, so that the edges are still readable
+         cabinetMaterial->m_cClearcoat = RGB(0, 0, 0);
+         cabinetMaterial->m_fRoughness = 0.6f;
+         m_ptable->AddMaterial(cabinetMaterial); // May rename it to keep names unique
+         const string cabinetMaterialName = cabinetMaterial->m_name;
+         m_ptable->SetupLookUpTables(true); // Materials are looked up through a hashtable while playing, which was built before we added ours
+         auto createBox = [this, &cabinetMaterialName](const wstring &name, float centerX, float centerY, float centerZ, float sizeX, float sizeY, float sizeZ) -> Primitive *
+         {
+            Primitive *const box = (Primitive *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemPrimitive, m_ptable, 0.f, 0.f);
+            if (box == nullptr)
+               return nullptr;
+            box->SetName(m_ptable->GetUniqueName(name));
+            box->m_desktopBackdrop = false;
+            box->m_d.m_Sides = 4; // Axis aligned box (unit cube scaled by size, see CalculateBuiltinOriginal)
+            box->m_d.m_vPosition.Set(centerX, centerY, centerZ);
+            box->m_d.m_vSize.Set(sizeX, sizeY, sizeZ);
+            box->m_d.m_szMaterial = cabinetMaterialName;
+            box->m_d.m_disableLightingTop = 0.f; // Fully shaded by the scene lights
+            box->m_d.m_collidable = false;
+            box->m_d.m_toy = true;
+            box->m_d.m_visible = true;
+            m_ptable->AddPart(box);
+            box->Release();
+            m_implicitVRCabinetParts.push_back(box);
+            return box;
+         };
+         // Standard machine proportions: the body hangs under the playfield and stands on 4 legs, the backbox sits on its head
+         const float cabinetWidth = tableWidth + 2.f * sideThickness;
+         const float centerX = 0.5f * (m_ptable->m_left + m_ptable->m_right);
+         const float bodyDepth = 0.28f * bodyHeight; // Body under the playfield, the rest of the height being the legs
+         const float legHeight = bodyHeight - bodyDepth;
+         // Kept slightly under the playfield, so that the box does not fight with the playfield surface for the same depth (visible as dark patches on the art)
+         constexpr float playfieldClearance = 10.f;
+         createBox(L"vr_cabinet"s, centerX, 0.5f * (m_ptable->m_top + m_ptable->m_bottom), -0.5f * bodyDepth - playfieldClearance, //
+            cabinetWidth, tableLength + 2.f * sideThickness, bodyDepth);
+         // Legs at the 4 corners, of the usual 2"x2" section, slightly inset
+         constexpr float legSize = INCHESTOVPU(2.f);
+         for (int corner = 0; corner < 4; corner++)
+         {
+            const float legX = ((corner & 1) ? m_ptable->m_right + sideThickness - 0.5f * legSize : m_ptable->m_left - sideThickness + 0.5f * legSize);
+            const float legY = ((corner & 2) ? m_ptable->m_bottom + sideThickness - 0.5f * legSize : m_ptable->m_top - sideThickness + 0.5f * legSize);
+            createBox(L"vr_cabinet_leg"s, legX, legY, -bodyDepth - playfieldClearance - 0.5f * legHeight, legSize, legSize, legHeight);
+         }
+         // Backbox, behind the playfield top edge, from the cabinet head up to the top of the backglass
+         const float backboxHeight = 0.9f * tableWidth + dmdPanelHeight; // Backglass (1.2 x 0.9 table width) and the standard display under it
+         const float backboxDepth = 0.25f * tableWidth;
+         // Down to the playfield level, so that no gap is left between the playfield head and the backbox (like the head of a real cabinet)
+         const float backboxTotalHeight = displayBase + backboxHeight;
+         createBox(L"vr_backbox"s, centerX, m_ptable->m_top - 0.5f * backboxDepth - 2.f, //
+            0.5f * backboxTotalHeight, 1.2f * tableWidth + 0.5f * sideThickness, backboxDepth, backboxTotalHeight);
+         PLOGI << "Table has no VR cabinet, adding a standard one (" << m_implicitVRCabinetParts.size() << " parts)";
+      }
+
       m_implicitVRBackglass = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
       if (m_implicitVRBackglass)
       {
@@ -1184,6 +1270,10 @@ Player::~Player()
    }
 
    m_tableVRDisplays.clear();
+   for (Primitive *const cabinetPart : m_implicitVRCabinetParts)
+      if (FindIndexOf(m_ptable->GetParts(), (IEditable *)cabinetPart) != -1)
+         m_ptable->RemovePart(cabinetPart);
+   m_implicitVRCabinetParts.clear();
    if (m_implicitVRDMD && FindIndexOf(m_ptable->GetParts(), (IEditable *)m_implicitVRDMD) != -1)
    {
       m_ptable->RemovePart(m_implicitVRDMD);
@@ -2671,11 +2761,12 @@ int MSGPIAPI Player::RenderDesktopBackdrop(VPXRenderContext2D *ctx, void *contex
    const float rightSkip = isOverlap ? max(0.f, layout.gapStart - layout.overlapShift) : 0.f; // Part of the right image already shown by the left one
    const float contentW = gap > 0.f ? layout.gapStart + max(0.f, rightW - rightSkip) : layout.duplicateWidth > 0.f ? layout.duplicateWidth : layout.width;
    const float contentH = layout.bottom - layout.top;
-   const float outAR = ctx->outHeight > 0.f ? ctx->outWidth / ctx->outHeight : 4.f / 3.f;
-   ctx->srcWidth = max(contentW, contentH * outAR);
-   ctx->srcHeight = ctx->srcWidth / outAR;
-   const float offsetX = 0.5f * (ctx->srcWidth - contentW);
-   const float offsetY = 0.5f * (ctx->srcHeight - contentH);
+   // The rebuilt backglass fills the standard backglass panel: desktop backdrops are screen overlays whose art is usually stretched to the
+   // screen, so their aspect ratio is not the one of the real backglass (which the panel matches)
+   ctx->srcWidth = contentW;
+   ctx->srcHeight = contentH;
+   constexpr float offsetX = 0.f;
+   constexpr float offsetY = 0.f;
 
    bool rendered = false;
    if (backdrop)

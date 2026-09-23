@@ -301,8 +301,10 @@ public:
 
    Primitive *m_implicitPlayfieldMesh = nullptr;
    Flasher *m_implicitVRBackglass = nullptr;
+   vector<Primitive *> m_implicitVRCabinetParts; // Standard cabinet (body, legs, backbox) for tables which do not have their own (see constructor)
    float m_implicitVRBackglassBaseHeight = 0.f; // Height of the implicit VR backglass center without a display under it
    float m_implicitVRDMDPanelHeight = 0.f; // Height of the standard display panel under the implicit VR backglass
+   int m_vrRoomBeforeMixedReality = INT_MIN; // Table VR room to restore when leaving mixed reality (INT_MIN if unchanged)
    bool m_vrDesktopBackdropBackglass = false; // The table can show its desktop backdrop (image & EM reels) on the implicit VR backglass (table not designed for VR)
    bool m_vrDesktopBackdropBackglassEnabled = true; // User setting (PlayerVR.DesktopBackdropBackglass), live
    struct DesktopBackdropLayout
