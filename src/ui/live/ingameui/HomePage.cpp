@@ -35,6 +35,21 @@ void HomePage::BuildPage()
             {
                m_player->m_renderer->m_vrApplyColorKey = enable; // Transparent background and mixed reality part visibility
                g_app->m_settings.SetPlayerVR_UsePassthroughColor(enable, false);
+               // A VR room would hide the real room: while in mixed reality, use the least furnished room of the table (restored when leaving)
+               if (enable)
+               {
+                  const int minimalRoom = m_player->m_ptable->GetMinimalVRRoomValue();
+                  if (const int room = m_player->m_ptable->GetVRRoomValue(); minimalRoom != INT_MIN && room != minimalRoom)
+                  {
+                     m_player->m_vrRoomBeforeMixedReality = room;
+                     m_player->m_ptable->SetVRRoom(minimalRoom);
+                  }
+               }
+               else if (m_player->m_vrRoomBeforeMixedReality != INT_MIN)
+               {
+                  m_player->m_ptable->SetVRRoom(m_player->m_vrRoomBeforeMixedReality);
+                  m_player->m_vrRoomBeforeMixedReality = INT_MIN;
+               }
             }
             RequestRebuild();
          }));

@@ -292,6 +292,9 @@ public:
    string GetVRRoomName() const;
    // Select the next VR room (wrapping around), apply it live and persist it for this table. Returns the new room name, or an empty string if the table has no VR room option.
    string CycleVRRoom();
+   int GetVRRoomValue() const; // Value of the selected VR room, INT_MIN if the table has no VR room option
+   int GetMinimalVRRoomValue() const; // Value of the least furnished VR room (off, cabinet only, ultra minimal,...), INT_MIN if the table has no VR room option
+   string SetVRRoom(int value); // Apply a VR room live and persist it for this table. Returns the room name, or an empty string if the table has no VR room option.
    STDMETHOD(get_Option)(BSTR optionName, float minValue, float maxValue, float step, float defaultValue, int unit, /*[optional][in]*/ VARIANT values, /*[out, retval]*/ float *param);
    STDMETHOD(put_Option)(BSTR optionName, float minValue, float maxValue, float step, float defaultValue, int unit, /*[optional][in]*/ VARIANT values, /*[in]*/ float val);
 

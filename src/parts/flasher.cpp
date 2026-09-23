@@ -1226,7 +1226,8 @@ void Flasher::Render(const unsigned int renderMask)
             const int dmdProfile = clamp(m_d.m_renderStyle, 0, 6); // 7 DMD profiles, see Renderer::m_dmdDotColor & co
             // The legacy renderer has no additive blend encoding, it outputs a plain alpha blended color
             const float addModulate = SetupDisplayBlend(!m_renderer->IsLegacyDMDRenderer(dmdProfile));
-            m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, RenderState::RS_FALSE);
+            // In mixed reality, displays must write depth: their panel is opaque, whatever the rendered content is (the color key uses the depth buffer)
+            m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, m_renderer->m_vrApplyColorKey ? RenderState::RS_TRUE : RenderState::RS_FALSE);
             const vec3 dotTint = m_renderFrame->m_format == BaseTexture::BW_FP32 ? vec3(color.x, color.y, color.z) : vec3(1.f, 1.f, 1.f);
             m_renderer->SetupDMDRender(dmdProfile, m_desktopBackdrop, dotTint, color.w, m_renderFrame, m_d.m_modulate_vs_add, addModulate, m_desktopBackdrop ? Renderer::Reinhard : Renderer::Linear,
                m_transformedVertices.data(), vec4(m_d.m_glassPadLeft, m_d.m_glassPadTop, m_d.m_glassPadRight, m_d.m_glassPadBottom), vec3(1.f, 1.f, 1.f), m_d.m_glassRoughness,
@@ -1244,7 +1245,8 @@ void Flasher::Render(const unsigned int renderMask)
             UploadRenderFrame(display);
             Texture *const glass = m_ptable->GetImage(m_d.m_szImageA);
             const float addModulate = SetupDisplayBlend(true);
-            m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, RenderState::RS_FALSE);
+            // In mixed reality, displays must write depth: their panel is opaque, whatever the rendered content is (the color key uses the depth buffer)
+            m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, m_renderer->m_vrApplyColorKey ? RenderState::RS_TRUE : RenderState::RS_FALSE);
             const vec3 crtTint = vec3(color.x, color.y, color.z);
             const int crtProfile = clamp(m_d.m_renderStyle, 0, 2);
             m_renderer->SetupCRTRender(crtProfile, m_desktopBackdrop, crtTint, color.w, m_renderFrame, m_d.m_modulate_vs_add, addModulate, m_desktopBackdrop ? Renderer::Reinhard : Renderer::Linear,
@@ -1266,7 +1268,8 @@ void Flasher::Render(const unsigned int renderMask)
             m_renderer->m_renderDevice->SetRenderState(RenderState::ALPHABLENDENABLE, RenderState::RS_TRUE);
             m_renderer->m_renderDevice->SetRenderState(RenderState::SRCBLEND, RenderState::SRC_ALPHA);
             m_renderer->m_renderDevice->SetRenderState(RenderState::DESTBLEND, RenderState::ONE);
-            m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, RenderState::RS_FALSE);
+            // In mixed reality, displays must write depth: their panel is opaque, whatever the rendered content is (the color key uses the depth buffer)
+            m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, m_renderer->m_vrApplyColorKey ? RenderState::RS_TRUE : RenderState::RS_FALSE);
             const int renderStyle = clamp(m_d.m_renderStyle % 8, 0, 7); // Shading settings
             const Renderer::SegmentFamily segFamily = static_cast<Renderer::SegmentFamily>(clamp(m_d.m_renderStyle / 8, 0, 4)); // Segments shape
             m_renderer->SetupSegmentRenderer(renderStyle, m_desktopBackdrop, vec3(color.x, color.y, color.z), color.w, segFamily, segs.source->elementType[0], segs.state.frame,
@@ -1286,7 +1289,8 @@ void Flasher::Render(const unsigned int renderMask)
             const float height = m_curve.GetMaxBound().y - m_curve.GetMinBound().y;
             m_renderer->m_renderDevice->SetRenderState(RenderState::ALPHABLENDENABLE, RenderState::RS_FALSE);
             // Draw a solid black background using the common flasher mesh and transform
-            m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, RenderState::RS_FALSE);
+            // In mixed reality, displays must write depth: their panel is opaque, whatever the rendered content is (the color key uses the depth buffer)
+            m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, m_renderer->m_vrApplyColorKey ? RenderState::RS_TRUE : RenderState::RS_FALSE);
             m_renderer->m_renderDevice->m_basicShader->SetTechnique(ShaderTechnique::unshaded_without_texture);
             m_renderer->m_renderDevice->m_basicShader->SetVector(ShaderUniform::staticColor_Alpha, 0.f, 0.f, 0.f, 1.f);
             m_renderer->m_renderDevice->DrawMesh(

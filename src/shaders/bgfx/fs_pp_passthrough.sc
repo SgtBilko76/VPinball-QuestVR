@@ -12,7 +12,10 @@ SAMPLER2DSTEREO(tex_depth,         4); // DepthBuffer
 
 void main()
 {
-	if (texStereoNoLod(tex_depth, v_texcoord0).x == 1.0)
+	vec3 color = texStereoNoLod(tex_fb_unfiltered, v_texcoord0).rgb;
+	// Parts rendered without depth write (DMD, displays, backglass, flashers,...) are only identified by their contribution to the
+	// framebuffer, so the background is the part which has neither depth nor color
+	if (texStereoNoLod(tex_depth, v_texcoord0).x == 1.0 && max(color.r, max(color.g, color.b)) <= threshold)
 	{
 		// Fixed color keyed passthrough
 		gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
@@ -20,7 +23,6 @@ void main()
 	else
 	{
 		// Solid part, compress color to ensure we won't be filtered by the fixed color key
-		vec3 color = texStereoNoLod(tex_fb_unfiltered, v_texcoord0).rgb;
 		color = vec3_splat(threshold) + (1.0 - threshold) * color;
 		gl_FragColor = vec4(color, 1.0);
 	}

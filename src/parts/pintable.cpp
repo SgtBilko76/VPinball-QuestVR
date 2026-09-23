@@ -5305,6 +5305,47 @@ string PinTable::GetVRRoomName() const
    return std::to_string(value);
 }
 
+int PinTable::GetVRRoomValue() const
+{
+   const TableOption* const option = GetVRRoomOption();
+   return option ? static_cast<int>(option->value) : INT_MIN;
+}
+
+int PinTable::GetMinimalVRRoomValue() const
+{
+   const TableOption* const option = GetVRRoomOption();
+   if (option == nullptr)
+      return INT_MIN;
+   const VPX::Properties::EnumPropertyDef* const prop = Settings::GetRegistry().GetEnumProperty(option->id);
+   if (prop == nullptr) // Plain integer option: lowest value
+      return Settings::GetRegistry().GetIntProperty(option->id)->m_min;
+   // Rooms are named by the table author: prefer no room at all, then the cabinet alone, then the least furnished ones
+   static const std::array<const char*, 4> preferences { "off", "cab", "ultra", "minimal" };
+   for (const char* preference : preferences)
+      for (size_t i = 0; i < prop->m_values.size(); i++)
+         if (lowerCase(prop->m_values[i]).find(preference) != string::npos)
+            return prop->m_min + static_cast<int>(i);
+   return INT_MIN;
+}
+
+string PinTable::SetVRRoom(int value)
+{
+   const TableOption* const option = GetVRRoomOption();
+   if (option == nullptr)
+      return ""s;
+   const VPX::Properties::PropertyRegistry::PropId id = option->id;
+   if (const VPX::Properties::EnumPropertyDef* const prop = Settings::GetRegistry().GetEnumProperty(id))
+      value = clamp(value, prop->m_min, prop->m_min + static_cast<int>(prop->m_values.size()) - 1);
+   else if (const VPX::Properties::IntPropertyDef* const intProp = Settings::GetRegistry().GetIntProperty(id))
+      value = clamp(value, intProp->m_min, intProp->m_max);
+   // Persist as a table override (like the table options page), then apply live (fires the table option event, used by the script to update the room)
+   m_settings.Set(id, value, true);
+   if (FileExists(m_filename))
+      m_settings.Save();
+   SetOptionLiveValue(id, static_cast<float>(value));
+   return GetVRRoomName();
+}
+
 string PinTable::CycleVRRoom()
 {
    const TableOption* const option = GetVRRoomOption();
@@ -5322,14 +5363,7 @@ string PinTable::CycleVRRoom()
       minValue = intProp->m_min;
       maxValue = intProp->m_max;
    }
-   const int value = static_cast<int>(option->value) >= maxValue ? minValue : static_cast<int>(option->value) + 1;
-   const VPX::Properties::PropertyRegistry::PropId id = option->id;
-   // Persist as a table override (like the table options page), then apply live (fires the table option event, used by the script to update the room)
-   m_settings.Set(id, value, true);
-   if (FileExists(m_filename))
-      m_settings.Save();
-   SetOptionLiveValue(id, static_cast<float>(value));
-   return GetVRRoomName();
+   return SetVRRoom(static_cast<int>(option->value) >= maxValue ? minValue : static_cast<int>(option->value) + 1);
 }
 
 STDMETHODIMP PinTable::get_Option(BSTR optionName, float minValue, float maxValue, float step, float defaultValue, int unit, /*[optional][in]*/ VARIANT values, /*[out, retval]*/ float* param)
