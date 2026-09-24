@@ -978,7 +978,12 @@ void Primitive::Render(const unsigned int renderMask)
 
    RenderState::RenderStateValue cullMode = m_renderer->m_renderDevice->GetRenderState().GetRenderState(RenderState::CULLMODE);
    RenderState::RenderStateValue reversedCullMode = cullMode == RenderState::CULL_CCW ? RenderState::CULL_CW : RenderState::CULL_CCW;
-   m_renderer->m_renderDevice->SetRenderState(RenderState::CULLMODE, depthMask ? ((m_d.m_backfacesEnabled && mat->m_bOpacityActive) ? reversedCullMode : cullMode) : RenderState::CULL_NONE);
+   // In mixed reality, the real room is composited wherever the scene did not write depth. Machines are often modeled with single sided panels
+   // (the back of a backbox, the inside of a cabinet,...) which are culled when looked at from their back, letting the room show through them.
+   // Render the opaque parts on both sides so that they hide the room whichever side they are seen from.
+   const bool hideRoomBehind = m_renderer->m_vrApplyColorKey && (alpha == 100.f) && !(mat->m_bOpacityActive && mat->m_fOpacity < 1.f);
+   m_renderer->m_renderDevice->SetRenderState(RenderState::CULLMODE,
+      (depthMask && !hideRoomBehind) ? ((m_d.m_backfacesEnabled && mat->m_bOpacityActive) ? reversedCullMode : cullMode) : RenderState::CULL_NONE);
 
    // Force disable light from below for objects marked as static since there is no light from below during pre-render pass (to get the same result in dynamic mode & static mode)
    m_renderer->m_renderDevice->m_basicShader->SetVector(ShaderUniform::fDisableLighting_top_below, m_d.m_disableLightingTop, m_d.m_staticRendering ? 1.0f : m_d.m_disableLightingBelow, 0.f, 0.f);

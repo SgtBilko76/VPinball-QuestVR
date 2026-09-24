@@ -208,6 +208,7 @@ public:
    // Mixed reality: only the machine is shown, the VR room of the table (room space parts, or parts lying outside of the machine) is hidden
    // to let the real room be seen. Computed on demand since tables build their room when their script starts.
    bool IsVRRoomPart(const IEditable *editable);
+   void IdentifyVRBackglassArtwork();
 
    int GetCabinetAutoFitMode() const { return m_cabinetAutoFitMode; }
    void SetCabinetAutoFitMode(int mode);
@@ -308,6 +309,7 @@ public:
 
    Primitive *m_implicitPlayfieldMesh = nullptr;
    Flasher *m_implicitVRBackglass = nullptr;
+   float m_vrDisplayBase = 0.f; // Height of the cabinet head, where the standard VR displays and backglass stand
    vector<Primitive *> m_implicitVRCabinetParts; // Standard cabinet (body, legs, backbox) for tables which do not have their own (see constructor)
    float m_implicitVRBackglassBaseHeight = 0.f; // Height of the implicit VR backglass center without a display under it
    float m_implicitVRDMDPanelHeight = 0.f; // Height of the standard display panel under the implicit VR backglass

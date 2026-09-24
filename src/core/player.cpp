@@ -485,6 +485,7 @@ Player::Player(PinTable *const table, const PlayMode playMode)
          }
          if (displayBase > m_ptable->m_glassTopHeight)
             PLOGI << "VR standard displays raised above the playfield back panel: " << displayBase << " (glass height " << m_ptable->m_glassTopHeight << ')';
+         m_vrDisplayBase = displayBase; // Kept for the backglass artwork identification, performed once the table script has set up its parts
       }
       m_implicitVRDMD = (Flasher *)EditableRegistry::CreateAndInit(ItemTypeEnum::eItemFlasher, m_ptable, 0.5f * (m_ptable->m_right - m_ptable->m_left), 0.f);
       if (m_implicitVRDMD)
@@ -969,6 +970,11 @@ Player::Player(PinTable *const table, const PlayMode playMode)
              editable->GetEventProxyBase()->FireVoidEvent(DISPID_AnimateEvents_Animate);
       }
       m_ptable->FireOptionEvent(PinTable::OptionEventType::Initialized);
+
+      // Tables move and show/hide their parts when initializing (a VR table usually builds its backglass there), so this is the point where
+      // the backglass artwork can be identified for mixed reality
+      if (IsVR())
+         IdentifyVRBackglassArtwork();
 
 #ifndef __STANDALONE__
       if (m_detectScriptHang && g_pvp)
@@ -2749,6 +2755,76 @@ static Player::DesktopBackdropLayout AnalyzeDesktopBackdrop(const Texture *const
    PLOGI << "VR backglass from desktop backdrop: " << w << 'x' << h << ", empty band " << layout.gapStart << ".." << layout.gapEnd << ", content rows " << layout.top << ".."
          << layout.bottom << ", overlap " << layout.overlapShift << ", duplicate " << layout.duplicateWidth;
    return layout;
+}
+
+// In mixed reality, the real room is composited wherever the scene did not write depth. Flashers are blended light effects which never
+// write depth, so a backglass drawn with flashers (most VR tables) lets the room show through the dark parts of its artwork. Identify
+// the artwork, which is the largest flasher standing in the backbox, to stamp it in the depth buffer while rendering (see Flasher).
+void Player::IdentifyVRBackglassArtwork()
+{
+   const float tableWidth = m_ptable->m_right - m_ptable->m_left;
+   const float backboxArea = m_ptable->m_top + 0.1f * (m_ptable->m_bottom - m_ptable->m_top); // Behind the playfield head
+   const float maxHeight = m_ptable->m_glassTopHeight + 1.6f * tableWidth; // Above this, a flasher is a room effect, not part of the machine
+   struct BackboxFlasher { Flasher *flasher; float area; float bottom; };
+   vector<BackboxFlasher> backboxFlashers;
+   for (IEditable *const part : m_ptable->GetParts())
+   {
+      if (part->m_desktopBackdrop || part->GetItemType() != ItemTypeEnum::eItemFlasher)
+         continue;
+      Flasher *const flasher = static_cast<Flasher *>(part);
+      if (flasher->m_d.m_renderMode != FlasherData::FLASHER) // Displays are opaque panels which already write depth in mixed reality
+         continue;
+      // Flashers do not report bounding vertices: evaluate the corners of their quad like the renderer does
+      const Vertex2D &center = flasher->m_curve.GetCenter();
+      const Matrix3D transform = Matrix3D::MatrixTranslate(-center.x, -center.y, 0.f)
+         * (((Matrix3D::MatrixRotateZ(ANGTORAD(flasher->m_d.m_rotZ)) * Matrix3D::MatrixRotateY(ANGTORAD(flasher->m_d.m_rotY)))
+            * Matrix3D::MatrixRotateX(ANGTORAD(flasher->m_d.m_rotX))) * Matrix3D::MatrixTranslate(center.x, center.y, flasher->m_d.m_height));
+      const Vertex2D &lo = flasher->m_curve.GetMinBound(), &hi = flasher->m_curve.GetMaxBound();
+      Vertex3Ds corners[4] = { { lo.x, lo.y, 0.f }, { lo.x, hi.y, 0.f }, { hi.x, hi.y, 0.f }, { hi.x, lo.y, 0.f } };
+      float minX = FLT_MAX, maxX = -FLT_MAX, maxY = -FLT_MAX, minZ = FLT_MAX, maxZ = -FLT_MAX;
+      for (Vertex3Ds &corner : corners)
+      {
+         transform.MultiplyVector(corner);
+         minX = min(minX, corner.x); maxX = max(maxX, corner.x);
+         maxY = max(maxY, corner.y);
+         minZ = min(minZ, corner.z); maxZ = max(maxZ, corner.z);
+      }
+      // Only keep the flashers standing in the backbox: above the cabinet head, behind the playfield, not reaching out of the machine, and
+      // no larger than a backglass (a real one is about 1.3 times the width of the cabinet), so that a room wide effect is never taken for one
+      if (minZ < m_vrDisplayBase || maxZ > maxHeight || maxY > backboxArea //
+         || minX < m_ptable->m_left - 0.6f * tableWidth || maxX > m_ptable->m_right + 0.6f * tableWidth //
+         || (maxX - minX) > 1.8f * tableWidth || (maxZ - minZ) > 1.5f * tableWidth)
+         continue;
+      backboxFlashers.push_back({ flasher, (maxX - minX) * (maxZ - minZ), minZ });
+   }
+   // The artwork is the largest of them, the others being the lamps lighting it. A table usually has a few variants of it (lit, dark,
+   // flashing,...) switched by its script, so take all the ones of that size, and only for a backglass sized artwork
+   const auto largest = std::ranges::max_element(backboxFlashers, {}, [](const BackboxFlasher &entry) { return entry.area; });
+   if (largest == backboxFlashers.end() || largest->area < 0.15f * tableWidth * tableWidth)
+      return;
+   int nArtwork = 0;
+   float artworkBottom = FLT_MAX;
+   for (const auto &[flasher, area, bottom] : backboxFlashers)
+      if (area > 0.9f * largest->area)
+      {
+         flasher->m_vrBackglassArtwork = true;
+         artworkBottom = min(artworkBottom, bottom);
+         nArtwork++;
+      }
+   PLOGI << "Mixed reality: " << backboxFlashers.size() << " backbox flashers, " << nArtwork << " identified as backglass artwork (display base " << m_vrDisplayBase
+         << ", artwork bottom " << artworkBottom << ')';
+
+   // The standard display stands on the cabinet head, directly under the standard backglass. When the table draws its own backglass higher up
+   // (its speaker panel is taller than the standard one), center the display in the panel instead of leaving it at its bottom.
+   const float panelCenter = 0.5f * (m_vrDisplayBase + artworkBottom);
+   if (m_implicitVRDMD && panelCenter > m_implicitVRDMD->m_d.m_height)
+   {
+      const float height = panelCenter;
+      PLOGI << "VR standard display centered in the speaker panel of the table: " << m_implicitVRDMD->m_d.m_height << " -> " << height;
+      m_implicitVRDMD->m_d.m_height = height;
+      if (m_implicitVRScoreView)
+         m_implicitVRScoreView->m_d.m_height = height;
+   }
 }
 
 // Mixed reality only shows the machine: a part belongs to the VR room when it is placed in the room space reference, or when it lies entirely

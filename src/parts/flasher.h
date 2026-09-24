@@ -176,6 +176,7 @@ public:
 
    bool m_lockedByLS = false;
    bool m_inPlayState = false;
+   bool m_vrBackglassArtwork = false; // Backglass artwork of a VR table: stamped in the depth buffer in mixed reality (see Player VR setup)
 
    std::shared_ptr<BaseTexture> m_dmdFrame = nullptr; // DMD defined through script API
    std::atomic_uint m_dmdFrameId = 0;

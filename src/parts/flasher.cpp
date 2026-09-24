@@ -1199,6 +1199,19 @@ void Flasher::Render(const unsigned int renderMask)
          m_renderer->m_renderDevice->DrawMesh(m_renderer->m_renderDevice->m_flasherShader, true, pos, m_d.m_depthBias, m_meshBuffer, RenderDevice::TRIANGLELIST, 0, m_numPolys * 3);
 
          m_renderer->m_renderDevice->m_flasherShader->SetVector(ShaderUniform::lightCenter_doShadow, 0.0f, 0.0f, 0.0f, 0.0f);
+
+         // In mixed reality, the real room is composited wherever the scene did not write depth, so it shows through the dark parts of a
+         // backglass drawn with flashers. Stamp the artwork in the depth buffer, without touching the colors, and after everything else
+         // (lowest sorting depth) so that the lamps rendered behind it are left untouched.
+         if (m_renderer->m_vrApplyColorKey && m_vrBackglassArtwork)
+         {
+            m_renderer->m_renderDevice->SetRenderState(RenderState::COLORWRITEENABLE, RenderState::RGBMASK_NONE);
+            m_renderer->m_renderDevice->SetRenderState(RenderState::ALPHABLENDENABLE, RenderState::RS_FALSE);
+            m_renderer->m_renderDevice->SetRenderState(RenderState::ZWRITEENABLE, RenderState::RS_TRUE);
+            m_renderer->m_renderDevice->m_basicShader->SetTechnique(ShaderTechnique::unshaded_without_texture);
+            m_renderer->m_renderDevice->DrawMesh(m_renderer->m_renderDevice->m_basicShader, true, pos, -100000.f, m_meshBuffer, RenderDevice::TRIANGLELIST, 0, m_numPolys * 3);
+            m_renderer->m_renderDevice->SetRenderState(RenderState::COLORWRITEENABLE, RenderState::RGBMASK_RGBA);
+         }
          break;
       }
 
